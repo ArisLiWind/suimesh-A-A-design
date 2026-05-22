@@ -43,4 +43,5 @@ Every user on A@A owns one or more Agent nodes. These Agents can:
 
 ---
 
-*Own the Context. Verify the Action. — SuiMesh*
+*Own the Context. Verify the Action.
+— Based on SuiMesh *
