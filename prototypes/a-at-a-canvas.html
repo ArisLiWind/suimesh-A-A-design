@@ -709,9 +709,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
       <span class="sib-label" id="sn-monitor">Monitor</span>
       <span class="dot g"></span>
     </div>
-    <div class="sib" onclick="openModal('automations')">
+    <div class="sib" onclick="openModal('floweditor')">
       <span class="sib-icon">⬡</span>
-      <span class="sib-label" id="sn-flow">Automations</span>
+      <span class="sib-label" id="sn-flow">Flow Editor</span>
     </div>
     <div class="sib" onclick="openModal('auditlog')">
       <span class="sib-icon">≡</span>
@@ -1335,162 +1335,61 @@ function clearSel(){
 function showNodePanel(id){
   const n=nodes[id];if(!n)return;
   const d=n.def;
-  document.getElementById('panel').classList.remove('gone');
-  const conns=edges.filter(e=>e.from===id||e.to===id);
-  const ZH=LANG==='zh';
+  const panel=document.getElementById('panel');
+  panel.classList.remove('gone');
 
-  // ── header ──────────────────────────────────────────────────────
+  const conns=edges.filter(e=>e.from===id||e.to===id);
+  const mdata={
+    mine:  [{l:'30D ROI',v:'+12.4%',c:'pos'},{l:'Sharpe',v:'1.82',c:''},{l:'Max DD',v:'−4.1%',c:'neg'},{l:'Win Rate',v:'67%',c:'pos'}],
+    market:[{l:'Tick Rate',v:'1,240/s',c:'info'},{l:'Latency',v:'4ms',c:'pos'},{l:'Source',v:'Binance',c:''},{l:'Pair',v:'SUI/USDC',c:''}],
+    news:  [{l:'Sentiment',v:'Bullish',c:'pos'},{l:'Score',v:'78%',c:'pos'},{l:'Articles',v:'24',c:''},{l:'Updated',v:'2m ago',c:''}],
+    ai:    [{l:'Confidence',v:'87%',c:'pos'},{l:'Signal',v:'LONG',c:'pos'},{l:'Model',v:'GPT-4o',c:''},{l:'Tokens',v:'2.4k',c:''}],
+    copy:  [{l:'30D ROI',v:'+28.7%',c:'pos'},{l:'Sharpe',v:'2.14',c:''},{l:'Max DD',v:'−3.2%',c:'neg'},{l:'Followers',v:'1,240',c:''}],
+    risk:  [{l:'DD Limit',v:'8%',c:'warn'},{l:'Daily Loss',v:'3%',c:'warn'},{l:'Vol Gate',v:'40',c:''},{l:'Status',v:'Watching',c:'warn'}],
+  };
+  const tags={mine:['SUI/USDC','4H TF','Trend Follow','Auto'],market:['CEX','Real-time','WebSocket'],news:['RSS','Twitter','NLP','GPT'],ai:['GPT-4o','Multi-modal','Auto-retry'],copy:['Top 1%','Verified','148d live'],risk:['On-chain','Auto-pause','Configurable']};
+
   document.getElementById('ph').innerHTML=`
     <div class="ph-icon">${d.icon}</div>
     <div style="flex:1;min-width:0">
-      <div class="ph-title">${t('nd_'+id)||d.label}</div>
-      <div class="ph-sub">${t('nd_'+id+'_type')||d.type}</div>
+      <div class="ph-title">${d.label}</div>
+      <div class="ph-sub">#${id.toUpperCase().padStart(4,'0')} · ${d.type}</div>
     </div>
     <div class="ph-close" onclick="clearSel()">✕</div>`;
 
-  let body='';
-
-  // ─────────────────────────────────────
-  // MY TRADING AGENT — Apple Stocks style
-  // ─────────────────────────────────────
-  if(id==='mine'){
-    body=`
-    <!-- Big price number like Apple Stocks -->
-    <div class="ps" style="padding:16px 16px 12px;border-bottom:1px solid var(--b1)">
-      <div style="font-size:11px;color:var(--t3);margin-bottom:4px">SUI / USDC</div>
-      <div style="display:flex;align-items:flex-end;gap:10px">
-        <div style="font-size:34px;font-weight:700;color:var(--t1);letter-spacing:-1.5px;line-height:1">0.8421</div>
-        <div style="font-size:13px;color:var(--acc-g);font-weight:600;margin-bottom:4px">+0.0174 (+2.1%)</div>
-      </div>
-      <div style="font-size:10px;color:var(--t3);margin-top:4px">${ZH?'今日':'Today'} · ${ZH?'最高':'H'}: 0.8512 · ${ZH?'最低':'L'}: 0.8280</div>
-    </div>
-
-    <!-- Clean sparkline chart -->
-    <div style="padding:0;background:var(--s2);border-bottom:1px solid var(--b1)">
-      <svg width="100%" height="80" viewBox="0 0 300 80" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="var(--acc-g)" stop-opacity=".18"/>
-            <stop offset="100%" stop-color="var(--acc-g)" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-        <!-- price area -->
-        <polygon points="0,65 25,58 50,61 75,50 100,44 125,46 150,35 175,32 200,24 225,20 250,15 275,10 300,6 300,80 0,80" fill="url(#ag)"/>
-        <polyline points="0,65 25,58 50,61 75,50 100,44 125,46 150,35 175,32 200,24 225,20 250,15 275,10 300,6" fill="none" stroke="var(--acc-g)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <!-- buy marker -->
-        <line x1="150" y1="35" x2="150" y2="75" stroke="var(--acc-g)" stroke-width="1" stroke-dasharray="2 2" opacity=".5"/>
-        <circle cx="150" cy="35" r="3" fill="var(--acc-g)"/>
-        <!-- sell marker -->
-        <line x1="250" y1="15" x2="250" y2="75" stroke="var(--r)" stroke-width="1" stroke-dasharray="2 2" opacity=".5"/>
-        <circle cx="250" cy="15" r="3" fill="var(--r)"/>
-        <!-- time labels -->
-        <text x="4" y="78" font-size="8" fill="var(--t3)" font-family="Inter,sans-serif">9:00</text>
-        <text x="145" y="78" font-size="8" fill="var(--t3)" font-family="Inter,sans-serif">12:00</text>
-        <text x="270" y="78" font-size="8" fill="var(--t3)" font-family="Inter,sans-serif">Now</text>
-      </svg>
-    </div>
-
-    <!-- Connect Exchange banner (if not connected) -->
-    <div style="margin:12px 14px;padding:10px 12px;background:rgba(51,85,204,.08);border:1px solid rgba(51,85,204,.2);border-radius:9px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="openModal('connect_exchange')">
-      <span style="font-size:18px">🔗</span>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:600;color:var(--t1)">${ZH?'连接交易所':'Connect Exchange'}</div>
-        <div style="font-size:10px;color:var(--t3);margin-top:1px">${ZH?'接入 Binance / OKX 实时持仓':'Link Binance / OKX for live positions'}</div>
-      </div>
-      <span style="color:var(--t3);font-size:14px">›</span>
-    </div>
-
-    <!-- Open positions — minimal -->
+  let body=``;
+  if(id==='mine'||id==='copy'){body+=`
     <div class="ps">
-      <div class="pst">${ZH?'持仓':'Positions'}</div>
-      ${[['SUI/USDC',true,'+$42','+8.4%'],['BTC/USDC',true,'+$180','+15.0%'],['ETH/USDC',false,'−$18','−6.0%']].map(([pair,long,pnl,pct])=>`
-      <div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--b1)">
-        <span style="font-size:12px;font-weight:600;flex:1">${pair}</span>
-        <span style="font-size:10px;color:${long?'var(--acc-g)':'var(--r)'};font-weight:700;margin-right:10px">${long?(ZH?'多':'L'):(ZH?'空':'S')}</span>
-        <span style="font-size:12px;font-weight:700;color:${pnl.startsWith('+')?'var(--acc-g)':'var(--r)'}">${pnl}</span>
-        <span style="font-size:10px;color:var(--t3);margin-left:6px">${pct}</span>
-      </div>`).join('')}
-    </div>
-
-    <!-- What is this agent doing right now -->
-    <div class="ps">
-      <div class="pst">${ZH?'Agent 当前动作':'Agent Activity'}</div>
-      <div style="display:flex;flex-direction:column;gap:5px">
-        ${[
-          {dot:'var(--acc-g)',txt:ZH?'AI Analyzer → 做多信号 (置信度 87%)':'AI Analyzer → LONG signal (conf 87%)',t:'09:14'},
-          {dot:'var(--acc-c)',txt:ZH?'Market Data → 价格突破 EMA20':'Market Data → Price cross EMA20',t:'09:13'},
-          {dot:'var(--y)',txt:ZH?'Risk Guard → 风控检查通过':'Risk Guard → Risk check passed',t:'09:14'},
-        ].map(a=>`
-        <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px">
-          <div style="width:6px;height:6px;border-radius:50%;background:${a.dot};flex-shrink:0;margin-top:3px"></div>
-          <span style="flex:1;color:var(--t2);line-height:1.4">${a.txt}</span>
-          <span style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace">${a.t}</span>
-        </div>`).join('')}
+      <div class="pst">Performance</div>
+      <div class="pchart">
+        <div class="pchart-val pos">${id==='copy'?'+28.7%':'+12.4%'}</div>
+        <div class="pchart-delta pos">▲ 30D</div>
+        <svg width="100%" height="100%" viewBox="0 0 316 54" preserveAspectRatio="none" style="opacity:.55">
+          <defs><linearGradient id="pcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${id==='copy'?'#22c55e':'#fff'}" stop-opacity=".3"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs>
+          <polygon points="0,48 35,42 70,44 105,36 140,26 175,28 210,18 245,14 280,8 316,2 316,54 0,54" fill="url(#pcg)"/>
+          <polyline points="0,48 35,42 70,44 105,36 140,26 175,28 210,18 245,14 280,8 316,2" fill="none" stroke="${id==='copy'?'#22c55e':'#fff'}" stroke-width="1.5"/>
+        </svg>
       </div>
-    </div>`;
-
-  // ─────────────────────────────────────
-  // OTHER NODES — just status + what it's feeding
-  // ─────────────────────────────────────
-  } else {
-
-    const statusText={
-      market: ZH?'正在推送 SUI/USDC 实时数据 → 我的交易 Agent':'Streaming SUI/USDC tick data → My Trading Agent',
-      news:   ZH?'监控 24 个资讯源，当前情绪：看涨 78%':'Monitoring 24 feeds · Sentiment: Bullish 78%',
-      ai:     ZH?'分析市场数据 + 新闻，输出做多信号 (87% 置信度)':'Analyzing data + news · Output: LONG signal 87%',
-      copy:   ZH?'@AlphaMesh Pro 正在执行策略，你已跟单':'@AlphaMesh Pro running · You are following',
-      risk:   ZH?'监控回撤 3.2%/8% · 日损 1.8%/3% · 状态正常':'Watching DD 3.2%/8% · Daily 1.8%/3% · OK',
-    };
-
-    const liveVal={
-      market: {label: ZH?'当前价格':'Current Price', val:'0.8421', sub:'SUI/USDC'},
-      news:   {label: ZH?'情绪分数':'Sentiment',    val:'78%',    sub:ZH?'看涨':'Bullish'},
-      ai:     {label: ZH?'置信度':'Confidence',     val:'87%',    sub:ZH?'做多信号':'LONG Signal'},
-      copy:   {label: ZH?'30日收益':'30D ROI',       val:'+28.7%', sub:'@AlphaMesh Pro'},
-      risk:   {label: ZH?'当前回撤':'Drawdown',      val:'3.2%',   sub:'/ 8% limit'},
-    };
-    const lv=liveVal[id]||{label:'Status',val:'—',sub:''};
-
-    body=`
-    <!-- Big live number -->
-    <div style="padding:18px 16px 14px;border-bottom:1px solid var(--b1)">
-      <div style="font-size:11px;color:var(--t3);margin-bottom:5px">${lv.label}</div>
-      <div style="font-size:32px;font-weight:700;color:var(--t1);letter-spacing:-1px;line-height:1">${lv.val}</div>
-      <div style="font-size:11px;color:var(--t2);margin-top:5px">${lv.sub}</div>
-    </div>
-
-    <!-- What this node is doing -->
-    <div class="ps">
-      <div class="pst">${ZH?'当前状态':'What it\'s doing'}</div>
-      <p style="font-size:12px;color:var(--t2);line-height:1.6">${statusText[id]||''}</p>
-    </div>
-
-    <!-- Connected to -->
-    <div class="ps">
-      <div class="pst">${ZH?'连接关系':'Connections'} (${conns.length})</div>
-      <div class="cl">
-        ${conns.map(e=>{
-          const oid=e.from===id?e.to:e.from;
-          const od=NDEFS[oid]||{};
-          const dir=e.from===id?(ZH?'输出 →':'Out →'):(ZH?'← 输入':'← In');
-          const typeZh={data:ZH?'数据':'data',signal:ZH?'信号':'signal',copy:ZH?'跟单':'copy',guard:ZH?'风控':'guard'};
-          return`<div class="citem" onclick="pickEdge(${edges.indexOf(e)},edges[${edges.indexOf(e)}],{x:0,y:0})">
-            <span class="citem-icon">${od.icon||'⬡'}</span>
-            <span class="citem-name" style="color:var(--t1)">${dir} ${t('nd_'+oid)||od.label||oid}</span>
-            <span class="citem-badge cb-${e.type}">${typeZh[e.type]||e.type}</span>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-  }
+    </div>`;}
+  body+=`<div class="ps"><div class="pst">Metrics</div><div class="mgrid">${(mdata[id]||[]).map(m=>`<div class="mc"><div class="mc-l">${m.l}</div><div class="mc-v ${m.c}">${m.v}</div></div>`).join('')}</div></div>`;
+  body+=`<div class="ps"><div class="pst">Connections (${conns.length})</div><div class="cl">${conns.map(e=>{
+    const oid=e.from===id?e.to:e.from;
+    const od=NDEFS[oid]||{};
+    const dir=e.from===id?'→':'←';
+    return`<div class="citem" onclick="pickEdge(${edges.indexOf(e)},edges[${edges.indexOf(e)}],{x:0,y:0})">
+      <span class="citem-icon">${od.icon||'⬡'}</span>
+      <span class="citem-name">${dir} ${od.label||oid}</span>
+      <span class="citem-badge cb-${e.type}">${e.type}</span>
+      <div class="citem-sdot" style="background:var(--acc-g)"></div>
+    </div>`}).join('')}</div></div>`;
+  body+=`<div class="ps"><div class="pst">Tags</div><div class="tags">${(tags[id]||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div></div>`;
 
   document.getElementById('pb').innerHTML=body;
   document.getElementById('pa').innerHTML=`
-    <button class="pab pab-ghost" onclick="clearSel()">${t('insp_close')}</button>
-    <button class="pab pab-white" onclick="openModal('config_${id}')">${t('insp_configure')}</button>
-    ${id==='mine'?`<button class="pab pab-red" onclick="openModal('pause')">${t('insp_pause')}</button>`:''}`;
+    <button class="pab pab-ghost" onclick="clearSel()">Close</button>
+    <button class="pab pab-white" onclick="openModal('config_${id}')">Configure</button>
+    ${id==='mine'?'<button class="pab pab-red" onclick="openModal(\'pause\')">Pause</button>':''}`;
 }
-
 
 /* ═══════════════════════════════════════
    EDGE PANEL
@@ -2105,106 +2004,6 @@ function buildModal(type){
         ${['AI signals','News filter','Auto risk guard','Public profile'].map(l=>`<div class="toggle-row"><span class="tgl-label">${l}</span><div class="tgl on"></div></div>`).join('')}
       </div>
       <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-white" onclick="closeModal()">Save</button></div>
-    </div>`;
-  }
-
-  if(type==='automations'){
-    const ZH=LANG==='zh';
-    const teams=[
-      {icon:'⚡',name:ZH?'短线策略组':'Short-term Team',lead:ZH?'速度Agent (队长)':'Speed Agent (Lead)',members:[ZH?'市场数据 Agent':'Market Data Agent',ZH?'AI 信号 Agent':'AI Signal Agent'],status:'active',roi:'+18.4%',desc:ZH?'专注 1H/4H 趋势突破，日均 3–8 笔':'Focus on 1H/4H breakouts, 3–8 trades/day'},
-      {icon:'🏛',name:ZH?'RWA 长期组':'RWA Long-term Team',lead:ZH?'稳健Agent (队长)':'Steady Agent (Lead)',members:[ZH?'链上数据 Agent':'On-chain Agent',ZH?'新闻哨兵 Agent':'News Agent'],status:'active',roi:'+9.2%',desc:ZH?'布局 RWA 代币，持仓周期 1–4 周':'RWA token positions, hold 1–4 weeks'},
-      {icon:'📊',name:ZH?'低频投资组':'Low-freq Invest Team',lead:ZH?'价值Agent (队长)':'Value Agent (Lead)',members:[ZH?'基本面 Agent':'Fundamental Agent'],status:'idle',roi:'+5.1%',desc:ZH?'低频长线，月均 2–4 笔，专注 SUI/BTC':'Low-freq, 2–4 trades/mo, SUI/BTC focus'},
-    ];
-    return`<div class="modal" style="width:520px">
-      <div class="modal-h">
-        <div class="modal-title">${ZH?'自动化策略团队':'Automations'}</div>
-        <div style="font-size:11px;color:var(--t3);margin-top:3px;flex:1;margin-left:10px">${ZH?'每个团队由一个队长 Agent 管理多个成员 Agent':'Each team is led by one Agent managing specialist sub-Agents'}</div>
-        <div class="modal-close" onclick="closeModal()">✕</div>
-      </div>
-      <div class="modal-body" style="padding:14px 18px;display:flex;flex-direction:column;gap:10px">
-        ${teams.map(team=>`
-        <div style="background:var(--s2);border:1px solid var(--b2);border-radius:11px;padding:14px 16px;cursor:pointer;transition:all .15s"
-          onmouseenter="this.style.borderColor='var(--b3)'" onmouseleave="this.style.borderColor='var(--b2)'">
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:22px;margin-top:1px">${team.icon}</span>
-            <div style="flex:1">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
-                <span style="font-size:13px;font-weight:700;color:var(--t1)">${team.name}</span>
-                <span style="font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;background:${team.status==='active'?'rgba(34,187,136,.1)':'rgba(255,255,255,.05)'};color:${team.status==='active'?'var(--acc-g)':'var(--t3)'}">${team.status==='active'?(ZH?'运行中':'Active'):(ZH?'待机':'Idle')}</span>
-                <span style="margin-left:auto;font-size:13px;font-weight:700;color:var(--acc-g)">${team.roi}</span>
-              </div>
-              <div style="font-size:11px;color:var(--t3);margin-bottom:8px;line-height:1.4">${team.desc}</div>
-              <!-- Agent tree -->
-              <div style="display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap">
-                <span style="font-size:10px;padding:3px 8px;border-radius:5px;background:var(--s5);color:var(--t1);font-weight:600;border:1px solid var(--b3)">👑 ${team.lead}</span>
-                ${team.members.map(m=>`<span style="font-size:10px;padding:3px 8px;border-radius:5px;background:var(--s3);color:var(--t2);border:1px solid var(--b1)">${m}</span>`).join('')}
-              </div>
-            </div>
-          </div>
-        </div>`).join('')}
-        <!-- Add team -->
-        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px dashed var(--b2);border-radius:11px;cursor:pointer;color:var(--t3);transition:all .15s"
-          onmouseenter="this.style.borderColor='var(--b3)';this.style.color='var(--t2)'" onmouseleave="this.style.borderColor='var(--b2)';this.style.color='var(--t3)'">
-          <span style="font-size:18px">+</span>
-          <span style="font-size:12px;font-weight:500">${ZH?'新建策略团队':'New Automation Team'}</span>
-        </div>
-      </div>
-      <div class="modal-foot">
-        <button class="btn btn-ghost" onclick="closeModal()">${ZH?'关闭':'Close'}</button>
-        <button class="btn btn-white" onclick="openModal('floweditor')">${ZH?'编辑流程 →':'Edit Flow →'}</button>
-      </div>
-    </div>`;
-  }
-  // ── Connect Exchange modal ──────────────────────────────────────
-  if(type==='connect_exchange'){
-    const ZH=LANG==='zh';
-    return`<div class="modal" style="width:440px">
-      <div class="modal-h">
-        <div class="modal-title">${ZH?'连接交易所':'Connect Exchange'}</div>
-        <div class="modal-close" onclick="closeModal()">✕</div>
-      </div>
-      <div class="modal-body">
-        <p style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:16px">
-          ${ZH?'授权 A@A 读取你的持仓和订单历史。仅读取权限，无法执行任何操作。':'Authorize A@A to read your positions and order history. Read-only access — no execution rights.'}
-        </p>
-        <!-- Exchange list -->
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
-          ${[
-            {name:'Binance',icon:'🟡',status:'popular',desc:ZH?'全球最大现货/合约交易所':'Largest global spot & futures'},
-            {name:'OKX',   icon:'⚫',status:'',        desc:ZH?'支持 Sui 生态交易对':'Sui ecosystem pairs supported'},
-            {name:'Bybit', icon:'🔵',status:'',        desc:ZH?'高流动性合约平台':'High-liquidity derivatives'},
-            {name:'自定义 DEX',icon:'⬡',status:'soon', desc:ZH?'Cetus / Turbos (即将支持)':'Cetus / Turbos (coming soon)'},
-          ].map(ex=>`
-          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--s3);border:1px solid var(--b2);border-radius:9px;cursor:${ex.status==='soon'?'default':'pointer'};opacity:${ex.status==='soon'?'.45':'1'};transition:all .15s"
-            ${ex.status!=='soon'?`onmouseenter="this.style.borderColor='var(--b3)'" onmouseleave="this.style.borderColor='var(--b2)'" onclick="${ex.status!=='soon'?'openModal('api_key_'+ex.name+'')':""}"`:''}
-          >
-            <span style="font-size:20px">${ex.icon}</span>
-            <div style="flex:1">
-              <div style="font-size:13px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:7px">
-                ${ex.name}
-                ${ex.status==='popular'?`<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(34,187,136,.1);color:var(--acc-g)">${ZH?'推荐':'Popular'}</span>`:''}
-                ${ex.status==='soon'?`<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(255,255,255,.06);color:var(--t3)">${ZH?'即将':'Soon'}</span>`:''}
-              </div>
-              <div style="font-size:10px;color:var(--t3);margin-top:2px">${ex.desc}</div>
-            </div>
-            ${ex.status!=='soon'?`<span style="color:var(--t3);font-size:16px">›</span>`:''}
-          </div>`).join('')}
-        </div>
-        <!-- How it works -->
-        <div style="padding:12px;background:var(--s2);border-radius:8px;border:1px solid var(--b1)">
-          <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">${ZH?'工作原理':'How it works'}</div>
-          ${[
-            ZH?'1. 在交易所创建只读 API Key':'1. Create a read-only API Key on the exchange',
-            ZH?'2. 粘贴到 A@A — 永不发送到任何服务器':'2. Paste into A@A — never sent to any server',
-            ZH?'3. A@A 本地读取持仓、价格、订单历史':'3. A@A reads positions, prices, order history locally',
-            ZH?'4. 所有交易决策仍由你的 Agent 执行':'4. All trade decisions still executed by your Agent',
-          ].map(s=>`<div style="font-size:11px;color:var(--t2);margin-bottom:4px;line-height:1.5">${s}</div>`).join('')}
-        </div>
-      </div>
-      <div class="modal-foot">
-        <button class="btn btn-ghost" onclick="closeModal()">${ZH?'取消':'Cancel'}</button>
-        <button class="btn btn-white" onclick="closeModal()">${ZH?'连接 Binance →':'Connect Binance →'}</button>
-      </div>
     </div>`;
   }
 
