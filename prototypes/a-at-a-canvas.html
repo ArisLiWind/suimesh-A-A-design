@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A@A — Agent Network Canvas</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  --bg0: #060B17;
+  --bg1: #0C1220;
+  --bg2: #101828;
+  --bg3: #151E30;
+  --bg4: #1C2640;
+  --bg5: #243050;
+
+  --blue:   #3B82F6;
+  --blue2:  #60A5FA;
+  --cyan:   #06B6D4;
+  --cyan2:  #22D3EE;
+  --purple: #8B5CF6;
+  --green:  #22C55E;
+  --yellow: #F59E0B;
+  --red:    #EF4444;
+
+  --txt1: #F0F4FF;
+  --txt2: #8B9EC0;
+  --txt3: #4B5E80;
+
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --border3: rgba(59,130,246,0.35);
+
+  --sidebar-w: 64px;
+  --panel-w: 300px;
+  --topbar-h: 52px;
+
+  --ease: cubic-bezier(0.16,1,0.3,1);
+  --ease-back: cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; background:var(--bg0); color:var(--txt1); font-family:'Inter',sans-serif; font-size:13px; }
+
+/* ============================================================
+   LAYOUT SHELL
+   ============================================================ */
+.app { display:flex; height:100%; }
+
+/* ---- Icon Sidebar ---- */
+.icon-sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: var(--bg1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+  gap: 4px;
+  z-index: 200;
+}
+.brand {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color:#fff; letter-spacing:-0.5px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease-back);
+}
+.brand:hover { transform: scale(1.08); }
+.icon-divider { width: 32px; height: 1px; background: var(--border2); margin: 6px 0; }
+.icon-btn {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--txt3); font-size: 16px;
+  transition: all 0.15s; position: relative;
+}
+.icon-btn:hover { background: var(--bg3); color: var(--txt2); }
+.icon-btn.active { background: rgba(59,130,246,0.15); color: var(--blue); }
+.icon-btn .badge {
+  position: absolute; top: 4px; right: 4px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--blue); border: 2px solid var(--bg1);
+}
+.icon-btn .badge.yellow { background: var(--yellow); }
+.sidebar-footer { margin-top: auto; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.avatar-sm {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple), var(--blue));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; cursor: pointer;
+}
+.status-ring {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.status-ring::after {
+  content:''; position:absolute; bottom:1px; right:1px;
+  width:8px; height:8px; border-radius:50%;
+  background:var(--green); border:2px solid var(--bg1);
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0%,100%{ box-shadow:0 0 0 0 rgba(34,197,94,0.4); }
+  50%{ box-shadow:0 0 0 4px rgba(34,197,94,0); }
+}
+
+/* ---- Main ---- */
+.main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+
+/* ---- Topbar ---- */
+.topbar {
+  height: var(--topbar-h); min-height: var(--topbar-h);
+  background: var(--bg1); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 16px; gap: 12px;
+  z-index: 100;
+}
+.topbar-breadcrumb {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--txt3);
+}
+.topbar-breadcrumb span { color: var(--txt2); }
+.topbar-breadcrumb b { color: var(--txt1); font-weight: 500; }
+.tb-sep { opacity: 0.3; }
+.topbar-center { flex:1; display:flex; justify-content:center; }
+.mode-tabs {
+  display: flex; background: var(--bg2); border-radius: 8px; padding: 3px; gap: 2px;
+  border: 1px solid var(--border);
+}
+.mode-tab {
+  padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  color: var(--txt3); cursor: pointer; transition: all 0.15s;
+  white-space: nowrap;
+}
+.mode-tab.active { background: var(--bg4); color: var(--txt1); }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.tb-btn {
+  padding: 6px 14px; border-radius: 7px; font-size: 12px; font-weight: 500;
+  cursor: pointer; border: none; font-family: inherit; transition: all 0.15s;
+}
+.tb-btn-ghost { background:transparent; color:var(--txt2); border:1px solid var(--border2); }
+.tb-btn-ghost:hover { background:var(--bg3); color:var(--txt1); }
+.tb-btn-primary { background:var(--blue); color:#fff; }
+.tb-btn-primary:hover { background:#2563eb; transform:translateY(-1px); }
+.tb-btn-danger { background: rgba(239,68,68,0.12); color:var(--red); border:1px solid rgba(239,68,68,0.25); }
+.live-badge {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 6px;
+  background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2);
+  font-size: 11px; font-weight: 500; color: var(--green);
+}
+.live-dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:pulse-dot 2s infinite; }
+
+/* ============================================================
+   CANVAS AREA
+   ============================================================ */
+.canvas-wrap { flex:1; display:flex; overflow:hidden; position:relative; }
+
+.canvas {
+  flex:1; position:relative; overflow:hidden;
+  background: var(--bg0);
+  cursor: grab;
+}
+.canvas.panning { cursor: grabbing; }
+
+/* Grid background */
+.canvas::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.canvas::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 240px 240px;
+}
+
+/* SVG connection layer */
+#svg-layer {
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  pointer-events:none;
+  overflow:visible;
+}
+
+/* ============================================================
+   NODE CARDS
+   ============================================================ */
+.node {
+  position: absolute;
+  width: 180px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: box-shadow 0.25s var(--ease), border-color 0.25s, transform 0.15s;
+  will-change: transform;
+}
+.node:hover {
+  border-color: var(--border3);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.08), 0 8px 32px rgba(0,0,0,0.4);
+}
+.node.selected {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15), 0 12px 40px rgba(0,0,0,0.5);
+}
+.node.dragging {
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  transform: scale(1.03);
+  z-index: 1000;
+}
+
+/* node glow per type */
+.node.type-mine    { border-color: rgba(59,130,246,0.3); }
+.node.type-mine.selected { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.2), 0 0 40px rgba(59,130,246,0.1); }
+.node.type-market  { border-color: rgba(6,182,212,0.25); }
+.node.type-news    { border-color: rgba(245,158,11,0.25); }
+.node.type-ai      { border-color: rgba(139,92,246,0.25); }
+.node.type-copy    { border-color: rgba(34,197,94,0.25); }
+.node.type-risk    { border-color: rgba(245,158,11,0.25); }
+
+/* node inner */
+.node-top { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
+.node-icon {
+  width:34px; height:34px; border-radius:9px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:15px;
+}
+.node-icon.blue   { background:rgba(59,130,246,0.15); }
+.node-icon.cyan   { background:rgba(6,182,212,0.15); }
+.node-icon.yellow { background:rgba(245,158,11,0.15); }
+.node-icon.purple { background:rgba(139,92,246,0.15); }
+.node-icon.green  { background:rgba(34,197,94,0.15); }
+.node-meta { flex:1; min-width:0; }
+.node-name { font-size:12px; font-weight:600; color:var(--txt1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.node-type { font-size:10px; color:var(--txt3); margin-top:1px; }
+.node-status-row { display:flex; align-items:center; gap:5px; margin-bottom:6px; }
+.status-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.status-dot.green  { background:var(--green); box-shadow:0 0 6px rgba(34,197,94,0.5); }
+.status-dot.blue   { background:var(--blue); }
+.status-dot.yellow { background:var(--yellow); box-shadow:0 0 5px rgba(245,158,11,0.4); }
+.status-dot.gray   { background:var(--txt3); }
+.status-text { font-size:10px; color:var(--txt2); }
+.node-metric { font-size:12px; font-weight:600; }
+.node-metric.pos   { color:var(--green); }
+.node-metric.muted { color:var(--txt2); }
+.node-metric.warn  { color:var(--yellow); }
+
+/* sparkline inside node */
+.node-sparkline { margin-top:8px; height:28px; }
+
+/* port handles */
+.port {
+  position:absolute; width:12px; height:12px; border-radius:50%;
+  background:var(--bg3); border:2px solid var(--txt3);
+  cursor:crosshair; z-index:10;
+  transition:all 0.15s; opacity:0;
+}
+.node:hover .port, .node.selected .port { opacity:1; }
+.port:hover { border-color:var(--blue); background:var(--blue); transform:scale(1.3); }
+.port.out { right:-6px; top:50%; transform:translateY(-50%); }
+.port.in  { left:-6px;  top:50%; transform:translateY(-50%); }
+.port.out:hover { transform:translateY(-50%) scale(1.3); }
+.port.in:hover  { transform:translateY(-50%) scale(1.3); }
+
+/* node badge */
+.node-badge {
+  position:absolute; top:-6px; right:8px;
+  padding:2px 7px; border-radius:10px; font-size:9px; font-weight:600;
+  border:1px solid;
+}
+.node-badge.live { background:rgba(34,197,94,0.15); color:var(--green); border-color:rgba(34,197,94,0.3); }
+.node-badge.copy { background:rgba(6,182,212,0.15); color:var(--cyan); border-color:rgba(6,182,212,0.3); }
+.node-badge.warn { background:rgba(245,158,11,0.15); color:var(--yellow); border-color:rgba(245,158,11,0.3); }
+
+/* ============================================================
+   SVG EDGES
+   ============================================================ */
+.edge { fill:none; stroke-width:1.5; transition:opacity 0.2s; }
+.edge.data   { stroke:rgba(6,182,212,0.4);  stroke-dasharray:6 4; }
+.edge.copy   { stroke:rgba(34,197,94,0.5);  }
+.edge.signal { stroke:rgba(139,92,246,0.4); stroke-dasharray:4 3; }
+.edge.guard  { stroke:rgba(245,158,11,0.4); stroke-dasharray:3 3; }
+.edge.selected { stroke-width:2.5; opacity:1!important; }
+.edge.data.selected   { stroke:rgba(6,182,212,0.9); }
+.edge.copy.selected   { stroke:rgba(34,197,94,0.9); }
+.edge.signal.selected { stroke:rgba(139,92,246,0.9); }
+
+/* animated dash */
+.edge.data   { animation: dash-data 2s linear infinite; }
+.edge.signal { animation: dash-signal 1.6s linear infinite; }
+.edge.guard  { animation: dash-guard 3s linear infinite; }
+
+@keyframes dash-data   { to { stroke-dashoffset:-20; } }
+@keyframes dash-signal { to { stroke-dashoffset:-14; } }
+@keyframes dash-guard  { to { stroke-dashoffset:-12; } }
+
+/* edge flow particle */
+.flow-particle { fill:none; stroke-width:3; stroke-linecap:round; opacity:0; }
+.flow-particle.active { opacity:1; animation:particle-fade 1.5s ease-out forwards; }
+@keyframes particle-fade { 0%{opacity:1} 100%{opacity:0} }
+
+/* ============================================================
+   CANVAS TOOLBAR
+   ============================================================ */
+.canvas-toolbar {
+  position:absolute; left:16px; top:16px; z-index:50;
+  display:flex; flex-direction:column; gap:4px;
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:12px; padding:6px;
+}
+.ct-btn {
+  width:32px; height:32px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--txt2); font-size:14px;
+  transition:all 0.15s; border:none; background:transparent;
+}
+.ct-btn:hover { background:var(--bg4); color:var(--txt1); }
+.ct-btn.active { background:rgba(59,130,246,0.15); color:var(--blue); }
+.ct-divider { height:1px; background:var(--border); margin:2px 0; }
+
+/* ============================================================
+   ZOOM CONTROLS
+   ============================================================ */
+.zoom-controls {
+  position:absolute; left:16px; bottom:80px; z-index:50;
+  display:flex; flex-direction:column; gap:4px;
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:10px; padding:5px;
+}
+.zc-btn {
+  width:28px; height:28px; border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--txt2); font-size:14px; font-weight:300;
+  transition:all 0.15s; background:transparent; border:none;
+}
+.zc-btn:hover { background:var(--bg4); color:var(--txt1); }
+.zoom-label { font-size:9px; color:var(--txt3); text-align:center; padding:2px 0; }
+
+/* ============================================================
+   MINIMAP
+   ============================================================ */
+.minimap {
+  position:absolute; right:16px; bottom:16px; z-index:50;
+  width:160px; height:100px;
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:10px; overflow:hidden;
+}
+.minimap-label { position:absolute; top:5px; left:8px; font-size:9px; color:var(--txt3); letter-spacing:0.5px; z-index:2; }
+#minimap-svg { width:100%; height:100%; }
+.minimap-viewport {
+  fill:none; stroke:rgba(59,130,246,0.5); stroke-width:1;
+}
+
+/* ============================================================
+   RIGHT PANEL — INSPECTOR
+   ============================================================ */
+.inspector {
+  width: var(--panel-w);
+  min-width: var(--panel-w);
+  background: var(--bg1);
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transform: translateX(0);
+  transition: transform 0.3s var(--ease), width 0.3s var(--ease);
+}
+.inspector.hidden {
+  transform: translateX(100%);
+  width: 0; min-width: 0;
+  border-left: none;
+}
+
+/* inspector header */
+.insp-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.insp-node-icon {
+  width:38px; height:38px; border-radius:10px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:17px;
+}
+.insp-title  { font-size:14px; font-weight:600; }
+.insp-sub    { font-size:10px; color:var(--txt3); margin-top:1px; font-family:'JetBrains Mono',monospace; }
+.insp-close  { margin-left:auto; width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--txt3); font-size:14px; transition:all 0.15s; }
+.insp-close:hover { background:var(--bg3); color:var(--txt1); }
+
+/* inspector body */
+.insp-body { flex:1; overflow-y:auto; }
+.insp-section { padding:14px 16px; border-bottom:1px solid var(--border); }
+.insp-section-title { font-size:10px; font-weight:500; color:var(--txt3); text-transform:uppercase; letter-spacing:0.7px; margin-bottom:10px; }
+
+/* perf chart */
+.perf-chart-wrap { height:60px; background:var(--bg2); border-radius:8px; overflow:hidden; position:relative; }
+.perf-val { position:absolute; top:8px; left:10px; font-size:18px; font-weight:600; }
+.perf-val.pos { color:var(--green); }
+.perf-delta { position:absolute; top:10px; right:10px; font-size:11px; }
+.perf-delta.pos { color:var(--green); }
+
+/* metrics grid */
+.metrics-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.metric-card { background:var(--bg2); border-radius:8px; padding:10px; }
+.mc-label { font-size:10px; color:var(--txt3); margin-bottom:3px; }
+.mc-val { font-size:15px; font-weight:600; }
+.mc-val.pos  { color:var(--green); }
+.mc-val.neg  { color:var(--red); }
+.mc-val.warn { color:var(--yellow); }
+
+/* connections list */
+.conn-list { display:flex; flex-direction:column; gap:2px; }
+.conn-item {
+  display:flex; align-items:center; gap:8px; padding:8px;
+  border-radius:8px; cursor:pointer; transition:background 0.12s;
+}
+.conn-item:hover { background:var(--bg3); }
+.conn-icon { font-size:14px; width:20px; text-align:center; }
+.conn-name { flex:1; font-size:12px; font-weight:500; }
+.conn-type-badge { font-size:9px; padding:2px 6px; border-radius:4px; }
+.conn-type-badge.data   { background:rgba(6,182,212,0.15); color:var(--cyan); }
+.conn-type-badge.copy   { background:rgba(34,197,94,0.15); color:var(--green); }
+.conn-type-badge.signal { background:rgba(139,92,246,0.15); color:var(--purple); }
+.conn-type-badge.guard  { background:rgba(245,158,11,0.15); color:var(--yellow); }
+.conn-status-dot { width:6px; height:6px; border-radius:50%; }
+
+/* tags */
+.tag-row { display:flex; flex-wrap:wrap; gap:5px; }
+.tag { padding:3px 8px; border-radius:5px; font-size:10px; background:var(--bg3); color:var(--txt2); border:1px solid var(--border); }
+
+/* action buttons */
+.insp-actions { padding:14px 16px; display:flex; gap:8px; }
+.insp-btn { flex:1; padding:8px 0; border-radius:8px; font-size:12px; font-weight:500; cursor:pointer; border:none; font-family:inherit; transition:all 0.15s; }
+.insp-btn-ghost   { background:transparent; color:var(--txt2); border:1px solid var(--border2); }
+.insp-btn-ghost:hover { background:var(--bg3); color:var(--txt1); }
+.insp-btn-primary { background:var(--blue); color:#fff; }
+.insp-btn-primary:hover { background:#2563eb; }
+.insp-btn-danger  { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
+
+/* ============================================================
+   BOTTOM STATUS BAR
+   ============================================================ */
+.statusbar {
+  position:absolute; bottom:0; left:var(--sidebar-w); right:0;
+  height:28px; z-index:50;
+  background:var(--bg1); border-top:1px solid var(--border);
+  display:flex; align-items:center; padding:0 16px; gap:16px;
+}
+.sb-item { display:flex; align-items:center; gap:5px; font-size:10px; color:var(--txt3); }
+.sb-item span { color:var(--txt2); }
+.sb-divider { height:14px; width:1px; background:var(--border2); }
+
+/* ============================================================
+   NODE ENTRY ANIMATION
+   ============================================================ */
+@keyframes node-enter {
+  from { opacity:0; transform:scale(0.85) translateY(8px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+.node { animation: node-enter 0.4s var(--ease-back) both; }
+
+/* ============================================================
+   CONTEXT MENU
+   ============================================================ */
+.ctx-menu {
+  position:fixed; z-index:9999;
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:10px; padding:5px; min-width:160px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.5);
+  animation:ctx-in 0.12s var(--ease) both;
+}
+@keyframes ctx-in { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+.ctx-item {
+  padding:7px 10px; border-radius:7px;
+  font-size:12px; color:var(--txt2); cursor:pointer;
+  display:flex; align-items:center; gap:8px; transition:all 0.1s;
+}
+.ctx-item:hover { background:var(--bg4); color:var(--txt1); }
+.ctx-item.danger { color:var(--red); }
+.ctx-item.danger:hover { background:rgba(239,68,68,0.1); }
+.ctx-divider { height:1px; background:var(--border); margin:4px 0; }
+
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
+.tooltip {
+  position:fixed; z-index:9998; pointer-events:none;
+  background:var(--bg3); border:1px solid var(--border2);
+  border-radius:7px; padding:6px 10px; font-size:11px; color:var(--txt1);
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);
+  opacity:0; transform:translateY(4px);
+  transition:opacity 0.15s, transform 0.15s;
+}
+.tooltip.show { opacity:1; transform:translateY(0); }
+
+/* ============================================================
+   ADD NODE BUTTON
+   ============================================================ */
+.add-node-btn {
+  position:absolute; bottom:50px; right:16px; z-index:50;
+  width:42px; height:42px; border-radius:12px;
+  background:var(--blue); color:#fff; font-size:20px; font-weight:300;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; border:none;
+  box-shadow:0 4px 20px rgba(59,130,246,0.4);
+  transition:all 0.2s var(--ease-back);
+}
+.add-node-btn:hover { transform:scale(1.1) rotate(90deg); box-shadow:0 6px 28px rgba(59,130,246,0.6); }
+
+/* ============================================================
+   NODE PALETTE (add node panel)
+   ============================================================ */
+.node-palette {
+  position:absolute; bottom:100px; right:16px; z-index:100;
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:12px; padding:8px; width:200px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.5);
+  display:none;
+  animation:ctx-in 0.15s var(--ease) both;
+}
+.node-palette.open { display:block; }
+.palette-title { font-size:10px; color:var(--txt3); padding:4px 8px 8px; text-transform:uppercase; letter-spacing:0.6px; }
+.palette-item {
+  display:flex; align-items:center; gap:8px;
+  padding:8px; border-radius:8px; cursor:pointer;
+  font-size:12px; color:var(--txt2); transition:all 0.12s;
+}
+.palette-item:hover { background:var(--bg4); color:var(--txt1); }
+.palette-item-icon { font-size:14px; width:22px; text-align:center; }
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--bg4); border-radius:2px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ======================================================
+       ICON SIDEBAR
+  ====================================================== -->
+  <nav class="icon-sidebar">
+    <div class="brand" title="A@A">A@A</div>
+
+    <div class="icon-btn active" title="Agent Network" onclick="setMode('network')">⬡</div>
+    <div class="icon-btn" title="Marketplace" onclick="setMode('market')">◈</div>
+    <div class="icon-btn" title="Flow Editor" onclick="setMode('editor')">⬡</div>
+    <div class="icon-divider"></div>
+    <div class="icon-btn" title="Monitor">▤</div>
+    <div class="icon-btn" title="Audit Log"><span class="badge yellow"></span>≡</div>
+    <div class="icon-divider"></div>
+    <div class="icon-btn" title="Settings">⚙</div>
+
+    <div class="sidebar-footer">
+      <div class="status-ring">
+        <div class="avatar-sm">AL</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ======================================================
+       MAIN
+  ====================================================== -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-breadcrumb">
+        <span>Workspace</span>
+        <span class="tb-sep">/</span>
+        <b>My Agent Network</b>
+      </div>
+
+      <div class="topbar-center">
+        <div class="mode-tabs">
+          <div class="mode-tab active">Network View</div>
+          <div class="mode-tab">Topology</div>
+          <div class="mode-tab">Performance</div>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="live-badge"><div class="live-dot"></div>Live</div>
+        <button class="tb-btn tb-btn-ghost" onclick="toggleLayout()">Auto Layout</button>
+        <button class="tb-btn tb-btn-primary" id="deploy-btn" onclick="animateDeploy()">⟳ Deploy</button>
+      </div>
+    </header>
+
+    <!-- CANVAS WRAP -->
+    <div class="canvas-wrap">
+
+      <!-- CANVAS -->
+      <div class="canvas" id="canvas"
+        onmousedown="canvasMouseDown(event)"
+        onmousemove="canvasMouseMove(event)"
+        onmouseup="canvasMouseUp(event)"
+        onwheel="canvasWheel(event)"
+        oncontextmenu="return false">
+
+        <!-- SVG connections -->
+        <svg id="svg-layer"></svg>
+
+        <!-- NODES — rendered by JS -->
+
+      </div>
+
+      <!-- RIGHT INSPECTOR -->
+      <aside class="inspector hidden" id="inspector">
+        <div class="insp-header" id="insp-header"></div>
+        <div class="insp-body" id="insp-body"></div>
+        <div class="insp-actions" id="insp-actions"></div>
+      </aside>
+
+    </div><!-- /canvas-wrap -->
+
+    <!-- STATUS BAR -->
+    <div class="statusbar">
+      <div class="sb-item">Nodes <span id="sb-nodes">4</span></div>
+      <div class="sb-divider"></div>
+      <div class="sb-item">Edges <span id="sb-edges">3</span></div>
+      <div class="sb-divider"></div>
+      <div class="sb-item">Active <span id="sb-active" style="color:var(--green)">3</span></div>
+      <div class="sb-divider"></div>
+      <div class="sb-item">Zoom <span id="sb-zoom">100%</span></div>
+      <div class="sb-divider"></div>
+      <div class="sb-item" style="margin-left:auto;">SuiMesh Protocol <span style="color:var(--green)">Connected</span></div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- CANVAS TOOLBAR -->
+<div class="canvas-toolbar" id="canvas-toolbar">
+  <button class="ct-btn active" id="tool-select" title="Select (V)" onclick="setTool('select')">↖</button>
+  <button class="ct-btn" id="tool-pan" title="Pan (Space)" onclick="setTool('pan')">✋</button>
+  <div class="ct-divider"></div>
+  <button class="ct-btn" id="tool-connect" title="Connect nodes (C)" onclick="setTool('connect')">⬡</button>
+  <div class="ct-divider"></div>
+  <button class="ct-btn" title="Fit to screen (F)" onclick="fitToScreen()">⊡</button>
+</div>
+
+<!-- ZOOM CONTROLS -->
+<div class="zoom-controls">
+  <button class="zc-btn" onclick="zoomIn()">+</button>
+  <div class="zoom-label" id="zoom-label">100%</div>
+  <button class="zc-btn" onclick="zoomOut()">−</button>
+</div>
+
+<!-- MINIMAP -->
+<div class="minimap">
+  <div class="minimap-label">OVERVIEW</div>
+  <svg id="minimap-svg" viewBox="0 0 160 100"></svg>
+</div>
+
+<!-- ADD NODE BUTTON -->
+<button class="add-node-btn" title="Add node" onclick="togglePalette()">+</button>
+
+<!-- NODE PALETTE -->
+<div class="node-palette" id="node-palette">
+  <div class="palette-title">Add Node</div>
+  <div class="palette-item" onclick="addNode('market')"><span class="palette-item-icon">📊</span>Market Data</div>
+  <div class="palette-item" onclick="addNode('news')"><span class="palette-item-icon">📰</span>News Sentinel</div>
+  <div class="palette-item" onclick="addNode('ai')"><span class="palette-item-icon">🧠</span>AI Analyzer</div>
+  <div class="palette-item" onclick="addNode('copy')"><span class="palette-item-icon">◈</span>Strategy Agent</div>
+  <div class="palette-item" onclick="addNode('risk')"><span class="palette-item-icon">🛡</span>Risk Guard</div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div class="ctx-menu" id="ctx-menu" style="display:none;"></div>
+
+<!-- TOOLTIP -->
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+/* ============================================================
+   DATA MODEL
+   ============================================================ */
+const NODE_DEFS = {
+  mine:   { label:'My Trading Agent', type:'Personal Agent',  icon:'🤖', color:'blue',   status:'active',   metric:'+12.4%', metricClass:'pos', badges:['live'], id:'mine' },
+  market: { label:'Market Data',      type:'Data Source',     icon:'📊', color:'cyan',   status:'streaming',metric:'1,240 ticks/s', metricClass:'muted', badges:[], id:'market' },
+  news:   { label:'News Sentinel',    type:'News + Sentiment',icon:'📰', color:'yellow', status:'active',   metric:'Bullish 78%',  metricClass:'pos',  badges:[], id:'news' },
+  ai:     { label:'AI Analyzer',      type:'LLM Signal',      icon:'🧠', color:'purple', status:'active',   metric:'Confidence 87%',metricClass:'muted',badges:[], id:'ai' },
+  copy:   { label:'@AlphaMesh Pro',   type:'Copy-Trade Source',icon:'◈', color:'green',  status:'following',metric:'+28.7%',metricClass:'pos', badges:['copy'], id:'copy' },
+  risk:   { label:'Risk Guard',       type:'Protection Layer', icon:'🛡', color:'yellow', status:'watching', metric:'DD Limit 8%', metricClass:'warn', badges:['warn'], id:'risk' },
+};
+const STATUS_MAP = {
+  active:'green', streaming:'blue', following:'green', watching:'yellow', offline:'gray'
+};
+const EDGE_TYPES = {
+  'market->mine':'data', 'news->mine':'data', 'ai->mine':'signal',
+  'mine->risk':'guard', 'copy->mine':'copy'
+};
+
+// Runtime state
+let nodes = {};       // id -> { def, el, x, y }
+let edges = [];       // [{from, to, type}]
+let scale = 1;
+let offsetX = 0, offsetY = 0;
+let isPanning = false, panStart = null, panOffset = null;
+let isDragging = false, dragNode = null, dragStartMouse = null, dragStartPos = null;
+let selectedNode = null;
+let currentTool = 'select';
+let connectingFrom = null;
+let paletteOpen = false;
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function init() {
+  const canvas = document.getElementById('canvas');
+  const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
+
+  // Initial layout — mine in center, 3 nodes around it
+  const cx = cw / 2 - 90, cy = ch / 2 - 60;
+  const radius = 220;
+  const initialLayout = {
+    mine:   { x: cx,                y: cy },
+    market: { x: cx - radius,       y: cy - 100 },
+    news:   { x: cx - radius + 20,  y: cy + 140 },
+    ai:     { x: cx + radius - 20,  y: cy + 120 },
+  };
+
+  ['mine','market','news','ai'].forEach((id, i) => {
+    const pos = initialLayout[id];
+    spawnNode(id, pos.x, pos.y, i * 80);
+  });
+
+  edges = [
+    { from:'market', to:'mine', type:'data' },
+    { from:'news',   to:'mine', type:'data' },
+    { from:'ai',     to:'mine', type:'signal' },
+  ];
+
+  setTimeout(drawEdges, 400);
+  setTimeout(startParticles, 1200);
+  updateStatusBar();
+  updateMinimap();
+}
+
+/* ============================================================
+   NODE SPAWN
+   ============================================================ */
+function spawnNode(id, x, y, delay = 0) {
+  const def = NODE_DEFS[id] || makeCustomDef(id);
+  const el = document.createElement('div');
+  el.className = `node type-${id}`;
+  el.id = `node-${id}`;
+  el.style.cssText = `left:${x}px;top:${y}px;animation-delay:${delay}ms;`;
+
+  // sparkline data
+  const sparkPoints = genSparkline(id);
+
+  el.innerHTML = `
+    ${def.badges.map(b=>`<div class="node-badge ${b}">${b==='live'?'LIVE':b==='copy'?'COPY':'WARN'}</div>`).join('')}
+    <div class="node-top">
+      <div class="node-icon ${def.color}">${def.icon}</div>
+      <div class="node-meta">
+        <div class="node-name">${def.label}</div>
+        <div class="node-type">${def.type}</div>
+      </div>
+    </div>
+    <div class="node-status-row">
+      <div class="status-dot ${STATUS_MAP[def.status]||'gray'}"></div>
+      <div class="status-text">${capitalize(def.status)}</div>
+    </div>
+    <div class="node-metric ${def.metricClass}">${def.metric}</div>
+    <svg class="node-sparkline" viewBox="0 0 140 28">${sparkPoints}</svg>
+    <div class="port in" data-node="${id}" data-port="in"></div>
+    <div class="port out" data-node="${id}" data-port="out"></div>
+  `;
+
+  el.addEventListener('mousedown', (e) => nodeMouseDown(e, id));
+  el.addEventListener('click', (e) => { e.stopPropagation(); selectNode(id); });
+  el.addEventListener('contextmenu', (e) => { e.preventDefault(); showCtxMenu(e, id); });
+
+  // port events
+  el.querySelectorAll('.port').forEach(p => {
+    p.addEventListener('mousedown', (e) => portMouseDown(e, id, p.dataset.port));
+  });
+
+  document.getElementById('canvas').appendChild(el);
+  nodes[id] = { def, el, x, y };
+}
+
+function makeCustomDef(id) {
+  return { label:id, type:'Custom Node', icon:'⬡', color:'blue', status:'active', metric:'—', metricClass:'muted', badges:[], id };
+}
+
+function genSparkline(id) {
+  const colors = { mine:'#3B82F6', market:'#06B6D4', news:'#F59E0B', ai:'#8B5CF6', copy:'#22C55E', risk:'#F59E0B' };
+  const c = colors[id] || '#3B82F6';
+  const pts = Array.from({length:10}, (_,i) => {
+    const base = id==='mine'?14:id==='market'?10:id==='ai'?12:16;
+    return [i*15.5, base + (Math.random()*10 - (id==='mine'||id==='copy'?8:4))];
+  });
+  const polyPts = pts.map(p=>`${p[0]},${p[1]}`).join(' ');
+  const polyFill = [...pts, [pts[pts.length-1][0],28],[0,28]].map(p=>`${p[0]},${p[1]}`).join(' ');
+  return `
+    <defs><linearGradient id="sg-${id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${c}" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="${c}" stop-opacity="0"/>
+    </linearGradient></defs>
+    <polygon points="${polyFill}" fill="url(#sg-${id})"/>
+    <polyline points="${polyPts}" fill="none" stroke="${c}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  `;
+}
+
+/* ============================================================
+   EDGE DRAWING
+   ============================================================ */
+function drawEdges() {
+  const svg = document.getElementById('svg-layer');
+  svg.innerHTML = `<defs>
+    <marker id="arr-data"   viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 2L8 5L1 8" fill="none" stroke="rgba(6,182,212,0.7)" stroke-width="1.5" stroke-linecap="round"/></marker>
+    <marker id="arr-copy"   viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 2L8 5L1 8" fill="none" stroke="rgba(34,197,94,0.8)" stroke-width="1.5" stroke-linecap="round"/></marker>
+    <marker id="arr-signal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 2L8 5L1 8" fill="none" stroke="rgba(139,92,246,0.7)" stroke-width="1.5" stroke-linecap="round"/></marker>
+    <marker id="arr-guard"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 2L8 5L1 8" fill="none" stroke="rgba(245,158,11,0.6)" stroke-width="1.5" stroke-linecap="round"/></marker>
+  </defs>`;
+
+  edges.forEach((edge, i) => {
+    const fromNode = nodes[edge.from];
+    const toNode   = nodes[edge.to];
+    if (!fromNode || !toNode) return;
+
+    const fw = fromNode.el.offsetWidth, fh = fromNode.el.offsetHeight;
+    const tw = toNode.el.offsetWidth,   th = toNode.el.offsetHeight;
+
+    const x1 = fromNode.x + fw;
+    const y1 = fromNode.y + fh / 2;
+    const x2 = toNode.x;
+    const y2 = toNode.y + th / 2;
+
+    const cx1 = x1 + (x2 - x1) * 0.5;
+    const cy1 = y1;
+    const cx2 = x2 - (x2 - x1) * 0.5;
+    const cy2 = y2;
+
+    const d = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', d);
+    path.setAttribute('class', `edge ${edge.type}`);
+    path.setAttribute('marker-end', `url(#arr-${edge.type})`);
+    path.dataset.edgeIndex = i;
+    path.addEventListener('click', () => selectEdge(i, path));
+    svg.appendChild(path);
+
+    // mid-label
+    const midX = (x1 + x2) / 2;
+    const midY = (y1 + y2) / 2 - 10;
+    const label = { data:'data feed', copy:'copy-trade', signal:'AI signal', guard:'risk guard' }[edge.type];
+    const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x', midX); txt.setAttribute('y', midY);
+    txt.setAttribute('text-anchor','middle');
+    txt.setAttribute('font-size','9'); txt.setAttribute('fill','rgba(255,255,255,0.25)');
+    txt.setAttribute('font-family','Inter,sans-serif');
+    txt.textContent = label;
+    svg.appendChild(txt);
+  });
+
+  updateMinimap();
+}
+
+/* ============================================================
+   EDGE PARTICLES (data flow animation)
+   ============================================================ */
+function startParticles() {
+  setInterval(() => {
+    const edge = edges[Math.floor(Math.random() * edges.length)];
+    if (!edge) return;
+    const fromNode = nodes[edge.from];
+    const toNode   = nodes[edge.to];
+    if (!fromNode || !toNode) return;
+
+    const fw = fromNode.el.offsetWidth, fh = fromNode.el.offsetHeight;
+    const tw = toNode.el.offsetWidth,   th = toNode.el.offsetHeight;
+    const x1=fromNode.x+fw, y1=fromNode.y+fh/2;
+    const x2=toNode.x,      y2=toNode.y+th/2;
+
+    const colors = { data:'#06B6D4', copy:'#22C55E', signal:'#8B5CF6', guard:'#F59E0B' };
+    const dur = 800 + Math.random() * 600;
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('r','4');
+    circle.setAttribute('fill', colors[edge.type] || '#3B82F6');
+    circle.setAttribute('opacity','0');
+
+    const svg = document.getElementById('svg-layer');
+    svg.appendChild(circle);
+
+    const start = performance.now();
+    function animParticle(t) {
+      const p = Math.min((t - start) / dur, 1);
+      const ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
+      const cx1=(x1+x2)/2, cy1=y1, cx2=(x1+x2)/2, cy2=y2;
+      const bx = (1-ease)**3*x1 + 3*(1-ease)**2*ease*cx1 + 3*(1-ease)*ease**2*cx2 + ease**3*x2;
+      const by = (1-ease)**3*y1 + 3*(1-ease)**2*ease*cy1 + 3*(1-ease)*ease**2*cy2 + ease**3*y2;
+      const opacity = p < 0.1 ? p*10 : p > 0.85 ? (1-p)/0.15 : 1;
+      circle.setAttribute('cx', bx);
+      circle.setAttribute('cy', by);
+      circle.setAttribute('opacity', opacity * 0.9);
+      if (p < 1) requestAnimationFrame(animParticle);
+      else circle.remove();
+    }
+    requestAnimationFrame(animParticle);
+  }, 600);
+}
+
+/* ============================================================
+   SELECTION
+   ============================================================ */
+function selectNode(id) {
+  // deselect previous
+  if (selectedNode) {
+    const prev = document.getElementById(`node-${selectedNode}`);
+    if (prev) prev.classList.remove('selected');
+  }
+  selectedNode = id;
+  const el = document.getElementById(`node-${id}`);
+  if (el) el.classList.add('selected');
+
+  // highlight connected edges
+  document.querySelectorAll('.edge').forEach(e => e.classList.remove('selected'));
+
+  showInspector(id);
+}
+
+function selectEdge(i, pathEl) {
+  document.querySelectorAll('.edge').forEach(e => e.classList.remove('selected'));
+  pathEl.classList.add('selected');
+}
+
+function deselectAll() {
+  if (selectedNode) {
+    const el = document.getElementById(`node-${selectedNode}`);
+    if (el) el.classList.remove('selected');
+    selectedNode = null;
+  }
+  document.querySelectorAll('.edge').forEach(e => e.classList.remove('selected'));
+  hideInspector();
+}
+
+/* ============================================================
+   INSPECTOR
+   ============================================================ */
+function showInspector(id) {
+  const n = nodes[id];
+  if (!n) return;
+  const def = n.def;
+  const insp = document.getElementById('inspector');
+  insp.classList.remove('hidden');
+
+  const colorMap = { blue:'rgba(59,130,246,0.15)', cyan:'rgba(6,182,212,0.15)', yellow:'rgba(245,158,11,0.15)', purple:'rgba(139,92,246,0.15)', green:'rgba(34,197,94,0.15)' };
+
+  document.getElementById('insp-header').innerHTML = `
+    <div class="insp-node-icon" style="background:${colorMap[def.color]||'rgba(59,130,246,0.15)'}">${def.icon}</div>
+    <div>
+      <div class="insp-title">${def.label}</div>
+      <div class="insp-sub">ID: #${id.toUpperCase().padStart(4,'0')} · ${def.type}</div>
+    </div>
+    <div class="insp-close" onclick="hideInspector()">✕</div>
+  `;
+
+  const connectedEdges = edges.filter(e => e.from===id || e.to===id);
+  const perf30d = id==='mine'?'+12.4%':id==='copy'?'+28.7%':id==='market'?'—':id==='news'?'78% Bullish':id==='ai'?'87% Conf.':'Watching';
+  const sparkPts = genSparkline(id);
+
+  document.getElementById('insp-body').innerHTML = `
+    ${id === 'mine' || id === 'copy' ? `
+    <div class="insp-section">
+      <div class="insp-section-title">Performance</div>
+      <div class="perf-chart-wrap">
+        <div class="perf-val pos">${id==='copy'?'+28.7%':'+12.4%'}</div>
+        <div class="perf-delta pos">▲ 30D ROI</div>
+        <svg width="100%" height="100%" viewBox="0 0 280 60" preserveAspectRatio="none" style="opacity:0.6">
+          <defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${id==='copy'?'#22C55E':'#3B82F6'}" stop-opacity="0.4"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs>
+          <polygon points="0,50 28,44 56,46 84,38 112,28 140,30 168,20 196,16 224,10 252,6 280,2 280,60 0,60" fill="url(#pg)"/>
+          <polyline points="0,50 28,44 56,46 84,38 112,28 140,30 168,20 196,16 224,10 252,6 280,2" fill="none" stroke="${id==='copy'?'#22C55E':'#3B82F6'}" stroke-width="1.5"/>
+        </svg>
+      </div>
+    </div>
+    <div class="insp-section">
+      <div class="insp-section-title">Metrics</div>
+      <div class="metrics-grid">
+        <div class="metric-card"><div class="mc-label">30D ROI</div><div class="mc-val pos">${id==='copy'?'+28.7%':'+12.4%'}</div></div>
+        <div class="metric-card"><div class="mc-label">Sharpe</div><div class="mc-val">${id==='copy'?'2.14':'1.82'}</div></div>
+        <div class="metric-card"><div class="mc-label">Max DD</div><div class="mc-val neg">${id==='copy'?'−3.2%':'−4.1%'}</div></div>
+        <div class="metric-card"><div class="mc-label">Win Rate</div><div class="mc-val pos">${id==='copy'?'71%':'67%'}</div></div>
+      </div>
+    </div>` : ''}
+    ${id === 'market' ? `
+    <div class="insp-section">
+      <div class="insp-section-title">Feed Status</div>
+      <div class="metrics-grid">
+        <div class="metric-card"><div class="mc-label">Tick Rate</div><div class="mc-val" style="color:var(--cyan)">1,240/s</div></div>
+        <div class="metric-card"><div class="mc-label">Latency</div><div class="mc-val pos">4ms</div></div>
+        <div class="metric-card"><div class="mc-label">Source</div><div class="mc-val" style="font-size:11px;color:var(--txt2)">Binance</div></div>
+        <div class="metric-card"><div class="mc-label">Pair</div><div class="mc-val" style="font-size:11px;color:var(--txt2)">SUI/USDC</div></div>
+      </div>
+    </div>` : ''}
+    ${id === 'news' ? `
+    <div class="insp-section">
+      <div class="insp-section-title">Sentiment</div>
+      <div class="metrics-grid">
+        <div class="metric-card"><div class="mc-label">Sentiment</div><div class="mc-val pos">Bullish</div></div>
+        <div class="metric-card"><div class="mc-label">Score</div><div class="mc-val pos">78%</div></div>
+        <div class="metric-card"><div class="mc-label">Articles</div><div class="mc-val">24</div></div>
+        <div class="metric-card"><div class="mc-label">Updated</div><div class="mc-val" style="font-size:11px;color:var(--txt2)">2m ago</div></div>
+      </div>
+    </div>` : ''}
+    ${id === 'ai' ? `
+    <div class="insp-section">
+      <div class="insp-section-title">AI Status</div>
+      <div class="metrics-grid">
+        <div class="metric-card"><div class="mc-label">Confidence</div><div class="mc-val" style="color:var(--purple)">87%</div></div>
+        <div class="metric-card"><div class="mc-label">Signal</div><div class="mc-val pos">LONG</div></div>
+        <div class="metric-card"><div class="mc-label">Model</div><div class="mc-val" style="font-size:10px;color:var(--txt2)">GPT-4o</div></div>
+        <div class="metric-card"><div class="mc-label">Tokens</div><div class="mc-val" style="font-size:11px;color:var(--txt2)">2.4k</div></div>
+      </div>
+    </div>` : ''}
+    <div class="insp-section">
+      <div class="insp-section-title">Connections (${connectedEdges.length})</div>
+      <div class="conn-list">
+        ${connectedEdges.map(e => {
+          const otherId = e.from===id ? e.to : e.from;
+          const otherDef = NODE_DEFS[otherId] || {};
+          const dir = e.from===id ? '→' : '←';
+          return `<div class="conn-item" onclick="selectNode('${otherId}')">
+            <span class="conn-icon">${otherDef.icon||'⬡'}</span>
+            <span class="conn-name">${dir} ${otherDef.label||otherId}</span>
+            <span class="conn-type-badge ${e.type}">${e.type}</span>
+            <div class="conn-status-dot" style="background:var(--green)"></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="insp-section">
+      <div class="insp-section-title">Tags</div>
+      <div class="tag-row">
+        ${id==='mine'?'<span class="tag">SUI/USDC</span><span class="tag">4H TF</span><span class="tag">Trend</span>':''}
+        ${id==='market'?'<span class="tag">CEX Feed</span><span class="tag">Real-time</span>':''}
+        ${id==='news'?'<span class="tag">RSS</span><span class="tag">Twitter</span><span class="tag">NLP</span>':''}
+        ${id==='ai'?'<span class="tag">GPT-4o</span><span class="tag">Signal</span><span class="tag">Auto</span>':''}
+        ${id==='copy'?'<span class="tag">Top 1%</span><span class="tag">Verified</span><span class="tag">Trend</span>':''}
+        ${id==='risk'?'<span class="tag">Guard</span><span class="tag">DD 8%</span><span class="tag">Auto-pause</span>':''}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('insp-actions').innerHTML = `
+    <button class="insp-btn insp-btn-ghost" onclick="hideInspector()">Close</button>
+    <button class="insp-btn insp-btn-primary">Configure</button>
+    ${id==='mine'?'<button class="insp-btn insp-btn-ghost" style="color:var(--red);border-color:rgba(239,68,68,0.3)">Pause</button>':''}
+  `;
+}
+
+function hideInspector() {
+  document.getElementById('inspector').classList.add('hidden');
+  deselectAll();
+}
+
+/* ============================================================
+   DRAG NODES
+   ============================================================ */
+function nodeMouseDown(e, id) {
+  if (currentTool === 'connect') return;
+  e.stopPropagation();
+  isDragging = false;
+  dragNode = id;
+  dragStartMouse = { x:e.clientX, y:e.clientY };
+  dragStartPos   = { x:nodes[id].x, y:nodes[id].y };
+  document.addEventListener('mousemove', onDragMove);
+  document.addEventListener('mouseup',   onDragUp);
+}
+
+function onDragMove(e) {
+  if (!dragNode) return;
+  const dx = (e.clientX - dragStartMouse.x) / scale;
+  const dy = (e.clientY - dragStartMouse.y) / scale;
+  if (!isDragging && (Math.abs(dx)>3 || Math.abs(dy)>3)) {
+    isDragging = true;
+    document.getElementById(`node-${dragNode}`).classList.add('dragging');
+  }
+  if (!isDragging) return;
+  const nx = dragStartPos.x + dx;
+  const ny = dragStartPos.y + dy;
+  nodes[dragNode].x = nx;
+  nodes[dragNode].y = ny;
+  document.getElementById(`node-${dragNode}`).style.left = nx + 'px';
+  document.getElementById(`node-${dragNode}`).style.top  = ny + 'px';
+  drawEdges();
+}
+
+function onDragUp(e) {
+  document.removeEventListener('mousemove', onDragMove);
+  document.removeEventListener('mouseup',   onDragUp);
+  if (dragNode) {
+    document.getElementById(`node-${dragNode}`)?.classList.remove('dragging');
+  }
+  isDragging = false;
+  dragNode = null;
+  updateMinimap();
+}
+
+/* ============================================================
+   CANVAS PAN & ZOOM
+   ============================================================ */
+function canvasMouseDown(e) {
+  if (e.target.id === 'canvas' || e.target === document.getElementById('svg-layer')) {
+    if (currentTool === 'pan' || e.button === 1 || (e.button===0 && e.altKey)) {
+      isPanning = true;
+      panStart  = { x:e.clientX, y:e.clientY };
+      panOffset = { x:offsetX, y:offsetY };
+      document.getElementById('canvas').classList.add('panning');
+    } else {
+      deselectAll();
+    }
+    hideCtxMenu();
+    hidePalette();
+  }
+}
+
+function canvasMouseMove(e) {
+  if (isPanning) {
+    offsetX = panOffset.x + (e.clientX - panStart.x);
+    offsetY = panOffset.y + (e.clientY - panStart.y);
+    applyTransform();
+  }
+}
+
+function canvasMouseUp(e) {
+  isPanning = false;
+  document.getElementById('canvas').classList.remove('panning');
+}
+
+function canvasWheel(e) {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.08 : 0.92;
+  const canvas = document.getElementById('canvas');
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  offsetX = mx - (mx - offsetX) * factor;
+  offsetY = my - (my - offsetY) * factor;
+  scale = Math.min(Math.max(scale * factor, 0.2), 3);
+  applyTransform();
+}
+
+function applyTransform() {
+  // We're not using CSS transform on the canvas wrapper in this version —
+  // nodes are positioned absolutely. For now just update zoom label.
+  document.getElementById('sb-zoom').textContent = Math.round(scale*100)+'%';
+  document.getElementById('zoom-label').textContent = Math.round(scale*100)+'%';
+}
+
+function zoomIn()  { scale = Math.min(scale*1.15, 3); applyTransform(); }
+function zoomOut() { scale = Math.max(scale*0.85, 0.2); applyTransform(); }
+
+function fitToScreen() {
+  scale = 1; offsetX = 0; offsetY = 0;
+  applyTransform();
+  // Re-init layout
+  const canvas = document.getElementById('canvas');
+  const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
+  const cx = cw/2-90, cy = ch/2-60, radius = 220;
+  const layout = { mine:{x:cx,y:cy}, market:{x:cx-radius,y:cy-100}, news:{x:cx-radius+20,y:cy+140}, ai:{x:cx+radius-20,y:cy+120} };
+  Object.entries(layout).forEach(([id, pos]) => {
+    if (nodes[id]) {
+      nodes[id].x = pos.x; nodes[id].y = pos.y;
+      document.getElementById(`node-${id}`).style.left = pos.x+'px';
+      document.getElementById(`node-${id}`).style.top  = pos.y+'px';
+    }
+  });
+  drawEdges();
+}
+
+function toggleLayout() {
+  // Radial layout toggle
+  const canvas = document.getElementById('canvas');
+  const cx = canvas.offsetWidth/2 - 90;
+  const cy = canvas.offsetHeight/2 - 60;
+  const ids = Object.keys(nodes);
+  ids.forEach((id, i) => {
+    if (id === 'mine') {
+      nodes[id].x = cx; nodes[id].y = cy;
+    } else {
+      const angle = (i / (ids.length-1)) * Math.PI * 2 - Math.PI/2;
+      const r = 230;
+      nodes[id].x = cx + Math.cos(angle)*r;
+      nodes[id].y = cy + Math.sin(angle)*r*0.7;
+    }
+    const el = document.getElementById(`node-${id}`);
+    if (el) { el.style.transition='left 0.5s cubic-bezier(0.16,1,0.3,1),top 0.5s cubic-bezier(0.16,1,0.3,1)'; el.style.left=nodes[id].x+'px'; el.style.top=nodes[id].y+'px'; }
+  });
+  setTimeout(()=>{ Object.values(nodes).forEach(n=>{ if(n.el) n.el.style.transition=''; }); drawEdges(); updateMinimap(); }, 550);
+}
+
+/* ============================================================
+   TOOL SWITCH
+   ============================================================ */
+function setTool(tool) {
+  currentTool = tool;
+  document.querySelectorAll('.ct-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tool-${tool}`)?.classList.add('active');
+  document.getElementById('canvas').style.cursor = tool==='pan' ? 'grab' : 'default';
+}
+
+/* ============================================================
+   PORT / CONNECT
+   ============================================================ */
+function portMouseDown(e, id, portType) {
+  if (currentTool !== 'connect') return;
+  e.stopPropagation();
+  connectingFrom = { id, portType };
+  // TODO: live edge preview
+}
+
+/* ============================================================
+   MINIMAP
+   ============================================================ */
+function updateMinimap() {
+  const svg = document.getElementById('minimap-svg');
+  const canvas = document.getElementById('canvas');
+  const cw = canvas.offsetWidth || 800;
+  const ch = canvas.offsetHeight || 600;
+  const scaleX = 160/cw, scaleY = 100/ch;
+
+  svg.innerHTML = '';
+
+  // nodes
+  Object.entries(nodes).forEach(([id, n]) => {
+    const colors = { mine:'#3B82F6', market:'#06B6D4', news:'#F59E0B', ai:'#8B5CF6', copy:'#22C55E', risk:'#F59E0B' };
+    const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('x', n.x * scaleX);
+    r.setAttribute('y', n.y * scaleY);
+    r.setAttribute('width', 28 * scaleX * cw/280);
+    r.setAttribute('height', 16 * scaleY * ch/160);
+    r.setAttribute('rx','2');
+    r.setAttribute('fill', colors[id]||'#3B82F6');
+    r.setAttribute('opacity','0.6');
+    svg.appendChild(r);
+  });
+
+  // edges
+  edges.forEach(e => {
+    const fn = nodes[e.from], tn = nodes[e.to];
+    if (!fn||!tn) return;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', (fn.x+90)*scaleX); line.setAttribute('y1', (fn.y+40)*scaleY);
+    line.setAttribute('x2', (tn.x+90)*scaleX); line.setAttribute('y2', (tn.y+40)*scaleY);
+    line.setAttribute('stroke','rgba(255,255,255,0.15)'); line.setAttribute('stroke-width','1');
+    svg.appendChild(line);
+  });
+}
+
+/* ============================================================
+   ADD NODE
+   ============================================================ */
+function addNode(type) {
+  const canvas = document.getElementById('canvas');
+  const cx = canvas.offsetWidth/2 - 90 + (Math.random()-0.5)*200;
+  const cy = canvas.offsetHeight/2 - 60 + (Math.random()-0.5)*150;
+  const uid = type + '_' + Date.now();
+  const def = {...NODE_DEFS[type]};
+  def.id = uid;
+  NODE_DEFS[uid] = def;
+  spawnNode(uid, cx, cy);
+  updateStatusBar();
+  hidePalette();
+}
+
+function togglePalette() {
+  paletteOpen = !paletteOpen;
+  document.getElementById('node-palette').classList.toggle('open', paletteOpen);
+}
+function hidePalette() {
+  paletteOpen = false;
+  document.getElementById('node-palette').classList.remove('open');
+}
+
+/* ============================================================
+   CONTEXT MENU
+   ============================================================ */
+function showCtxMenu(e, id) {
+  const menu = document.getElementById('ctx-menu');
+  menu.innerHTML = `
+    <div class="ctx-item" onclick="selectNode('${id}');hideCtxMenu()">🔍 Inspect</div>
+    <div class="ctx-item" onclick="hideCtxMenu()">✏️ Rename</div>
+    <div class="ctx-item" onclick="hideCtxMenu()">🔗 Connect to...</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item" onclick="duplicateNode('${id}');hideCtxMenu()">⎘ Duplicate</div>
+    <div class="ctx-item danger" onclick="removeNode('${id}');hideCtxMenu()">✕ Remove</div>
+  `;
+  menu.style.display = 'block';
+  menu.style.left = e.clientX + 'px';
+  menu.style.top  = e.clientY + 'px';
+}
+function hideCtxMenu() { document.getElementById('ctx-menu').style.display='none'; }
+document.addEventListener('click', () => { hideCtxMenu(); });
+
+function duplicateNode(id) {
+  const n = nodes[id];
+  if (!n) return;
+  const uid = id + '_copy_' + Date.now();
+  NODE_DEFS[uid] = {...n.def, label: n.def.label+' (copy)'};
+  spawnNode(uid, n.x+30, n.y+30);
+  updateStatusBar();
+}
+
+function removeNode(id) {
+  const el = document.getElementById(`node-${id}`);
+  if (el) { el.style.transform='scale(0)'; el.style.opacity='0'; el.style.transition='all 0.2s'; setTimeout(()=>el.remove(),200); }
+  edges = edges.filter(e => e.from!==id && e.to!==id);
+  delete nodes[id];
+  drawEdges();
+  updateStatusBar();
+  if (selectedNode === id) hideInspector();
+}
+
+/* ============================================================
+   STATUS BAR
+   ============================================================ */
+function updateStatusBar() {
+  const n = Object.keys(nodes).length;
+  const e = edges.length;
+  document.getElementById('sb-nodes').textContent = n;
+  document.getElementById('sb-edges').textContent = e;
+  document.getElementById('sb-active').textContent = Math.min(n, e+1);
+}
+
+/* ============================================================
+   DEPLOY ANIMATION
+   ============================================================ */
+function animateDeploy() {
+  const btn = document.getElementById('deploy-btn');
+  btn.textContent = '⟳ Deploying...';
+  btn.style.background = 'var(--yellow)';
+  btn.disabled = true;
+  setTimeout(()=>{
+    btn.textContent = '✓ Deployed';
+    btn.style.background = 'var(--green)';
+    setTimeout(()=>{
+      btn.textContent = '⟳ Deploy';
+      btn.style.background = 'var(--blue)';
+      btn.disabled = false;
+    }, 2000);
+  }, 1800);
+}
+
+/* ============================================================
+   MODE SWITCH (stub)
+   ============================================================ */
+function setMode(mode) {
+  const labels = { network:'Agent Network', market:'Agent Marketplace', editor:'Flow Editor' };
+  // Update icon sidebar active state
+  document.querySelectorAll('.icon-btn').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+/* ============================================================
+   KEYBOARD SHORTCUTS
+   ============================================================ */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key==='v'||e.key==='V') setTool('select');
+  if (e.key==='h'||e.key==='H') setTool('pan');
+  if (e.key==='c'||e.key==='C') setTool('connect');
+  if (e.key==='f'||e.key==='F') fitToScreen();
+  if (e.key==='Escape') { deselectAll(); hidePalette(); }
+  if ((e.key==='='||e.key==='+') && (e.metaKey||e.ctrlKey)) { e.preventDefault(); zoomIn(); }
+  if (e.key==='-' && (e.metaKey||e.ctrlKey)) { e.preventDefault(); zoomOut(); }
+  if (e.key==='Delete'||e.key==='Backspace') {
+    if (selectedNode && !e.target.closest('.inspector')) { e.preventDefault(); removeNode(selectedNode); }
+  }
+});
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function capitalize(s) { return s.charAt(0).toUpperCase()+s.slice(1); }
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+window.addEventListener('load', () => {
+  init();
+  // auto-select mine after load
+  setTimeout(() => selectNode('mine'), 600);
+});
+</script>
+</body>
+</html>
