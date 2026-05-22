@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SuiMesh A2A — Interface Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0: #070C18;
+  --bg1: #0D1424;
+  --bg2: #111827;
+  --bg3: #161D2F;
+  --bg4: #1E2740;
+  --accent: #3B82F6;
+  --accent2: #06B6D4;
+  --accent3: #6366F1;
+  --txt1: #F1F5F9;
+  --txt2: #94A3B8;
+  --txt3: #64748B;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --green: #22C55E;
+  --red: #EF4444;
+  --yellow: #F59E0B;
+  --purple: #A855F7;
+  --radius: 10px;
+  --sidebar: 220px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg0);
+  color: var(--txt1);
+  font-size: 13px;
+  display: flex;
+}
+
+/* ========== SIDEBAR ========== */
+.sidebar {
+  width: var(--sidebar);
+  min-width: var(--sidebar);
+  background: var(--bg1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+.logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff;
+  letter-spacing: -0.5px;
+}
+.logo-text { font-size: 15px; font-weight: 600; color: var(--txt1); }
+.logo-sub { font-size: 10px; color: var(--txt3); margin-top: 1px; letter-spacing: 0.5px; }
+.nav { padding: 12px 10px; flex: 1; }
+.nav-section { margin-bottom: 20px; }
+.nav-label {
+  font-size: 10px; font-weight: 500; color: var(--txt3);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  padding: 0 10px; margin-bottom: 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 7px;
+  color: var(--txt2); cursor: pointer;
+  transition: all 0.15s; margin-bottom: 2px;
+  font-size: 13px;
+}
+.nav-item:hover { background: var(--bg3); color: var(--txt1); }
+.nav-item.active { background: rgba(59,130,246,0.15); color: var(--accent); }
+.nav-item .icon { width: 16px; text-align: center; font-size: 14px; }
+.nav-badge {
+  margin-left: auto; background: var(--accent); color: #fff;
+  font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 500;
+}
+.sidebar-footer {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+}
+.user-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent3), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: #fff;
+}
+.user-name { font-size: 12px; font-weight: 500; }
+.user-addr { font-size: 10px; color: var(--txt3); font-family: 'JetBrains Mono', monospace; }
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green); margin-left: auto;
+  box-shadow: 0 0 6px var(--green);
+}
+
+/* ========== MAIN AREA ========== */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.topbar {
+  height: 52px; min-height: 52px;
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 24px; gap: 16px;
+}
+.topbar-title { font-size: 15px; font-weight: 600; flex: 1; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.btn {
+  padding: 6px 14px; border-radius: 7px; font-size: 12px;
+  font-weight: 500; cursor: pointer; border: none;
+  transition: all 0.15s; font-family: inherit;
+}
+.btn-ghost {
+  background: transparent; color: var(--txt2);
+  border: 1px solid var(--border2);
+}
+.btn-ghost:hover { background: var(--bg3); color: var(--txt1); }
+.btn-primary {
+  background: var(--accent); color: #fff;
+}
+.btn-primary:hover { background: #2563eb; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+
+/* ========== SCREENS ========== */
+.screen { display: none; flex: 1; overflow: hidden; }
+.screen.active { display: flex; }
+
+/* ===== SCREEN 1: AGENT NETWORK CANVAS ===== */
+#screen-network {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg0);
+}
+.canvas-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+.canvas-bg {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.canvas-svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+.node-card {
+  position: absolute;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 12px 14px;
+  min-width: 140px;
+  cursor: move;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  user-select: none;
+}
+.node-card:hover {
+  border-color: rgba(59,130,246,0.4);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+}
+.node-card.active-node {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+.node-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px;
+}
+.node-type-icon {
+  width: 28px; height: 28px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+}
+.node-type-icon.blue { background: rgba(59,130,246,0.2); }
+.node-type-icon.cyan { background: rgba(6,182,212,0.2); }
+.node-type-icon.purple { background: rgba(168,85,247,0.2); }
+.node-type-icon.green { background: rgba(34,197,94,0.2); }
+.node-type-icon.yellow { background: rgba(245,158,11,0.2); }
+.node-name { font-size: 12px; font-weight: 600; color: var(--txt1); }
+.node-type { font-size: 10px; color: var(--txt3); }
+.node-status {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px;
+}
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+}
+.dot.green { background: var(--green); box-shadow: 0 0 5px var(--green); }
+.dot.blue { background: var(--accent); }
+.dot.yellow { background: var(--yellow); }
+.dot.gray { background: var(--txt3); }
+.node-metric {
+  font-size: 11px; font-weight: 600;
+  margin-top: 4px;
+}
+.node-metric.pos { color: var(--green); }
+.node-metric.neg { color: var(--red); }
+
+/* Canvas toolbar */
+.canvas-toolbar {
+  position: absolute; top: 16px; left: 16px;
+  display: flex; gap: 6px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 9px;
+  padding: 6px;
+}
+.canvas-tool {
+  width: 30px; height: 30px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--txt2); font-size: 14px;
+  transition: all 0.15s;
+}
+.canvas-tool:hover, .canvas-tool.active { background: var(--bg4); color: var(--txt1); }
+
+/* Canvas minimap */
+.minimap {
+  position: absolute; bottom: 20px; right: 20px;
+  width: 140px; height: 90px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  overflow: hidden;
+  opacity: 0.8;
+}
+.minimap-label {
+  position: absolute; top: 5px; left: 8px;
+  font-size: 9px; color: var(--txt3); letter-spacing: 0.5px;
+}
+
+/* Node inspector panel */
+.inspector {
+  width: 280px; min-width: 280px;
+  background: var(--bg1);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.inspector-header {
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.inspector-title { font-size: 14px; font-weight: 600; }
+.section-title {
+  font-size: 10px; font-weight: 500; color: var(--txt3);
+  text-transform: uppercase; letter-spacing: 0.7px;
+  margin-bottom: 8px;
+}
+.metric-row {
+  display: flex; justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.metric-row:last-child { border-bottom: none; }
+.metric-label { color: var(--txt2); }
+.metric-value { font-weight: 500; }
+.metric-value.pos { color: var(--green); }
+.metric-value.neg { color: var(--red); }
+.sparkline { height: 36px; width: 100%; }
+.tag-row { display: flex; gap: 5px; flex-wrap: wrap; }
+.tag {
+  padding: 3px 8px; border-radius: 4px; font-size: 10px;
+  background: var(--bg4); color: var(--txt2);
+}
+.conn-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 0; border-bottom: 1px solid var(--border);
+  font-size: 11px;
+}
+.conn-item:last-child { border-bottom: none; }
+.conn-icon { font-size: 12px; }
+
+/* ===== SCREEN 2: MARKETPLACE ===== */
+#screen-market { flex-direction: column; overflow: hidden; }
+.market-body {
+  flex: 1; display: flex; overflow: hidden;
+}
+.market-filters {
+  width: 200px; min-width: 200px;
+  background: var(--bg1);
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  overflow-y: auto;
+}
+.filter-group { margin-bottom: 20px; }
+.filter-group-title {
+  font-size: 10px; font-weight: 500; color: var(--txt3);
+  text-transform: uppercase; letter-spacing: 0.7px;
+  margin-bottom: 10px;
+}
+.filter-option {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0; font-size: 12px; color: var(--txt2);
+  cursor: pointer;
+}
+.filter-option:hover { color: var(--txt1); }
+.checkbox {
+  width: 14px; height: 14px; border-radius: 3px;
+  border: 1px solid var(--border2); background: var(--bg3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: var(--accent);
+}
+.checkbox.checked { background: var(--accent); border-color: var(--accent); color: #fff; }
+.sort-tabs {
+  display: flex; gap: 2px;
+  background: var(--bg2); border-radius: 8px; padding: 3px;
+  margin-bottom: 16px;
+}
+.sort-tab {
+  flex: 1; text-align: center; padding: 5px 6px;
+  border-radius: 6px; font-size: 11px; color: var(--txt2);
+  cursor: pointer; transition: all 0.15s;
+}
+.sort-tab.active { background: var(--bg4); color: var(--txt1); }
+.market-grid {
+  flex: 1; overflow-y: auto;
+  padding: 16px; display: flex; flex-direction: column; gap: 10px;
+}
+.agent-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex; gap: 14px;
+  cursor: pointer; transition: all 0.15s;
+}
+.agent-card:hover {
+  border-color: var(--border2);
+  background: var(--bg3);
+}
+.agent-avatar {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.agent-info { flex: 1; }
+.agent-name { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.agent-desc { font-size: 11px; color: var(--txt2); margin-bottom: 8px; }
+.agent-metrics {
+  display: flex; gap: 16px;
+}
+.agent-metric { text-align: center; }
+.agent-metric-val { font-size: 14px; font-weight: 600; }
+.agent-metric-val.pos { color: var(--green); }
+.agent-metric-val.neg { color: var(--red); }
+.agent-metric-label { font-size: 9px; color: var(--txt3); margin-top: 1px; }
+.agent-actions {
+  display: flex; flex-direction: column; justify-content: space-between;
+  align-items: flex-end; gap: 8px;
+}
+.followers-row {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--txt2);
+}
+.badge {
+  padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 500;
+}
+.badge-verified { background: rgba(34,197,94,0.15); color: var(--green); }
+.badge-top { background: rgba(245,158,11,0.15); color: var(--yellow); }
+.badge-new { background: rgba(59,130,246,0.15); color: var(--accent); }
+.chart-micro {
+  height: 32px; overflow: hidden;
+}
+.market-right {
+  width: 260px; min-width: 260px;
+  background: var(--bg1);
+  border-left: 1px solid var(--border);
+  padding: 16px;
+  overflow-y: auto;
+}
+.my-followed { margin-bottom: 16px; }
+.followed-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.followed-item:last-child { border-bottom: none; }
+.followed-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ===== SCREEN 3: FLOW EDITOR ===== */
+#screen-editor { overflow: hidden; }
+.editor-left {
+  width: 200px; min-width: 200px;
+  background: var(--bg1);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 12px;
+}
+.node-library-section { margin-bottom: 16px; }
+.library-title {
+  font-size: 10px; font-weight: 500; color: var(--txt3);
+  text-transform: uppercase; letter-spacing: 0.7px;
+  padding: 0 4px; margin-bottom: 8px;
+}
+.library-node {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 8px; border-radius: 7px;
+  margin-bottom: 3px; cursor: grab;
+  background: var(--bg3); border: 1px solid var(--border);
+  font-size: 11px; transition: all 0.15s;
+}
+.library-node:hover {
+  border-color: var(--border2); background: var(--bg4);
+}
+.library-node:active { cursor: grabbing; }
+.lib-icon {
+  width: 22px; height: 22px; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+}
+.editor-canvas {
+  flex: 1; position: relative; overflow: hidden;
+  background: var(--bg0);
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.flow-node {
+  position: absolute;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-width: 130px;
+  cursor: move;
+}
+.flow-node.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+.flow-node-header {
+  display: flex; align-items: center; gap: 7px;
+  margin-bottom: 6px;
+}
+.flow-node-title { font-size: 11px; font-weight: 600; }
+.port {
+  position: absolute;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--bg3); border: 2px solid var(--txt3);
+  cursor: crosshair; transition: all 0.15s;
+}
+.port:hover { border-color: var(--accent); background: var(--accent); }
+.port.out { right: -5px; top: 50%; transform: translateY(-50%); }
+.port.in { left: -5px; top: 50%; transform: translateY(-50%); }
+.flow-canvas-svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.editor-right {
+  width: 240px; min-width: 240px;
+  background: var(--bg1);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 16px;
+}
+.config-field { margin-bottom: 14px; }
+.field-label { font-size: 11px; color: var(--txt2); margin-bottom: 5px; }
+.field-input {
+  width: 100%; padding: 7px 10px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 7px; color: var(--txt1); font-size: 12px;
+  font-family: inherit; outline: none;
+  transition: border-color 0.15s;
+}
+.field-input:focus { border-color: var(--accent); }
+.field-select {
+  width: 100%; padding: 7px 10px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 7px; color: var(--txt1); font-size: 12px;
+  font-family: inherit; outline: none; cursor: pointer;
+}
+.toggle-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 7px 0; border-bottom: 1px solid var(--border);
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { font-size: 12px; color: var(--txt2); }
+.toggle {
+  width: 30px; height: 16px; border-radius: 8px;
+  background: var(--bg4); position: relative; cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle.on { background: var(--accent); }
+.toggle::after {
+  content: ''; position: absolute;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #fff; top: 2px; left: 2px;
+  transition: transform 0.2s;
+}
+.toggle.on::after { transform: translateX(14px); }
+
+/* ===== SCREEN 4: MONITOR ===== */
+#screen-monitor { flex-direction: column; overflow: hidden; }
+.monitor-body {
+  flex: 1; display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  overflow: hidden;
+}
+.monitor-panel {
+  background: var(--bg1);
+  padding: 16px;
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.panel-title-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px;
+}
+.panel-title { font-size: 13px; font-weight: 600; }
+.equity-chart {
+  flex: 1; min-height: 140px;
+  background: var(--bg2);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.equity-label {
+  position: absolute; top: 10px; left: 12px;
+  font-size: 11px; color: var(--txt3);
+}
+.equity-value {
+  position: absolute; top: 28px; left: 12px;
+  font-size: 22px; font-weight: 600; color: var(--green);
+}
+.equity-change {
+  position: absolute; top: 55px; left: 12px;
+  font-size: 11px; color: var(--green);
+}
+.positions-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.positions-table th {
+  text-align: left; color: var(--txt3); font-weight: 500;
+  padding: 0 0 8px;
+}
+.positions-table td { padding: 7px 0; border-bottom: 1px solid var(--border); }
+.positions-table tr:last-child td { border-bottom: none; }
+.pair-badge {
+  background: var(--bg4); padding: 2px 6px;
+  border-radius: 4px; font-size: 10px; font-weight: 600;
+}
+.risk-bars { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.risk-item { }
+.risk-item-header {
+  display: flex; justify-content: space-between;
+  font-size: 11px; margin-bottom: 5px;
+}
+.risk-bar-track {
+  height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden;
+}
+.risk-bar-fill {
+  height: 100%; border-radius: 3px; transition: width 0.5s;
+}
+.trades-feed { display: flex; flex-direction: column; gap: 2px; }
+.trade-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 0; border-bottom: 1px solid var(--border);
+  font-size: 11px;
+}
+.trade-item:last-child { border-bottom: none; }
+.trade-side {
+  padding: 2px 6px; border-radius: 3px;
+  font-size: 10px; font-weight: 600;
+}
+.trade-side.buy { background: rgba(34,197,94,0.15); color: var(--green); }
+.trade-side.sell { background: rgba(239,68,68,0.15); color: var(--red); }
+.trade-info { flex: 1; }
+.trade-pair { font-weight: 500; }
+.trade-meta { color: var(--txt3); font-size: 10px; }
+.trade-pnl { font-weight: 600; }
+.trade-pnl.pos { color: var(--green); }
+.trade-pnl.neg { color: var(--red); }
+
+/* ===== SCREEN 5: AUDIT LOG ===== */
+#screen-log { flex-direction: column; overflow: hidden; }
+.log-body {
+  flex: 1; display: flex; overflow: hidden;
+}
+.log-list {
+  width: 400px; min-width: 400px;
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+}
+.log-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background 0.1s;
+  display: flex; gap: 12px;
+}
+.log-item:hover { background: var(--bg2); }
+.log-item.active { background: var(--bg3); border-left: 2px solid var(--accent); padding-left: 14px; }
+.log-timeline {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.log-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  margin-top: 3px;
+}
+.log-line { flex: 1; width: 1px; background: var(--border2); }
+.log-content { flex: 1; }
+.log-title { font-size: 12px; font-weight: 500; margin-bottom: 3px; }
+.log-meta { font-size: 10px; color: var(--txt3); display: flex; gap: 8px; }
+.log-node-tag {
+  padding: 1px 6px; border-radius: 3px; font-size: 10px;
+  background: var(--bg4); color: var(--txt2);
+}
+.log-detail {
+  flex: 1; padding: 20px;
+  overflow-y: auto;
+}
+.chain-trace {
+  display: flex; flex-direction: column; gap: 0;
+  margin-top: 12px;
+}
+.chain-step {
+  display: flex; gap: 12px; position: relative;
+}
+.chain-step::before {
+  content: ''; position: absolute;
+  left: 11px; top: 22px; bottom: -4px;
+  width: 1px; background: var(--border2);
+}
+.chain-step:last-child::before { display: none; }
+.chain-step-dot {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; margin-top: 2px;
+}
+.chain-step-body { flex: 1; padding-bottom: 16px; }
+.chain-step-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.chain-step-desc { font-size: 11px; color: var(--txt2); line-height: 1.5; margin-bottom: 6px; }
+.chain-step-code {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--txt3); background: var(--bg2);
+  padding: 6px 10px; border-radius: 5px;
+  border: 1px solid var(--border);
+  word-break: break-all;
+}
+
+/* ========== CANVAS CONNECTIONS ========== */
+.connection-line {
+  fill: none; stroke: rgba(59,130,246,0.3); stroke-width: 1.5;
+  stroke-dasharray: 5 5;
+}
+.connection-line.copy { stroke: rgba(34,197,94,0.4); }
+.connection-line.data { stroke: rgba(6,182,212,0.3); }
+
+/* ========== SCROLLBAR ========== */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <div class="logo-icon">SM</div>
+      <div>
+        <div class="logo-text">SuiMesh A2A</div>
+        <div class="logo-sub">AGENT TRADING NETWORK</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <div class="nav-item active" onclick="showScreen('network')">
+        <span class="icon">⬡</span> Agent Network
+      </div>
+      <div class="nav-item" onclick="showScreen('market')">
+        <span class="icon">◈</span> Agent Market
+        <span class="nav-badge">48</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('editor')">
+        <span class="icon">⬡</span> Flow Editor
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Monitor</div>
+      <div class="nav-item" onclick="showScreen('monitor')">
+        <span class="icon">▤</span> Strategy Monitor
+      </div>
+      <div class="nav-item" onclick="showScreen('log')">
+        <span class="icon">≡</span> Decision Log
+        <span class="nav-badge" style="background:var(--yellow)">3</span>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Settings</div>
+      <div class="nav-item">
+        <span class="icon">⚙</span> Configuration
+      </div>
+      <div class="nav-item">
+        <span class="icon">◈</span> Wallet
+      </div>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="avatar">AL</div>
+      <div>
+        <div class="user-name">ArisLiWind</div>
+        <div class="user-addr">0x3f9a…d42c</div>
+      </div>
+      <div class="status-dot"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN AREA -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="screen-title">Agent Network View</div>
+    <div class="topbar-actions" id="topbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="showScreen('editor')">+ New Flow</button>
+      <button class="btn btn-primary btn-sm">⟳ Deploy Agent</button>
+    </div>
+  </div>
+
+  <!-- ====== SCREEN 1: AGENT NETWORK ====== -->
+  <div class="screen active" id="screen-network">
+    <div class="canvas-area" id="canvas-area">
+      <div class="canvas-bg"></div>
+
+      <svg class="canvas-svg" id="canvas-svg">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M1 1L9 5L1 9" fill="none" stroke="rgba(59,130,246,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+          </marker>
+          <marker id="arr-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M1 1L9 5L1 9" fill="none" stroke="rgba(6,182,212,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+          </marker>
+          <marker id="arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M1 1L9 5L1 9" fill="none" stroke="rgba(34,197,94,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+          </marker>
+        </defs>
+      </svg>
+
+      <!-- Node: My Trading Agent -->
+      <div class="node-card active-node" id="n-mine" style="left:340px;top:180px;" onclick="selectNode('mine')">
+        <div class="node-header">
+          <div class="node-type-icon blue">🤖</div>
+          <div>
+            <div class="node-name">My Trading Agent</div>
+            <div class="node-type">Personal Agent</div>
+          </div>
+        </div>
+        <div class="node-status"><div class="dot green"></div><span style="color:var(--green)">Active</span></div>
+        <div class="node-metric pos">+12.4% / 30d</div>
+      </div>
+
+      <!-- Node: Market Data -->
+      <div class="node-card" id="n-market" style="left:80px;top:100px;" onclick="selectNode('market')">
+        <div class="node-header">
+          <div class="node-type-icon cyan">📊</div>
+          <div>
+            <div class="node-name">Market Data</div>
+            <div class="node-type">Data Source</div>
+          </div>
+        </div>
+        <div class="node-status"><div class="dot blue"></div><span style="color:var(--accent)">Streaming</span></div>
+        <div class="node-metric" style="color:var(--txt2)">1,240 ticks/s</div>
+      </div>
+
+      <!-- Node: News Agent -->
+      <div class="node-card" id="n-news" style="left:80px;top:280px;" onclick="selectNode('news')">
+        <div class="node-header">
+          <div class="node-type-icon yellow">📰</div>
+          <div>
+            <div class="node-name">News Sentinel</div>
+            <div class="node-type">News + Sentiment</div>
+          </div>
+        </div>
+        <div class="node-status"><div class="dot green"></div><span style="color:var(--green)">Live</span></div>
+        <div class="node-metric" style="color:var(--txt2)">Sentiment: 📈 Bullish</div>
+      </div>
+
+      <!-- Node: AI Analyzer -->
+      <div class="node-card" id="n-ai" style="left:200px;top:390px;" onclick="selectNode('ai')">
+        <div class="node-header">
+          <div class="node-type-icon purple">🧠</div>
+          <div>
+            <div class="node-name">AI Analyzer</div>
+            <div class="node-type">LLM Signal</div>
+          </div>
+        </div>
+        <div class="node-status"><div class="dot green"></div><span style="color:var(--green)">Running</span></div>
+        <div class="node-metric" style="color:var(--txt2)">Confidence: 87%</div>
+      </div>
+
+      <!-- Node: User B Strategy Agent (Copy) -->
+      <div class="node-card" id="n-copy" style="left:560px;top:120px;" onclick="selectNode('copy')">
+        <div class="node-header">
+          <div class="node-type-icon green">◈</div>
+          <div>
+            <div class="node-name">@AlphaMesh Pro</div>
+            <div class="node-type">Copy-Trade Source</div>
+          </div>
+        </div>
+        <div class="node-status"><div class="dot green"></div><span style="color:var(--green)">Following</span></div>
+        <div class="node-metric pos">+28.7% / 30d</div>
+      </div>
+
+      <!-- Node: Risk Guard -->
+      <div class="node-card" id="n-risk" style="left:560px;top:300px;" onclick="selectNode('risk')">
+        <div class="node-header">
+          <div class="node-type-icon yellow">🛡</div>
+          <div>
+            <div class="node-name">Risk Guard</div>
+            <div class="node-type">Protection Layer</div>
+          </div>
+        </div>
+        <div class="node-status"><div class="dot yellow"></div><span style="color:var(--yellow)">Watching</span></div>
+        <div class="node-metric" style="color:var(--yellow)">DD Limit: 8%</div>
+      </div>
+
+      <!-- Canvas Toolbar -->
+      <div class="canvas-toolbar">
+        <div class="canvas-tool active" title="Select">↖</div>
+        <div class="canvas-tool" title="Pan">✋</div>
+        <div class="canvas-tool" title="Connect">⬡</div>
+        <div class="canvas-tool" title="Add Node">+</div>
+        <div style="width:1px;background:var(--border2);margin:2px 0;"></div>
+        <div class="canvas-tool" title="Zoom In">+</div>
+        <div class="canvas-tool" title="Zoom Out">−</div>
+        <div class="canvas-tool" title="Fit">⊡</div>
+      </div>
+
+      <!-- Minimap -->
+      <div class="minimap">
+        <div class="minimap-label">OVERVIEW</div>
+        <svg width="100%" height="100%" viewBox="0 0 140 90">
+          <rect x="47" y="23" width="18" height="12" rx="2" fill="rgba(59,130,246,0.4)"/>
+          <rect x="11" y="13" width="16" height="10" rx="2" fill="rgba(6,182,212,0.3)"/>
+          <rect x="11" y="36" width="16" height="10" rx="2" fill="rgba(245,158,11,0.3)"/>
+          <rect x="27" y="51" width="16" height="10" rx="2" fill="rgba(168,85,247,0.3)"/>
+          <rect x="77" y="16" width="16" height="10" rx="2" fill="rgba(34,197,94,0.3)"/>
+          <rect x="77" y="39" width="16" height="10" rx="2" fill="rgba(245,158,11,0.3)"/>
+          <rect x="4" y="4" width="132" height="82" rx="3" fill="none" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Inspector Panel -->
+    <div class="inspector" id="inspector">
+      <div class="inspector-header">
+        <div class="node-type-icon blue" style="width:32px;height:32px;">🤖</div>
+        <div>
+          <div class="inspector-title">My Trading Agent</div>
+          <div style="font-size:10px;color:var(--txt3)">Personal Agent · ID: #A-0042</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Performance</div>
+        <svg class="sparkline" viewBox="0 0 240 36">
+          <polyline points="0,28 20,24 40,26 60,20 80,16 100,18 120,12 140,14 160,10 180,8 200,6 220,4 240,2"
+            fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/>
+          <polygon points="0,28 20,24 40,26 60,20 80,16 100,18 120,12 140,14 160,10 180,8 200,6 220,4 240,2 240,36 0,36"
+            fill="url(#g1)" opacity="0.3"/>
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#22C55E"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="metric-row">
+          <span class="metric-label">30d ROI</span>
+          <span class="metric-value pos">+12.4%</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Sharpe Ratio</span>
+          <span class="metric-value">1.82</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Max Drawdown</span>
+          <span class="metric-value neg">−4.1%</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Win Rate</span>
+          <span class="metric-value pos">67%</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Total Trades</span>
+          <span class="metric-value">342</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Strategy Tags</div>
+        <div class="tag-row">
+          <span class="tag">Trend Following</span>
+          <span class="tag">DeFi</span>
+          <span class="tag">SUI/USDC</span>
+          <span class="tag">4H TF</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Connected Nodes (5)</div>
+        <div class="conn-item">
+          <span class="conn-icon">📊</span>
+          <div>
+            <div style="font-size:11px;font-weight:500;">Market Data</div>
+            <div style="font-size:10px;color:var(--txt3);">Data feed — active</div>
+          </div>
+          <div class="dot green" style="margin-left:auto"></div>
+        </div>
+        <div class="conn-item">
+          <span class="conn-icon">📰</span>
+          <div>
+            <div style="font-size:11px;font-weight:500;">News Sentinel</div>
+            <div style="font-size:10px;color:var(--txt3);">Sentiment input — active</div>
+          </div>
+          <div class="dot green" style="margin-left:auto"></div>
+        </div>
+        <div class="conn-item">
+          <span class="conn-icon">🧠</span>
+          <div>
+            <div style="font-size:11px;font-weight:500;">AI Analyzer</div>
+            <div style="font-size:10px;color:var(--txt3);">Signal analysis — active</div>
+          </div>
+          <div class="dot green" style="margin-left:auto"></div>
+        </div>
+        <div class="conn-item">
+          <span class="conn-icon">◈</span>
+          <div>
+            <div style="font-size:11px;font-weight:500;">@AlphaMesh Pro</div>
+            <div style="font-size:10px;color:var(--txt3);">Copy-trade — following</div>
+          </div>
+          <div class="dot green" style="margin-left:auto"></div>
+        </div>
+        <div class="conn-item">
+          <span class="conn-icon">🛡</span>
+          <div>
+            <div style="font-size:11px;font-weight:500;">Risk Guard</div>
+            <div style="font-size:10px;color:var(--txt3);">Protection — watching</div>
+          </div>
+          <div class="dot yellow" style="margin-left:auto"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-ghost" style="flex:1;font-size:11px;">Configure</button>
+        <button class="btn btn-primary" style="flex:1;font-size:11px;">⟳ Restart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SCREEN 2: MARKETPLACE ====== -->
+  <div class="screen" id="screen-market">
+    <div class="market-body">
+      <!-- Filters -->
+      <div class="market-filters">
+        <div class="filter-group">
+          <div class="filter-group-title">Strategy Type</div>
+          <div class="filter-option"><div class="checkbox checked">✓</div> Trend Following</div>
+          <div class="filter-option"><div class="checkbox checked">✓</div> Mean Reversion</div>
+          <div class="filter-option"><div class="checkbox"></div> Arbitrage</div>
+          <div class="filter-option"><div class="checkbox"></div> AI-Driven</div>
+          <div class="filter-option"><div class="checkbox"></div> Grid Trading</div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-title">Chain</div>
+          <div class="filter-option"><div class="checkbox checked">✓</div> Sui</div>
+          <div class="filter-option"><div class="checkbox"></div> Ethereum</div>
+          <div class="filter-option"><div class="checkbox"></div> Solana</div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-title">Min 30d ROI</div>
+          <input class="field-input" type="range" min="0" max="100" value="10" style="padding:4px 0;background:transparent;border:none;width:100%">
+          <div style="font-size:11px;color:var(--txt2);text-align:right;">≥ 10%</div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-title">Risk Level</div>
+          <div class="filter-option"><div class="checkbox checked">✓</div> Low</div>
+          <div class="filter-option"><div class="checkbox checked">✓</div> Medium</div>
+          <div class="filter-option"><div class="checkbox"></div> High</div>
+        </div>
+      </div>
+
+      <!-- Agent Grid -->
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;">
+          <div class="sort-tabs" style="flex:1;max-width:320px;">
+            <div class="sort-tab active">Hot 🔥</div>
+            <div class="sort-tab">Top ROI</div>
+            <div class="sort-tab">Most Followed</div>
+            <div class="sort-tab">Newest</div>
+          </div>
+          <div style="font-size:11px;color:var(--txt3);">48 agents found</div>
+        </div>
+        <div class="market-grid">
+
+          <!-- Agent 1 -->
+          <div class="agent-card">
+            <div class="agent-avatar" style="background:rgba(34,197,94,0.15)">🦁</div>
+            <div class="agent-info">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                <div class="agent-name">AlphaMesh Pro</div>
+                <span class="badge badge-verified">✓ Verified</span>
+                <span class="badge badge-top">Top 1%</span>
+              </div>
+              <div class="agent-desc">Multi-timeframe trend following strategy on SUI/USDC and BTC/USDC. AI-enhanced entry signals.</div>
+              <div class="agent-metrics">
+                <div class="agent-metric">
+                  <div class="agent-metric-val pos">+28.7%</div>
+                  <div class="agent-metric-label">30D ROI</div>
+                </div>
+                <div class="agent-metric">
+                  <div class="agent-metric-val">2.14</div>
+                  <div class="agent-metric-label">Sharpe</div>
+                </div>
+                <div class="agent-metric">
+                  <div class="agent-metric-val neg">−3.2%</div>
+                  <div class="agent-metric-label">Max DD</div>
+                </div>
+                <div class="agent-metric">
+                  <div class="agent-metric-val">71%</div>
+                  <div class="agent-metric-label">Win Rate</div>
+                </div>
+              </div>
+            </div>
+            <div class="agent-actions">
+              <div>
+                <div class="followers-row">👥 1,240 following</div>
+                <div style="margin-top:4px;">
+                  <svg viewBox="0 0 100 30" class="chart-micro" style="width:100px">
+                    <polyline points="0,25 10,20 20,22 30,15 40,12 50,14 60,8 70,10 80,5 90,3 100,1"
+                      fill="none" stroke="var(--green)" stroke-width="1.5"/>
+                  </svg>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="alert('Copy-trade setup wizard: Set size multiplier, max position, pause conditions...')">Follow ⟶</button>
+            </div>
+          </div>
+
+          <!-- Agent 2 -->
+          <div class="agent-card">
+            <div class="agent-avatar" style="background:rgba(59,130,246,0.15)">🐬</div>
+            <div class="agent-info">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                <div class="agent-name">DeltaWave DeFi</div>
+                <span class="badge badge-verified">✓ Verified</span>
+              </div>
+              <div class="agent-desc">Mean reversion on DeFi pairs using on-chain liquidity signals + news sentiment scoring.</div>
+              <div class="agent-metrics">
+                <div class="agent-metric">
+                  <div class="agent-metric-val pos">+19.3%</div>
+                  <div class="agent-metric-label">30D ROI</div>
+                </div>
+                <div class="agent-metric">
+                  <div class="agent-metric-val">1.76</div>
+                  <div class="agent-metric-label">Sharpe</div>
+                </div>
+                <div class="agent-metric">
+                  <div class="agent-metric-val neg">−5.8%</div>
+                  <div class="agent-metric-label">Max DD</div>
+                </div>
+                <div class="agent-metric">
+                  <div class="agent-metric-val">63%</div>
+                  <div class="agent-metric-label">Win Rate</div>
+                </div>
+              </div>
+            </div>
+            <div class="agent-actions">
+              <div>
+                <div class="followers-row">👥 872 following</div>
+                <svg viewBox="0 0 100 30" class="chart-micro" style="width:100px">
+                  <polyline points="0,20 10,18 20,22 30,16 40,20 50,13 60,15 70,10 80,12 90,8 100,6"
+                    fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <button class="btn btn-ghost btn-sm">Follow ⟶</button>
+            </div>
+          </div>
+
+          <!-- Agent 3 -->
+          <div class="agent-card">
+            <div class="agent-avatar" style="background:rgba(168,85,247,0.15)">🤖</div>
+            <div class="agent-info">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                <div class="agent-name">NeuralSui v2</div>
+                <span class="badge badge-new">New</span>
+              </div>
+              <div class="agent-desc">Fully LLM-driven decision agent. Reads news, on-chain data, social signals, and executes autonomously.</div>
+              <div class="agent-metrics">
+                <div class="agent-metric">
+                  <div class="agent-metric-val pos">+34.1%</div>
+                  <div class="agent-metric-label">30D ROI</div>
+                </div>
+                <div class="agent-metric">
+                  <div class="agent-metric-val">1.92</div>
+                  <div class="agent-metric-label">Sharpe</div>
+                </div>
+                <div class="agent-metric">
+                  <div class="agent-metric-val neg">−9.4%</div>
+                  <div class="agent-metric-label">Max DD</div>
+                </div>
+                <div class="agent-metric">
+                  <div class="agent-metric-val">58%</div>
+                  <div class="agent-metric-label">Win Rate</div>
+                </div>
+              </div>
+            </div>
+            <div class="agent-actions">
+              <div>
+                <div class="followers-row">👥 341 following</div>
+                <svg viewBox="0 0 100 30" class="chart-micro" style="width:100px">
+                  <polyline points="0,25 10,22 20,28 30,18 40,10 50,20 60,8 70,5 80,12 90,2 100,4"
+                    fill="none" stroke="var(--purple)" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <button class="btn btn-ghost btn-sm">Follow ⟶</button>
+            </div>
+          </div>
+
+          <!-- Agent 4 -->
+          <div class="agent-card">
+            <div class="agent-avatar" style="background:rgba(245,158,11,0.15)">⚡</div>
+            <div class="agent-info">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                <div class="agent-name">GridStrike Sui</div>
+                <span class="badge badge-verified">✓ Verified</span>
+              </div>
+              <div class="agent-desc">Tight grid strategy on SUI perpetuals. Low risk, consistent small gains, auto-rebalancing.</div>
+              <div class="agent-metrics">
+                <div class="agent-metric">
+                  <div class="agent-metric-val pos">+11.2%</div>
+                  <div class="agent-metric-label">30D ROI</div>
+                </div>
+                <div class="agent-metric">
+                  <div class="agent-metric-val">2.40</div>
+                  <div class="agent-metric-label">Sharpe</div>
+                </div>
+                <div class="agent-metric">
+                  <div class="agent-metric-val neg">−1.8%</div>
+                  <div class="agent-metric-label">Max DD</div>
+                </div>
+                <div class="agent-metric">
+                  <div class="agent-metric-val">82%</div>
+                  <div class="agent-metric-label">Win Rate</div>
+                </div>
+              </div>
+            </div>
+            <div class="agent-actions">
+              <div>
+                <div class="followers-row">👥 2,104 following</div>
+                <svg viewBox="0 0 100 30" class="chart-micro" style="width:100px">
+                  <polyline points="0,20 10,19 20,18 30,17 40,16 50,15 60,13 70,12 80,11 90,9 100,8"
+                    fill="none" stroke="var(--yellow)" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <button class="btn btn-ghost btn-sm">Follow ⟶</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- My Followed -->
+      <div class="market-right">
+        <div>
+          <div class="section-title" style="margin-bottom:12px;">My Followed (2)</div>
+          <div class="followed-item">
+            <div class="followed-dot" style="background:var(--green)"></div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:500;">AlphaMesh Pro</div>
+              <div style="font-size:10px;color:var(--txt3);">+28.7% · 1,240 followers</div>
+            </div>
+            <span style="font-size:11px;color:var(--green);">+$284</span>
+          </div>
+          <div class="followed-item">
+            <div class="followed-dot" style="background:var(--yellow)"></div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:500;">GridStrike Sui</div>
+              <div style="font-size:10px;color:var(--txt3);">+11.2% · 2,104 followers</div>
+            </div>
+            <span style="font-size:11px;color:var(--green);">+$96</span>
+          </div>
+        </div>
+        <div style="margin-top:20px;">
+          <div class="section-title" style="margin-bottom:12px;">Copy-Trade P&amp;L</div>
+          <div style="font-size:22px;font-weight:600;color:var(--green);">+$380</div>
+          <div style="font-size:11px;color:var(--txt3);margin-top:2px;">This month from copy-trade</div>
+          <svg viewBox="0 0 220 60" style="width:100%;margin-top:12px;">
+            <polyline points="0,50 22,44 44,46 66,38 88,30 110,32 132,24 154,20 176,14 198,10 220,6"
+              fill="none" stroke="var(--green)" stroke-width="1.5"/>
+            <polygon points="0,50 22,44 44,46 66,38 88,30 110,32 132,24 154,20 176,14 198,10 220,6 220,60 0,60"
+              fill="rgba(34,197,94,0.1)"/>
+          </svg>
+        </div>
+        <div style="margin-top:20px;">
+          <div class="section-title" style="margin-bottom:10px;">Risk Settings</div>
+          <div class="metric-row">
+            <span class="metric-label">Max copy size</span>
+            <span class="metric-value">$500</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Stop copy if DD &gt;</span>
+            <span class="metric-value">8%</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">News pause trigger</span>
+            <span class="metric-value pos">ON</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SCREEN 3: FLOW EDITOR ====== -->
+  <div class="screen" id="screen-editor">
+    <div class="editor-left">
+      <div class="node-library-section">
+        <div class="library-title">Data Sources</div>
+        <div class="library-node">
+          <div class="lib-icon" style="background:rgba(6,182,212,0.2)">📊</div>Market Feed
+        </div>
+        <div class="library-node">
+          <div class="lib-icon" style="background:rgba(245,158,11,0.2)">📰</div>News Sentinel
+        </div>
+        <div class="library-node">
+          <div class="lib-icon" style="background:rgba(34,197,94,0.2)">⛓</div>On-Chain Data
+        </div>
+        <div class="library-node">
+          <div class="lib-icon" style="background:rgba(59,130,246,0.2)">🔌</div>Custom API
+        </div>
+      </div>
+      <div class="node-library-section">
+        <div class="library-title">Analysis</div>
+        <div class="library-node">
+          <div class="lib-icon" style="background:rgba(168,85,247,0.2)">🧠</div>AI Analyzer
+        </div>
+        <div class="library-node">
+          <div class="lib-icon" style="background:rgba(59,130,246,0.2)">📐</div>TA Indicators
+        </div>
+        <div class="library-node">
+          <div class="lib-icon" style="background:rgba(168,85,247,0.2)">📉</div>Signal Filter
+        </div>
+      </div>
+      <div class="node-library-section">
+        <div class="library-title">Actions</div>
+        <div class="library-node">
+          <div class="lib-icon" style="background:rgba(34,197,94,0.2)">🛒</div>Place Order
+        </div>
+        <div class="library-node">
+          <div class="lib-icon" style="background:rgba(239,68,68,0.2)">❌</div>Close Position
+        </div>
+        <div class="library-node">
+          <div class="lib-icon" style="background:rgba(59,130,246,0.2)">◈</div>Copy-Trade
+        </div>
+      </div>
+      <div class="node-library-section">
+        <div class="library-title">Guards</div>
+        <div class="library-node">
+          <div class="lib-icon" style="background:rgba(245,158,11,0.2)">🛡</div>Risk Guard
+        </div>
+        <div class="library-node">
+          <div class="lib-icon" style="background:rgba(245,158,11,0.2)">⏸</div>Pause Condition
+        </div>
+        <div class="library-node">
+          <div class="lib-icon" style="background:rgba(239,68,68,0.2)">🚨</div>Alert Node
+        </div>
+      </div>
+    </div>
+
+    <!-- Flow Canvas -->
+    <div class="editor-canvas">
+      <svg class="flow-canvas-svg" id="flow-svg">
+        <defs>
+          <marker id="flow-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M1 1L9 5L1 9" fill="none" stroke="rgba(59,130,246,0.6)" stroke-width="2" stroke-linecap="round"/>
+          </marker>
+          <marker id="flow-arr-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M1 1L9 5L1 9" fill="none" stroke="rgba(34,197,94,0.6)" stroke-width="2" stroke-linecap="round"/>
+          </marker>
+          <marker id="flow-arr-y" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M1 1L9 5L1 9" fill="none" stroke="rgba(245,158,11,0.6)" stroke-width="2" stroke-linecap="round"/>
+          </marker>
+        </defs>
+        <!-- Connections -->
+        <path d="M 200 110 C 240 110, 260 150, 320 150" fill="none" stroke="rgba(6,182,212,0.5)" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#flow-arr)"/>
+        <path d="M 200 270 C 240 270, 260 200, 320 180" fill="none" stroke="rgba(245,158,11,0.4)" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#flow-arr)"/>
+        <path d="M 200 380 C 260 380, 280 220, 320 200" fill="none" stroke="rgba(168,85,247,0.4)" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#flow-arr)"/>
+        <path d="M 490 165 C 540 165, 560 220, 580 240" fill="none" stroke="rgba(34,197,94,0.5)" stroke-width="1.5" marker-end="url(#flow-arr-g)"/>
+        <path d="M 490 165 C 560 165, 600 350, 580 380" fill="none" stroke="rgba(239,68,68,0.4)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#flow-arr)"/>
+        <path d="M 710 165 C 750 165, 760 220, 760 240" fill="none" stroke="rgba(245,158,11,0.5)" stroke-width="1.5" marker-end="url(#flow-arr-y)"/>
+      </svg>
+
+      <!-- Flow nodes -->
+      <div class="flow-node" style="left:60px;top:80px;">
+        <div class="flow-node-header">
+          <div class="lib-icon" style="background:rgba(6,182,212,0.2);width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;">📊</div>
+          <div class="flow-node-title">Market Feed</div>
+        </div>
+        <div style="font-size:10px;color:var(--txt3);">SUI/USDC · 1H candles</div>
+        <div class="port out"></div>
+      </div>
+
+      <div class="flow-node" style="left:60px;top:240px;">
+        <div class="flow-node-header">
+          <div class="lib-icon" style="background:rgba(245,158,11,0.2);width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;">📰</div>
+          <div class="flow-node-title">News Sentinel</div>
+        </div>
+        <div style="font-size:10px;color:var(--txt3);">Real-time sentiment</div>
+        <div class="port out"></div>
+      </div>
+
+      <div class="flow-node" style="left:60px;top:350px;">
+        <div class="flow-node-header">
+          <div class="lib-icon" style="background:rgba(168,85,247,0.2);width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;">🧠</div>
+          <div class="flow-node-title">AI Analyzer</div>
+        </div>
+        <div style="font-size:10px;color:var(--txt3);">LLM signal scoring</div>
+        <div class="port out"></div>
+      </div>
+
+      <div class="flow-node selected" style="left:320px;top:130px;" onclick="selectFlowNode()">
+        <div class="flow-node-header">
+          <div class="lib-icon" style="background:rgba(59,130,246,0.2);width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;">🤖</div>
+          <div class="flow-node-title">My Trading Agent</div>
+        </div>
+        <div style="font-size:10px;color:var(--txt3);">Decision coordinator</div>
+        <div class="port in"></div>
+        <div class="port out"></div>
+      </div>
+
+      <div class="flow-node" style="left:560px;top:210px;">
+        <div class="flow-node-header">
+          <div class="lib-icon" style="background:rgba(34,197,94,0.2);width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;">🛒</div>
+          <div class="flow-node-title">Place Order</div>
+        </div>
+        <div style="font-size:10px;color:var(--txt3);">DEX execution</div>
+        <div class="port in"></div>
+      </div>
+
+      <div class="flow-node" style="left:560px;top:350px;">
+        <div class="flow-node-header">
+          <div class="lib-icon" style="background:rgba(239,68,68,0.2);width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;">🚨</div>
+          <div class="flow-node-title">Alert Node</div>
+        </div>
+        <div style="font-size:10px;color:var(--txt3);">Push + Telegram</div>
+        <div class="port in"></div>
+      </div>
+
+      <div class="flow-node" style="left:490px;top:130px;">
+        <div class="flow-node-header">
+          <div class="lib-icon" style="background:rgba(245,158,11,0.2);width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;">🛡</div>
+          <div class="flow-node-title">Risk Guard</div>
+        </div>
+        <div style="font-size:10px;color:var(--txt3);">DD 8% · Vol gate</div>
+        <div class="port in"></div>
+        <div class="port out" style="right:auto;left:auto;right:-5px;"></div>
+      </div>
+
+      <!-- Canvas controls -->
+      <div style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm">⏮ Test Run</button>
+        <button class="btn btn-ghost btn-sm">◉ Simulate</button>
+        <button class="btn btn-primary btn-sm">Deploy Flow ▶</button>
+      </div>
+    </div>
+
+    <!-- Config Panel -->
+    <div class="editor-right">
+      <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+        <div style="font-size:13px;font-weight:600;margin-bottom:2px;">My Trading Agent</div>
+        <div style="font-size:10px;color:var(--txt3);">Decision coordinator node</div>
+      </div>
+
+      <div class="config-field">
+        <div class="field-label">Agent Name</div>
+        <input class="field-input" value="My Trading Agent">
+      </div>
+      <div class="config-field">
+        <div class="field-label">Base Asset</div>
+        <select class="field-select">
+          <option>SUI / USDC</option>
+          <option>BTC / USDC</option>
+          <option>ETH / USDC</option>
+        </select>
+      </div>
+      <div class="config-field">
+        <div class="field-label">Position Size (%)</div>
+        <input class="field-input" value="5" type="number">
+      </div>
+      <div class="config-field">
+        <div class="field-label">Max Daily Trades</div>
+        <input class="field-input" value="10" type="number">
+      </div>
+
+      <div style="margin-top:16px;margin-bottom:8px;">
+        <div class="section-title">Behavior</div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Use AI signals</span>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">News sentiment filter</span>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Copy-trade enabled</span>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Auto risk guard</span>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Public profile</span>
+        <div class="toggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+
+      <div style="margin-top:16px;display:flex;gap:6px;">
+        <button class="btn btn-ghost" style="flex:1;font-size:11px;">Reset</button>
+        <button class="btn btn-primary" style="flex:1;font-size:11px;">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SCREEN 4: STRATEGY MONITOR ====== -->
+  <div class="screen" id="screen-monitor">
+    <div class="monitor-body">
+      <!-- Panel 1: Equity Curve -->
+      <div class="monitor-panel">
+        <div class="panel-title-row">
+          <div class="panel-title">Portfolio Equity</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-ghost btn-sm">1D</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--accent);border-color:var(--accent);">7D</button>
+            <button class="btn btn-ghost btn-sm">30D</button>
+          </div>
+        </div>
+        <div class="equity-chart" style="flex:1;">
+          <div class="equity-label">Total Value</div>
+          <div class="equity-value">$12,840</div>
+          <div class="equity-change">▲ +$1,240 (+10.7%) this week</div>
+          <svg width="100%" height="100%" viewBox="0 0 400 160" preserveAspectRatio="none" style="margin-top:70px;">
+            <defs>
+              <linearGradient id="eq-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#22C55E" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#22C55E" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="0,90 40,80 80,85 120,70 160,55 200,58 240,42 280,38 320,28 360,20 400,10 400,90 0,90"
+              fill="url(#eq-grad)"/>
+            <polyline points="0,90 40,80 80,85 120,70 160,55 200,58 240,42 280,38 320,28 360,20 400,10"
+              fill="none" stroke="var(--green)" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Panel 2: Active Positions -->
+      <div class="monitor-panel">
+        <div class="panel-title-row">
+          <div class="panel-title">Active Positions</div>
+          <div style="font-size:11px;color:var(--txt3);">3 open</div>
+        </div>
+        <table class="positions-table">
+          <thead>
+            <tr>
+              <th>Pair</th>
+              <th>Side</th>
+              <th>Size</th>
+              <th>Entry</th>
+              <th>P&amp;L</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="pair-badge">SUI/USDC</span></td>
+              <td><span class="trade-side buy">LONG</span></td>
+              <td>$500</td>
+              <td>0.842</td>
+              <td class="metric-value pos">+$42 (+8.4%)</td>
+            </tr>
+            <tr>
+              <td><span class="pair-badge">BTC/USDC</span></td>
+              <td><span class="trade-side buy">LONG</span></td>
+              <td>$1,200</td>
+              <td>67,240</td>
+              <td class="metric-value pos">+$180 (+15%)</td>
+            </tr>
+            <tr>
+              <td><span class="pair-badge">ETH/USDC</span></td>
+              <td><span class="trade-side sell">SHORT</span></td>
+              <td>$300</td>
+              <td>3,485</td>
+              <td class="metric-value neg">−$18 (−6%)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Panel 3: Risk Dashboard -->
+      <div class="monitor-panel">
+        <div class="panel-title-row">
+          <div class="panel-title">Risk Dashboard</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);">
+            <div class="dot green"></div> Healthy
+          </div>
+        </div>
+        <div class="risk-bars">
+          <div class="risk-item">
+            <div class="risk-item-header">
+              <span>Current Drawdown</span>
+              <span style="color:var(--green);">3.2% / 8% limit</span>
+            </div>
+            <div class="risk-bar-track">
+              <div class="risk-bar-fill" style="width:40%;background:var(--green);"></div>
+            </div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-item-header">
+              <span>Daily Loss</span>
+              <span style="color:var(--yellow);">1.8% / 3% limit</span>
+            </div>
+            <div class="risk-bar-track">
+              <div class="risk-bar-fill" style="width:60%;background:var(--yellow);"></div>
+            </div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-item-header">
+              <span>Position Exposure</span>
+              <span>$2,000 / $5,000</span>
+            </div>
+            <div class="risk-bar-track">
+              <div class="risk-bar-fill" style="width:40%;background:var(--accent);"></div>
+            </div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-item-header">
+              <span>Volatility Index</span>
+              <span style="color:var(--green);">24 (Low)</span>
+            </div>
+            <div class="risk-bar-track">
+              <div class="risk-bar-fill" style="width:24%;background:var(--green);"></div>
+            </div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-item-header">
+              <span>News Sentiment</span>
+              <span style="color:var(--green);">Bullish 78%</span>
+            </div>
+            <div class="risk-bar-track">
+              <div class="risk-bar-fill" style="width:78%;background:var(--green);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 4: Recent Trades -->
+      <div class="monitor-panel">
+        <div class="panel-title-row">
+          <div class="panel-title">Recent Trades</div>
+          <div style="font-size:11px;color:var(--txt3);">Today: 8 trades</div>
+        </div>
+        <div class="trades-feed">
+          <div class="trade-item">
+            <span class="trade-side buy">BUY</span>
+            <div class="trade-info">
+              <div class="trade-pair">SUI/USDC</div>
+              <div class="trade-meta">09:14 · AI Signal · $500</div>
+            </div>
+            <span class="trade-pnl pos">+$42</span>
+          </div>
+          <div class="trade-item">
+            <span class="trade-side sell">SELL</span>
+            <div class="trade-info">
+              <div class="trade-pair">ETH/USDC</div>
+              <div class="trade-meta">08:52 · Copy @AlphaMesh · $300</div>
+            </div>
+            <span class="trade-pnl neg">−$18</span>
+          </div>
+          <div class="trade-item">
+            <span class="trade-side buy">BUY</span>
+            <div class="trade-info">
+              <div class="trade-pair">BTC/USDC</div>
+              <div class="trade-meta">08:30 · Trend signal · $1,200</div>
+            </div>
+            <span class="trade-pnl pos">+$180</span>
+          </div>
+          <div class="trade-item">
+            <span class="trade-side sell">SELL</span>
+            <div class="trade-info">
+              <div class="trade-pair">SUI/USDC</div>
+              <div class="trade-meta">Yesterday 22:10 · Take profit · $500</div>
+            </div>
+            <span class="trade-pnl pos">+$61</span>
+          </div>
+          <div class="trade-item">
+            <span class="trade-side buy">BUY</span>
+            <div class="trade-info">
+              <div class="trade-pair">SUI/USDC</div>
+              <div class="trade-meta">Yesterday 18:44 · News signal · $500</div>
+            </div>
+            <span class="trade-pnl pos">+$34</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SCREEN 5: DECISION AUDIT LOG ====== -->
+  <div class="screen" id="screen-log">
+    <div class="log-body">
+      <div class="log-list">
+        <!-- Log items -->
+        <div class="log-item active" onclick="selectLog(this, 1)">
+          <div class="log-timeline">
+            <div class="log-dot" style="background:var(--green)"></div>
+            <div class="log-line"></div>
+          </div>
+          <div class="log-content">
+            <div class="log-title">LONG SUI/USDC $500 — Executed</div>
+            <div class="log-meta">
+              <span>09:14:32</span>
+              <span class="log-node-tag">My Agent</span>
+              <span class="log-node-tag">AI Signal</span>
+            </div>
+          </div>
+        </div>
+        <div class="log-item" onclick="selectLog(this, 2)">
+          <div class="log-timeline">
+            <div class="log-dot" style="background:var(--red)"></div>
+            <div class="log-line"></div>
+          </div>
+          <div class="log-content">
+            <div class="log-title">SHORT ETH/USDC $300 — Executed</div>
+            <div class="log-meta">
+              <span>08:52:07</span>
+              <span class="log-node-tag">Copy @AlphaMesh</span>
+            </div>
+          </div>
+        </div>
+        <div class="log-item" onclick="selectLog(this, 3)">
+          <div class="log-timeline">
+            <div class="log-dot" style="background:var(--yellow)"></div>
+            <div class="log-line"></div>
+          </div>
+          <div class="log-content">
+            <div class="log-title">Risk Guard: Volatility check passed</div>
+            <div class="log-meta">
+              <span>08:50:01</span>
+              <span class="log-node-tag">Risk Guard</span>
+            </div>
+          </div>
+        </div>
+        <div class="log-item" onclick="selectLog(this, 4)">
+          <div class="log-timeline">
+            <div class="log-dot" style="background:var(--green)"></div>
+            <div class="log-line"></div>
+          </div>
+          <div class="log-content">
+            <div class="log-title">LONG BTC/USDC $1,200 — Executed</div>
+            <div class="log-meta">
+              <span>08:30:18</span>
+              <span class="log-node-tag">My Agent</span>
+              <span class="log-node-tag">Trend Signal</span>
+            </div>
+          </div>
+        </div>
+        <div class="log-item" onclick="selectLog(this, 5)">
+          <div class="log-timeline">
+            <div class="log-dot" style="background:var(--txt3)"></div>
+            <div class="log-line"></div>
+          </div>
+          <div class="log-content">
+            <div class="log-title">News pause trigger — Skipped trade</div>
+            <div class="log-meta">
+              <span>08:10:44</span>
+              <span class="log-node-tag">News Sentinel</span>
+              <span class="log-node-tag">Risk Guard</span>
+            </div>
+          </div>
+        </div>
+        <div class="log-item" onclick="selectLog(this, 6)">
+          <div class="log-timeline">
+            <div class="log-dot" style="background:var(--green)"></div>
+            <div class="log-line"></div>
+          </div>
+          <div class="log-content">
+            <div class="log-title">SELL SUI/USDC $500 — Take Profit</div>
+            <div class="log-meta">
+              <span>Yesterday 22:10</span>
+              <span class="log-node-tag">My Agent</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Log Detail -->
+      <div class="log-detail">
+        <div style="margin-bottom:16px;">
+          <div style="font-size:15px;font-weight:600;margin-bottom:4px;">LONG SUI/USDC $500 — Executed</div>
+          <div style="font-size:11px;color:var(--txt3);">2026-05-22 · 09:14:32 CST · Tx: <span style="font-family:'JetBrains Mono';color:var(--accent);">0x8f4a...2e91</span></div>
+        </div>
+
+        <div class="section-title" style="margin-bottom:12px;">Decision Chain Trace</div>
+        <div class="chain-trace">
+          <div class="chain-step">
+            <div class="chain-step-dot" style="background:rgba(6,182,212,0.2);color:var(--accent2);">1</div>
+            <div class="chain-step-body">
+              <div class="chain-step-title">Market Feed Signal</div>
+              <div class="chain-step-desc">SUI/USDC crossed above 20-period EMA on 1H chart. RSI: 58. Volume: +34% above average.</div>
+              <div class="chain-step-code">source: "Binance CEX" · pair: "SUI/USDC" · close: 0.842 · ema20: 0.831</div>
+            </div>
+          </div>
+          <div class="chain-step">
+            <div class="chain-step-dot" style="background:rgba(245,158,11,0.2);color:var(--yellow);">2</div>
+            <div class="chain-step-body">
+              <div class="chain-step-title">News Sentinel — Bullish signal</div>
+              <div class="chain-step-desc">Detected 3 positive Sui ecosystem news items in last 2 hours. Sentiment score: 0.78 (Bullish).</div>
+              <div class="chain-step-code">sentiment: 0.78 · articles: 3 · keywords: ["Sui", "ecosystem", "growth"]</div>
+            </div>
+          </div>
+          <div class="chain-step">
+            <div class="chain-step-dot" style="background:rgba(168,85,247,0.2);color:var(--purple);">3</div>
+            <div class="chain-step-body">
+              <div class="chain-step-title">AI Analyzer — LONG recommendation</div>
+              <div class="chain-step-desc">LLM analysis of combined signals: technical breakout + positive sentiment alignment. Confidence: 87%.</div>
+              <div class="chain-step-code">decision: "LONG" · confidence: 0.87 · reasoning: "Bullish alignment confirmed"</div>
+            </div>
+          </div>
+          <div class="chain-step">
+            <div class="chain-step-dot" style="background:rgba(245,158,11,0.2);color:var(--yellow);">4</div>
+            <div class="chain-step-body">
+              <div class="chain-step-title">Risk Guard — Check passed</div>
+              <div class="chain-step-desc">Current drawdown (3.2%) within 8% limit. Daily loss (1.8%) within 3% limit. Volatility: 24 (Low). Trade approved.</div>
+              <div class="chain-step-code">dd_check: PASS · daily_loss_check: PASS · vol_check: PASS · sentiment_check: PASS</div>
+            </div>
+          </div>
+          <div class="chain-step">
+            <div class="chain-step-dot" style="background:rgba(34,197,94,0.2);color:var(--green);">5</div>
+            <div class="chain-step-body">
+              <div class="chain-step-title">Order Executed On-chain</div>
+              <div class="chain-step-desc">LONG SUI/USDC $500 at 0.842. DEX: Cetus Protocol. Gas: 0.0012 SUI.</div>
+              <div class="chain-step-code">tx: 0x8f4a9e2b1c3d4e5f...2e91 · block: 4,120,844 · status: confirmed</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm">Copy Tx Hash</button>
+          <button class="btn btn-ghost btn-sm">View on Explorer ↗</button>
+          <button class="btn btn-ghost btn-sm">Export Log</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .main -->
+
+<script>
+const screens = {
+  'network': { title: 'Agent Network View', actions: '<button class="btn btn-ghost btn-sm" onclick="showScreen(\'editor\')">+ New Flow</button><button class="btn btn-primary btn-sm">⟳ Deploy Agent</button>' },
+  'market':  { title: 'Agent Marketplace', actions: '<input placeholder="Search agents..." style="background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:5px 12px;color:var(--txt1);font-size:12px;font-family:inherit;outline:none;width:220px;"><button class="btn btn-ghost btn-sm">Sort ▾</button>' },
+  'editor':  { title: 'Flow Editor', actions: '<button class="btn btn-ghost btn-sm">Templates</button><button class="btn btn-ghost btn-sm">⏮ Test Run</button><button class="btn btn-primary btn-sm">Deploy ▶</button>' },
+  'monitor': { title: 'Strategy Monitor', actions: '<button class="btn btn-ghost btn-sm">Export</button><button class="btn btn-primary btn-sm" style="background:var(--red);border-color:var(--red);">⏸ Pause All</button>' },
+  'log':     { title: 'Decision Audit Log', actions: '<button class="btn btn-ghost btn-sm">Filter</button><button class="btn btn-ghost btn-sm">Export CSV</button><button class="btn btn-ghost btn-sm">On-chain Attest</button>' },
+};
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.getElementById('screen-title').textContent = screens[id].title;
+  document.getElementById('topbar-actions').innerHTML = screens[id].actions;
+  const items = document.querySelectorAll('.nav-item');
+  const map = { network: 0, market: 1, editor: 2, monitor: 3, log: 4 };
+  if (map[id] !== undefined) items[map[id]].classList.add('active');
+}
+
+function selectNode(id) {
+  document.querySelectorAll('.node-card').forEach(n => n.classList.remove('active-node'));
+  document.getElementById('n-' + id).classList.add('active-node');
+}
+
+function selectFlowNode() {}
+
+function selectLog(el, idx) {
+  document.querySelectorAll('.log-item').forEach(l => l.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Draw SVG connections on network canvas
+function drawConnections() {
+  const svg = document.getElementById('canvas-svg');
+  const pairs = [
+    { from: 'n-market', to: 'n-mine', cls: 'data' },
+    { from: 'n-news', to: 'n-mine', cls: 'data' },
+    { from: 'n-ai', to: 'n-mine', cls: 'data' },
+    { from: 'n-copy', to: 'n-mine', cls: 'copy' },
+    { from: 'n-mine', to: 'n-risk', cls: '' },
+  ];
+  pairs.forEach(({ from, to, cls }) => {
+    const a = document.getElementById(from);
+    const b = document.getElementById(to);
+    if (!a || !b) return;
+    const ar = a.getBoundingClientRect();
+    const br = b.getBoundingClientRect();
+    const canvas = document.getElementById('canvas-area').getBoundingClientRect();
+    const x1 = ar.left + ar.width/2 - canvas.left;
+    const y1 = ar.top + ar.height/2 - canvas.top;
+    const x2 = br.left + br.width/2 - canvas.left;
+    const y2 = br.top + br.height/2 - canvas.top;
+    const cx = (x1+x2)/2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    line.setAttribute('d', `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`);
+    line.setAttribute('class', 'connection-line ' + cls);
+    if (cls === 'copy') line.setAttribute('marker-end', 'url(#arr-green)');
+    else line.setAttribute('marker-end', 'url(#arr)');
+    svg.appendChild(line);
+  });
+}
+
+window.addEventListener('load', () => {
+  setTimeout(drawConnections, 100);
+});
+window.addEventListener('resize', () => {
+  const svg = document.getElementById('canvas-svg');
+  while (svg.firstChild.nextSibling) svg.removeChild(svg.lastChild);
+  drawConnections();
+});
+</script>
+</body>
+</html>
