@@ -704,7 +704,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
       <span class="sib-icon">⬡</span>
       <span class="sib-label" id="sn-network">Agent Network</span>
     </div>
-    <div class="sib" onclick="openModal('monitor')">
+    <div class="sib" onclick="switchTab('monitor',document.getElementById('tab-mon'))">
       <span class="sib-icon">▤</span>
       <span class="sib-label" id="sn-monitor">Monitor</span>
       <span class="dot g"></span>
@@ -713,7 +713,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
       <span class="sib-icon">⬡</span>
       <span class="sib-label" id="sn-flow">Flow Editor</span>
     </div>
-    <div class="sib" onclick="openModal('auditlog')">
+    <div class="sib" onclick="switchTab('history',document.getElementById('tab-log'))">
       <span class="sib-icon">≡</span>
       <span class="sib-label" id="sn-log">Audit Log</span>
       <span class="sib-badge new">3</span>
@@ -733,11 +733,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
       <span class="sib-label" id="sn-market">Agent Market</span>
       <span class="sib-badge">48</span>
     </div>
-    <div class="sib sib-dim" onclick="openModal('monitor')">
+    <div class="sib sib-dim" onclick="switchTab('monitor',document.getElementById('tab-mon'))">
       <span class="sib-icon">◉</span>
       <span class="sib-label" id="sn-leaderboard">Leaderboard</span>
     </div>
-    <div class="sib sib-dim" onclick="openModal('auditlog')">
+    <div class="sib sib-dim" onclick="switchTab('history',document.getElementById('tab-log'))">
       <span class="sib-icon">◈</span>
       <span class="sib-label" id="sn-activity">Activity</span>
     </div>
@@ -751,7 +751,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
       <span class="sib-icon">◈</span>
       <span class="sib-label" id="sn-marketplace">Marketplace</span>
     </div>
-    <div class="sib" onclick="openModal('monitor')">
+    <div class="sib" onclick="switchTab('monitor',document.getElementById('tab-mon'))">
       <span class="sib-icon">▦</span>
       <span class="sib-label" id="sn-metrics">Metrics</span>
       <span class="sib-badge new" id="metrics-new">New</span>
@@ -1447,7 +1447,7 @@ function showEdgePanel(edge){
   document.getElementById('pb').innerHTML=body;
   document.getElementById('pa').innerHTML=`
     <button class="pab pab-ghost" onclick="clearSel()">Close</button>
-    <button class="pab pab-ghost" onclick="openModal('auditlog')">View Log</button>
+    <button class="pab pab-ghost" onclick="switchTab('history',document.getElementById('tab-log'))">View Log</button>
     <button class="pab pab-red" onclick="removeEdge()">Disconnect</button>`;
 }
 
