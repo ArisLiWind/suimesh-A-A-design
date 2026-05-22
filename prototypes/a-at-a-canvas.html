@@ -35,6 +35,7 @@
   --ease:  cubic-bezier(.16,1,.3,1);
   --easeb: cubic-bezier(.34,1.56,.64,1);
   --sw: 64px;
+  --lp: 240px;   /* left panel expanded width */
   --pw: 320px;
   --th: 48px;
 }
@@ -85,6 +86,132 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 }
 .online{width:6px;height:6px;border-radius:50%;background:var(--acc-g);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.4)}50%{box-shadow:0 0 0 5px rgba(34,197,94,0)}}
+
+/* ─── LEFT PANEL ─── */
+.lp{
+  width:var(--lp);min-width:var(--lp);
+  background:var(--s1);border-right:1px solid var(--b1);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  transition:width .28s var(--ease),min-width .28s var(--ease),opacity .2s;
+  z-index:150;
+}
+.lp.closed{width:0;min-width:0;opacity:0;border-right:none;pointer-events:none}
+.lp-head{
+  height:var(--th);min-height:var(--th);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;border-bottom:1px solid var(--b1);
+  flex-shrink:0
+}
+.lp-title{font-size:11px;font-weight:600;color:var(--t1);letter-spacing:.3px;white-space:nowrap}
+.lp-close{
+  width:20px;height:20px;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--t3);font-size:11px;transition:all .15s
+}
+.lp-close:hover{background:var(--s3);color:var(--t1)}
+.lp-body{flex:1;overflow-y:auto;padding:10px 0}
+.lp-section{padding:6px 0 10px}
+.lp-sec-title{
+  font-size:9px;font-weight:500;color:var(--t3);
+  text-transform:uppercase;letter-spacing:.7px;
+  padding:0 14px;margin-bottom:4px
+}
+/* agent status rows */
+.lp-agent{
+  display:flex;align-items:center;gap:9px;
+  padding:7px 14px;cursor:pointer;transition:background .12s;
+  border-radius:0
+}
+.lp-agent:hover{background:var(--s3)}
+.lp-agent.active-row{background:var(--s2);border-left:2px solid var(--b3)}
+.lp-a-dot{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0
+}
+.lp-a-icon{
+  width:26px;height:26px;border-radius:7px;
+  background:var(--s4);border:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;flex-shrink:0
+}
+.lp-a-meta{flex:1;min-width:0}
+.lp-a-name{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lp-a-sub{font-size:10px;color:var(--t3);margin-top:1px}
+.lp-a-val{font-size:11px;font-weight:600;white-space:nowrap;text-align:right}
+/* ticker strip */
+.lp-ticker{
+  margin:6px 14px;
+  background:var(--s2);border:1px solid var(--b1);border-radius:7px;
+  overflow:hidden
+}
+.lp-tick-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 10px;border-bottom:1px solid var(--b1);
+  font-size:11px
+}
+.lp-tick-row:last-child{border-bottom:none}
+.lp-tick-pair{color:var(--t2)}
+.lp-tick-price{font-weight:600;font-family:'JetBrains Mono',monospace}
+.lp-tick-chg{font-size:10px;margin-left:4px}
+/* risk bar */
+.lp-risk{padding:0 14px;margin-bottom:4px}
+.lp-risk-row{margin-bottom:8px}
+.lp-risk-hd{
+  display:flex;justify-content:space-between;
+  font-size:10px;margin-bottom:4px;
+  color:var(--t2)
+}
+.lp-risk-val{}
+.lp-bar-track{height:3px;background:var(--s4);border-radius:2px;overflow:hidden}
+.lp-bar-fill{height:100%;border-radius:2px;transition:width .8s}
+/* recent trades */
+.lp-trade{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 14px;font-size:11px;
+  border-bottom:1px solid var(--b1);
+  cursor:default
+}
+.lp-trade:last-child{border-bottom:none}
+.lp-trade-side{
+  padding:1px 5px;border-radius:3px;
+  font-size:9px;font-weight:600
+}
+.lp-trade-side.L{background:rgba(34,197,94,.12);color:var(--acc-g)}
+.lp-trade-side.S{background:rgba(239,68,68,.12);color:var(--r)}
+.lp-trade-info{flex:1;min-width:0}
+.lp-trade-pair{font-weight:500}
+.lp-trade-time{font-size:9px;color:var(--t3)}
+.lp-trade-pnl{font-weight:600}
+/* bottom actions */
+.lp-foot{
+  border-top:1px solid var(--b1);
+  padding:10px 14px;
+  display:flex;flex-direction:column;gap:6px;
+  flex-shrink:0
+}
+.lp-foot-btn{
+  width:100%;padding:7px 0;
+  border-radius:7px;font-size:11px;font-weight:500;
+  cursor:pointer;border:none;font-family:inherit;
+  transition:all .15s;text-align:center
+}
+.lp-foot-btn.primary{background:var(--t1);color:#000}
+.lp-foot-btn.primary:hover{background:#e0e0e0}
+.lp-foot-btn.ghost{background:transparent;color:var(--t2);border:1px solid var(--b2)}
+.lp-foot-btn.ghost:hover{background:var(--s3);color:var(--t1);border-color:var(--b3)}
+
+/* left panel toggle button — attached to sidebar */
+.lp-toggle{
+  width:36px;height:36px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--t3);font-size:15px;
+  transition:all .15s;position:relative
+}
+.lp-toggle:hover{background:var(--s3);color:var(--t2)}
+.lp-toggle.on{background:var(--s3);color:var(--t1)}
+
+/* status bar left offset adjusts with panel */
+.sbar{transition:left .28s var(--ease)}
 
 /* ─── TOPBAR ─── */
 .topbar{
@@ -450,19 +577,125 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 ══════════════════════════════════════════ -->
 <nav class="sidebar">
   <div class="logo" onclick="openModal('about')">A@A</div>
-  <div class="sib on" title="Agent Network" onclick="setSib(this)">⬡</div>
+  <div class="sib on" id="sib-network" title="Agent Network" onclick="setSib(this)">⬡</div>
   <div class="sib" title="Marketplace" onclick="openModal('market')">◈</div>
   <div class="sib" title="Flow Editor" onclick="openModal('floweditor')">⬡</div>
   <div class="sdiv"></div>
   <div class="sib" title="Monitor" onclick="openModal('monitor')"><span class="dot g"></span>▤</div>
   <div class="sib" title="Audit Log" onclick="openModal('auditlog')"><span class="dot y"></span>≡</div>
   <div class="sdiv"></div>
+  <div class="lp-toggle on" id="lp-tog" title="Panel (Tab)" onclick="toggleLP()">☰</div>
   <div class="sib" title="Settings" onclick="openModal('settings')">⚙</div>
   <div class="sfooter">
     <div class="online"></div>
     <div class="ava" onclick="openModal('profile')">AL</div>
   </div>
 </nav>
+
+<!-- LEFT PANEL -->
+<aside class="lp" id="lp">
+  <div class="lp-head">
+    <span class="lp-title">Overview</span>
+    <div class="lp-close" onclick="toggleLP()">✕</div>
+  </div>
+  <div class="lp-body">
+
+    <div class="lp-section">
+      <div class="lp-sec-title">My Network</div>
+      <div class="lp-agent active-row" onclick="pickNode('mine')">
+        <div class="lp-a-dot" style="background:var(--acc-g)"></div>
+        <div class="lp-a-icon">🤖</div>
+        <div class="lp-a-meta"><div class="lp-a-name">My Trading Agent</div><div class="lp-a-sub">Active · SUI/USDC</div></div>
+        <div class="lp-a-val" style="color:var(--acc-g)" id="lp-roi">+12.4%</div>
+      </div>
+      <div class="lp-agent" onclick="pickNode('market')">
+        <div class="lp-a-dot" style="background:var(--b)"></div>
+        <div class="lp-a-icon">📊</div>
+        <div class="lp-a-meta"><div class="lp-a-name">Market Data</div><div class="lp-a-sub">Streaming</div></div>
+        <div class="lp-a-val" style="color:var(--t2)" id="lp-tick">1,240/s</div>
+      </div>
+      <div class="lp-agent" onclick="pickNode('news')">
+        <div class="lp-a-dot" style="background:var(--acc-g)"></div>
+        <div class="lp-a-icon">📰</div>
+        <div class="lp-a-meta"><div class="lp-a-name">News Sentinel</div><div class="lp-a-sub">NLP active</div></div>
+        <div class="lp-a-val" style="color:var(--acc-g)" id="lp-sent">78%</div>
+      </div>
+      <div class="lp-agent" onclick="pickNode('ai')">
+        <div class="lp-a-dot" style="background:var(--acc-g)"></div>
+        <div class="lp-a-icon">🧠</div>
+        <div class="lp-a-meta"><div class="lp-a-name">AI Analyzer</div><div class="lp-a-sub">Signal: LONG</div></div>
+        <div class="lp-a-val" style="color:var(--t2)" id="lp-conf">87%</div>
+      </div>
+    </div>
+
+    <div class="lp-section">
+      <div class="lp-sec-title">Live Prices</div>
+      <div class="lp-ticker">
+        <div class="lp-tick-row">
+          <span class="lp-tick-pair">SUI/USDC</span>
+          <span><span class="lp-tick-price" id="lp-p-sui">0.8421</span><span class="lp-tick-chg" style="color:var(--acc-g)"> +2.1%</span></span>
+        </div>
+        <div class="lp-tick-row">
+          <span class="lp-tick-pair">BTC/USDC</span>
+          <span><span class="lp-tick-price" id="lp-p-btc">67,240</span><span class="lp-tick-chg" style="color:var(--acc-g)"> +0.8%</span></span>
+        </div>
+        <div class="lp-tick-row">
+          <span class="lp-tick-pair">ETH/USDC</span>
+          <span><span class="lp-tick-price" id="lp-p-eth">3,482</span><span class="lp-tick-chg" style="color:var(--r)"> −0.4%</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="lp-section">
+      <div class="lp-sec-title">Risk Status</div>
+      <div class="lp-risk">
+        <div class="lp-risk-row">
+          <div class="lp-risk-hd"><span>Drawdown</span><span style="color:var(--acc-g)">3.2% / 8%</span></div>
+          <div class="lp-bar-track"><div class="lp-bar-fill" style="width:40%;background:var(--acc-g)"></div></div>
+        </div>
+        <div class="lp-risk-row">
+          <div class="lp-risk-hd"><span>Daily Loss</span><span style="color:var(--acc-y)">1.8% / 3%</span></div>
+          <div class="lp-bar-track"><div class="lp-bar-fill" style="width:60%;background:var(--acc-y)"></div></div>
+        </div>
+        <div class="lp-risk-row">
+          <div class="lp-risk-hd"><span>Exposure</span><span>$2,000 / $5,000</span></div>
+          <div class="lp-bar-track"><div class="lp-bar-fill" style="width:40%;background:var(--t3)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lp-section">
+      <div class="lp-sec-title">Recent Trades</div>
+      <div class="lp-trade"><span class="lp-trade-side L">L</span><div class="lp-trade-info"><div class="lp-trade-pair">SUI/USDC</div><div class="lp-trade-time">09:14 · AI Signal</div></div><span class="lp-trade-pnl" style="color:var(--acc-g)">+$42</span></div>
+      <div class="lp-trade"><span class="lp-trade-side S">S</span><div class="lp-trade-info"><div class="lp-trade-pair">ETH/USDC</div><div class="lp-trade-time">08:52 · Copy</div></div><span class="lp-trade-pnl" style="color:var(--r)">−$18</span></div>
+      <div class="lp-trade"><span class="lp-trade-side L">L</span><div class="lp-trade-info"><div class="lp-trade-pair">BTC/USDC</div><div class="lp-trade-time">08:30 · Trend</div></div><span class="lp-trade-pnl" style="color:var(--acc-g)">+$180</span></div>
+      <div class="lp-trade"><span class="lp-trade-side L">L</span><div class="lp-trade-info"><div class="lp-trade-pair">SUI/USDC</div><div class="lp-trade-time">Yesterday · TP</div></div><span class="lp-trade-pnl" style="color:var(--acc-g)">+$61</span></div>
+    </div>
+
+    <div class="lp-section">
+      <div class="lp-sec-title">Last AI Decision</div>
+      <div style="margin:0 14px 6px;background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:10px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+          <div style="width:5px;height:5px;border-radius:50%;background:var(--acc-g)"></div>
+          <span style="font-size:11px;font-weight:600">LONG SUI/USDC</span>
+          <span style="margin-left:auto;font-size:9px;color:var(--t3)">09:14</span>
+        </div>
+        <div style="font-size:10px;color:var(--t3);line-height:1.5">Conf: 87% · TP: 0.91 · SL: 0.81<br>Sources: Market + News + AI</div>
+        <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">
+          <span style="font-size:9px;padding:2px 6px;border-radius:3px;background:var(--s3);color:var(--t3)">EMA cross</span>
+          <span style="font-size:9px;padding:2px 6px;border-radius:3px;background:var(--s3);color:var(--t3)">Bullish news</span>
+          <span style="font-size:9px;padding:2px 6px;border-radius:3px;background:var(--s3);color:var(--t3)">87% conf</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="lp-foot">
+    <button class="lp-foot-btn primary" onclick="openModal('deploy')">Deploy Agent →</button>
+    <button class="lp-foot-btn ghost" onclick="openModal('monitor')">View Monitor</button>
+  </div>
+</aside>
 
 <!-- ══════════════════════════════════════════
      MAIN
@@ -506,7 +739,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
   </div>
 
   <!-- STATUS BAR -->
-  <div class="sbar">
+  <div class="sbar" style="left:calc(var(--sw) + var(--lp))">
     <div class="si">Nodes <span id="sbn">4</span></div><div class="sdivi"></div>
     <div class="si">Edges <span id="sbe">3</span></div><div class="sdivi"></div>
     <div class="si">Active <span id="sba" style="color:var(--g)">3</span></div><div class="sdivi"></div>
@@ -1101,76 +1334,155 @@ function updateSBar(){
 /* ═══════════════════════════════════════
    MODALS
 ═══════════════════════════════════════ */
+let _mktFilter='all', _mktSort='roi', _connectedAgents=new Set(['AlphaMesh Pro']);
+
 function openModal(type){
   closeModal();
   const ov=document.createElement('div');ov.className='overlay';ov.id='ov';
   ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
-
   const content=buildModal(type);
   ov.innerHTML=content;
   document.getElementById('overlays').appendChild(ov);
-  // re-attach toggle events
   ov.querySelectorAll('.tgl').forEach(t=>t.addEventListener('click',function(){this.classList.toggle('on')}));
+  if(type==='market')initMarket();
+  if(type==='monitor')initMonitor();
+  if(type==='floweditor')initFlowEditor();
 }
 function closeModal(){document.getElementById('ov')?.remove()}
+
+/* ── AGENT DATA ── */
+const MKT_AGENTS=[
+  {id:'alphaMesh',icon:'AM',bg:'#1a1a1a',name:'AlphaMesh Pro',proto:'SuiMesh',cat:'strategy',tag:'Trend Follow',tagCat:'Alpha',roi:28.7,sharpe:2.14,dd:3.2,win:71,followers:1240,days:148,desc:'Multi-timeframe trend following on SUI/USDC and BTC pairs. AI-enhanced entries using GPT-4o signal fusion with real-time order book depth analysis.',tags:['Trend','SUI','BTC','AI-enhanced'],verified:true,hot:true},
+  {id:'deltaWave',icon:'DW',bg:'#161616',name:'DeltaWave DeFi',proto:'SuiMesh',cat:'strategy',tag:'Mean Reversion',tagCat:'DeFi',roi:19.3,sharpe:1.76,dd:5.8,win:63,followers:872,days:94,desc:'Mean reversion strategy using on-chain liquidity depth and cross-exchange sentiment divergence signals on Sui DeFi pairs.',tags:['Mean Rev','DeFi','On-chain'],verified:true,hot:false},
+  {id:'gridStrike',icon:'GS',bg:'#131313',name:'GridStrike Sui',proto:'SuiMesh',cat:'strategy',tag:'Grid',tagCat:'Low Risk',roi:11.2,sharpe:2.40,dd:1.8,win:82,followers:2104,days:201,desc:'Tight automated grid on SUI perpetuals. Low drawdown, consistent small returns. Best for capital preservation with steady compounding.',tags:['Grid','SUI Perp','Low Risk'],verified:true,hot:false},
+  {id:'neuralSui',icon:'NS',bg:'#181818',name:'NeuralSui v2',proto:'SuiMesh',cat:'strategy',tag:'AI-Native',tagCat:'High Alpha',roi:34.1,sharpe:1.92,dd:9.4,win:58,followers:341,days:31,desc:'Fully LLM-driven autonomous agent. Reads news feeds, on-chain governance, social sentiment and DEX liquidity simultaneously to form trade conviction.',tags:['AI-Native','Multi-source','High Alpha'],verified:false,hot:true},
+  {id:'marketFeed',icon:'MF',bg:'#111',name:'Market Data',proto:'SuiMesh',cat:'data',tag:'Price Feed',tagCat:'Data',roi:null,sharpe:null,dd:null,win:null,followers:4820,days:365,desc:'Real-time OHLCV tick stream from 12 CEX/DEX sources. 4ms latency. WebSocket push to your Agent every 250ms. Free tier: 3 pairs.',tags:['Real-time','CEX+DEX','WebSocket'],verified:true,hot:false},
+  {id:'newsSentinel',icon:'NS',bg:'#121212',name:'News Sentinel',proto:'SuiMesh',cat:'data',tag:'Sentiment',tagCat:'News',roi:null,sharpe:null,dd:null,win:null,followers:3210,days:280,desc:'NLP sentiment scoring across 24 RSS feeds, Twitter/X KOL tracking, and on-chain governance activity. Score updates every 30s.',tags:['NLP','Twitter','RSS','On-chain'],verified:true,hot:false},
+  {id:'whaleWatch',icon:'WW',bg:'#0e0e0e',name:'Whale Watch',proto:'SuiMesh',cat:'data',tag:'On-chain',tagCat:'Alpha',roi:null,sharpe:null,dd:null,win:null,followers:1890,days:120,desc:'Tracks large wallet flows, staking/unstaking events, and institutional moves on Sui in real-time. Surface whale intent before price reacts.',tags:['Whale','Sui','On-chain'],verified:true,hot:true},
+  {id:'riskGuard',icon:'RG',bg:'#0f0f0f',name:'Risk Guard Pro',proto:'SuiMesh',cat:'guard',tag:'Risk',tagCat:'Guard',roi:null,sharpe:null,dd:null,win:null,followers:5640,days:365,desc:'Automated drawdown protection, daily loss caps, volatility gates, and news-based pause triggers. Runs as an always-on layer above your strategy.',tags:['Guard','DD','Volatility','Auto-pause'],verified:true,hot:false},
+];
 
 function buildModal(type){
   const modals={
     /* MARKET */
-    market:`<div class="modal">
-      <div class="modal-h"><div class="modal-title">Agent Marketplace</div><div class="modal-close" onclick="closeModal()">✕</div></div>
-      <div class="modal-body">
-        <p style="font-size:11px;color:var(--t3);margin-bottom:12px">Discover and follow top-performing strategy agents. One click to start copy-trading.</p>
-        <div class="mkt-grid">
-          ${[
-            {icon:'🦁',name:'AlphaMesh Pro',desc:'Multi-TF trend following on SUI/USDC. AI-enhanced entries.',roi:'+28.7%',sharpe:'2.14',dd:'−3.2%',f:'1,240'},
-            {icon:'🐬',name:'DeltaWave DeFi',desc:'Mean reversion using on-chain liquidity + sentiment.',roi:'+19.3%',sharpe:'1.76',dd:'−5.8%',f:'872'},
-            {icon:'⚡',name:'GridStrike Sui',desc:'Tight grid on SUI perps. Low risk, consistent returns.',roi:'+11.2%',sharpe:'2.40',dd:'−1.8%',f:'2,104'},
-            {icon:'🤖',name:'NeuralSui v2',desc:'Fully LLM-driven: news + on-chain + social signals.',roi:'+34.1%',sharpe:'1.92',dd:'−9.4%',f:'341'},
-          ].map(a=>`<div class="mkt-card">
-            <div class="mkt-ava">${a.icon}</div>
-            <div class="mkt-info">
-              <div class="mkt-name">${a.name}</div>
-              <div class="mkt-desc">${a.desc}</div>
-              <div class="mkt-stats">
-                <div><div class="mkt-stat pos">${a.roi}</div><div class="mkt-stat-l">30D ROI</div></div>
-                <div><div class="mkt-stat">${a.sharpe}</div><div class="mkt-stat-l">Sharpe</div></div>
-                <div><div class="mkt-stat" style="color:var(--r)">${a.dd}</div><div class="mkt-stat-l">Max DD</div></div>
-                <div><div class="mkt-stat" style="color:var(--t2)">${a.f}</div><div class="mkt-stat-l">Followers</div></div>
-              </div>
-            </div>
-            <div class="mkt-action"><button class="btn btn-white" style="font-size:11px;padding:5px 10px" onclick="closeModal()">Follow →</button></div>
-          </div>`).join('')}
+    market:`<div class="modal" style="width:780px;max-height:88vh">
+      <div class="modal-h" style="padding:16px 20px 0">
+        <div>
+          <div class="modal-title">Agent Hub</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:2px">Discover and connect strategy agents, data sources, and guard layers powered by SuiMesh</div>
+        </div>
+        <div class="modal-close" onclick="closeModal()">✕</div>
+      </div>
+      <!-- filter bar -->
+      <div style="display:flex;align-items:center;gap:10px;padding:14px 20px 12px;border-bottom:1px solid var(--b1)">
+        <div id="mkt-search-wrap" style="flex:1;position:relative">
+          <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:13px">⌕</span>
+          <input id="mkt-search" placeholder="Search agents..." style="width:100%;padding:7px 10px 7px 28px;background:var(--s3);border:1px solid var(--b2);border-radius:7px;color:var(--t1);font-size:12px;font-family:inherit;outline:none" oninput="renderMarket()">
+        </div>
+        <div style="display:flex;gap:3px">
+          ${['all','strategy','data','guard'].map(f=>`<button onclick="_mktFilter='${f}';renderMarket();document.querySelectorAll('.mf-btn').forEach(b=>b.classList.remove('on'));this.classList.add('on')" class="mf-btn btn btn-ghost" style="font-size:11px;padding:5px 11px;${f==='all'?'background:var(--s4);color:var(--t1);':''}"> ${f==='all'?'All':f==='strategy'?'Strategy Agents':f==='data'?'Data Sources':'Guards'}</button>`).join('')}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t3)">
+          Sort:
+          <select id="mkt-sort" onchange="_mktSort=this.value;renderMarket()" style="background:var(--s3);border:1px solid var(--b2);border-radius:5px;color:var(--t1);font-size:11px;padding:4px 8px;font-family:inherit;outline:none">
+            <option value="roi">30D ROI</option>
+            <option value="sharpe">Sharpe</option>
+            <option value="followers">Followers</option>
+            <option value="dd">Low Risk</option>
+          </select>
         </div>
       </div>
-      <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal()">Close</button></div>
+      <div class="modal-body" style="padding:0;display:flex;gap:0">
+        <!-- list -->
+        <div id="mkt-list" style="flex:1;overflow-y:auto;padding:12px 20px"></div>
+        <!-- detail panel -->
+        <div id="mkt-detail" style="width:260px;min-width:260px;border-left:1px solid var(--b1);padding:16px;overflow-y:auto;background:var(--s1)">
+          <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:40px">← Select an agent<br>to see details</div>
+        </div>
+      </div>
+      <div class="modal-foot" style="padding:10px 20px">
+        <div style="font-size:10px;color:var(--t3)">Connected: <span style="color:var(--acc-g)" id="mkt-conn-count">${_connectedAgents.size}</span> agents · Powered by SuiMesh</div>
+        <button class="btn btn-ghost" onclick="closeModal()">Done</button>
+      </div>
     </div>`,
 
     /* FLOW EDITOR */
-    floweditor:`<div class="modal" style="width:540px">
-      <div class="modal-h"><div class="modal-title">Flow Editor</div><div class="modal-close" onclick="closeModal()">✕</div></div>
-      <div class="modal-body">
-        <p style="font-size:11px;color:var(--t3);margin-bottom:14px">Drag-and-drop strategy builder. Connect data sources → analyzers → actions → guards.</p>
-        <div style="background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:14px;min-height:200px;position:relative">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            ${[
-              {icon:'📊',label:'Market Feed',col:'#06b6d4'},
-              {icon:'📰',label:'News Sentinel',col:'#f59e0b'},
-              {icon:'🧠',label:'AI Analyzer',col:'#8b5cf6'},
-              {icon:'🤖',label:'My Agent',col:'#fff'},
-              {icon:'🛒',label:'Place Order',col:'#22c55e'},
-              {icon:'🛡',label:'Risk Guard',col:'#f59e0b'},
-            ].map((n,i)=>`<div style="background:var(--s3);border:1px solid rgba(${n.col==='#fff'?'255,255,255':''},.15);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:7px;font-size:11px;font-weight:500;cursor:move">
-              <span>${n.icon}</span><span>${n.label}</span>
-              ${i<5?`<span style="color:var(--t3);font-size:14px">→</span>`:''}
-            </div>`).join('')}
+    floweditor:`<div class="modal" style="width:700px;max-height:88vh">
+      <div class="modal-h"><div class="modal-title">Flow Editor</div><div style="font-size:11px;color:var(--t3);margin-left:10px;margin-top:3px">No-code strategy builder</div><div class="modal-close" onclick="closeModal()">✕</div></div>
+      <div class="modal-body" style="padding:0;display:flex;flex-direction:column">
+        <!-- toolbar -->
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--b1)">
+          <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-right:4px">Node Library</div>
+          ${[
+            {icon:'📊',l:'Market Feed',t:'data'},
+            {icon:'📰',l:'News',t:'data'},
+            {icon:'🧠',l:'AI Analyzer',t:'analysis'},
+            {icon:'🤖',l:'Agent',t:'action'},
+            {icon:'🛒',l:'Place Order',t:'action'},
+            {icon:'🛡',l:'Risk Guard',t:'guard'},
+            {icon:'⛳',l:'Condition',t:'logic'},
+            {icon:'📣',l:'Alert',t:'output'},
+          ].map(n=>`<div draggable="true" style="display:flex;align-items:center;gap:5px;padding:5px 9px;border-radius:6px;background:var(--s3);border:1px solid var(--b1);font-size:11px;color:var(--t2);cursor:grab">${n.icon} ${n.l}</div>`).join('')}
+        </div>
+        <!-- canvas -->
+        <div id="fe-canvas" style="flex:1;min-height:280px;background:var(--bg);position:relative;overflow:hidden;
+          background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+          background-size:32px 32px">
+          <!-- wired flow -->
+          <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+            <defs><marker id="fe-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 2L8 5L1 8" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+            <path d="M 128 80 C 168 80, 168 80, 198 80" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#fe-arr)"/>
+            <path d="M 128 148 C 168 148, 168 80, 198 80" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#fe-arr)"/>
+            <path d="M 128 216 C 178 216, 178 110, 198 110" fill="none" stroke="rgba(139,92,246,.4)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#fe-arr)"/>
+            <path d="M 330 88 C 370 88, 370 88, 400 88" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.5" marker-end="url(#fe-arr)"/>
+            <path d="M 330 88 C 370 88, 370 136, 400 136" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#fe-arr)"/>
+            <path d="M 530 88 C 570 88, 570 88, 600 88" fill="none" stroke="rgba(34,197,94,.5)" stroke-width="1.5" marker-end="url(#fe-arr)"/>
+          </svg>
+          ${[
+            {x:20, y:60, icon:'📊',name:'Market Feed',sub:'SUI/USDC · 1H',col:'#06b6d4',w:108},
+            {x:20, y:128,icon:'📰',name:'News Sentinel',sub:'Score: 0.78',col:'#f59e0b',w:108},
+            {x:20, y:196,icon:'🧠',name:'AI Analyzer',sub:'Conf: 87%',col:'#8b5cf6',w:108},
+            {x:198,y:62, icon:'🤖',name:'My Agent',sub:'Active',col:'#fff',w:132,sel:true},
+            {x:398,y:62, icon:'🛡',name:'Risk Guard',sub:'DD 8%',col:'#f59e0b',w:108},
+            {x:398,y:118,icon:'⛳', name:'Vol Gate',sub:'VI < 40',col:'#888',w:108},
+            {x:598,y:62, icon:'🛒',name:'Place Order',sub:'DEX: Cetus',col:'#22c55e',w:108},
+          ].map(n=>`<div style="position:absolute;left:${n.x}px;top:${n.y}px;width:${n.w}px;
+            background:var(--s2);border:1px solid ${n.sel?'rgba(255,255,255,.35)':'var(--b2)'};border-radius:9px;padding:8px 10px;
+            ${n.sel?'box-shadow:0 0 0 3px rgba(255,255,255,.06)':''};cursor:move">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+              <span style="font-size:12px">${n.icon}</span>
+              <span style="font-size:11px;font-weight:600">${n.name}</span>
+            </div>
+            <div style="font-size:9px;color:var(--t3)">${n.sub}</div>
+          </div>`).join('')}
+          <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--t3)">Market Feed → AI Analyzer → My Agent → Risk Guard → Place Order</div>
+        </div>
+        <!-- config panel -->
+        <div style="border-top:1px solid var(--b1);padding:14px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div>
+            <div style="font-size:10px;color:var(--t3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.6px">Selected Node</div>
+            <div style="font-size:12px;font-weight:600">My Agent</div>
+            <div style="font-size:10px;color:var(--t3);margin-top:2px">Decision coordinator</div>
           </div>
-          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--b1);font-size:10px;color:var(--t3)">Market Feed → News Sentinel → AI Analyzer → My Agent → Risk Guard → Place Order</div>
+          <div>
+            <div style="font-size:10px;color:var(--t3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px">Trigger</div>
+            <select style="width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:6px;color:var(--t1);font-size:11px;padding:5px 8px;font-family:inherit;outline:none">
+              <option>All sources agree</option>
+              <option>Any source fires</option>
+              <option>AI signal only</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--t3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px">Min Confidence</div>
+            <input type="range" min="50" max="99" value="80" style="width:100%" oninput="this.nextElementSibling.textContent=this.value+'%'">
+            <div style="font-size:11px;color:var(--t1);margin-top:2px">80%</div>
+          </div>
         </div>
-        <div style="margin-top:12px;display:flex;gap:8px">
-          <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Test Run ⏮</button>
-          <button class="btn btn-white" style="flex:1" onclick="openModal('deploy')">Deploy Flow →</button>
-        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-ghost" onclick="closeModal()">Simulate &#9654;</button>
+        <button class="btn btn-white" onclick="openModal('deploy')">Deploy Flow →</button>
       </div>
     </div>`,
 
@@ -1401,6 +1713,63 @@ function animDeploy(){
 /* ═══════════════════════════════════════
    UI HELPERS
 ═══════════════════════════════════════ */
+/* left panel toggle */
+let _lpOpen=true;
+function toggleLP(){
+  _lpOpen=!_lpOpen;
+  document.getElementById('lp').classList.toggle('closed',!_lpOpen);
+  document.getElementById('lp-tog').classList.toggle('on',_lpOpen);
+  // shift status bar
+  const sb=document.querySelector('.sbar');
+  if(sb) sb.style.left=_lpOpen?`calc(var(--sw) + var(--lp))`:'var(--sw)';
+}
+
+/* left panel live updates */
+function startLPTicker(){
+  const prices={sui:{v:0.8421,d:0.0004},btc:{v:67240,d:40},eth:{v:3482,d:3}};
+  setInterval(()=>{
+    // prices
+    prices.sui.v+=( Math.random()-.48)*prices.sui.d;
+    prices.btc.v+=( Math.random()-.48)*prices.btc.d;
+    prices.eth.v+=( Math.random()-.52)*prices.eth.d;
+    const sp=document.getElementById('lp-p-sui');
+    const bp=document.getElementById('lp-p-btc');
+    const ep=document.getElementById('lp-p-eth');
+    if(sp) tickFlash(sp, prices.sui.v.toFixed(4));
+    if(bp) tickFlash(bp, Math.round(prices.btc.v).toLocaleString());
+    if(ep) tickFlash(ep, Math.round(prices.eth.v).toLocaleString());
+    // roi
+    const roi=document.getElementById('lp-roi');
+    if(roi){
+      const v=12.4+(Math.random()-.45)*0.06;
+      tickFlash(roi,`+${v.toFixed(1)}%`);
+    }
+    // sentiment
+    const sent=document.getElementById('lp-sent');
+    if(sent){
+      const v=78+(Math.random()-.4)*1.2;
+      tickFlash(sent,`${Math.round(v)}%`);
+    }
+    // conf
+    const conf=document.getElementById('lp-conf');
+    if(conf){
+      const v=87+(Math.random()-.45)*0.8;
+      tickFlash(conf,`${v.toFixed(0)}%`);
+    }
+    // tick
+    const tick=document.getElementById('lp-tick');
+    if(tick){
+      const v=1240+(Math.random()-.5)*80;
+      tickFlash(tick,`${Math.round(v)}/s`);
+    }
+  },1800);
+}
+function tickFlash(el,val){
+  el.style.transition='opacity .12s';
+  el.style.opacity='.35';
+  setTimeout(()=>{el.textContent=val;el.style.opacity='1';},120);
+}
+
 function setSib(el){document.querySelectorAll('.sib').forEach(s=>s.classList.remove('on'));el.classList.add('on')}
 function setTab(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on')}
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
@@ -1415,6 +1784,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='c'||e.key==='C')setTool('con');
   if(e.key==='f'||e.key==='F')fitScreen();
   if(e.key==='Escape'){clearSel();hidePal();closeModal();}
+  if(e.key==='Tab'&&!e.metaKey&&!e.ctrlKey){e.preventDefault();toggleLP();}
   if((e.key==='='||e.key==='+')&&(e.metaKey||e.ctrlKey)){e.preventDefault();zIn();}
   if(e.key==='-'&&(e.metaKey||e.ctrlKey)){e.preventDefault();zOut();}
   if((e.key==='Delete'||e.key==='Backspace')&&selNode&&!document.getElementById('ov')){e.preventDefault();rmNode(selNode);}
@@ -1506,6 +1876,7 @@ window.addEventListener('load',()=>{
   setTimeout(()=>pickNode('mine'),600);
   setTimeout(startTicker,1800);
   setTimeout(startSignalBubbles,2500);
+  setTimeout(startLPTicker,1200);
 });
 </script>
 </body>
