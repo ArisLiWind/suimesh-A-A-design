@@ -708,7 +708,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
       <span class="sib-label" id="sn-monitor">Monitor</span>
       <span class="dot g"></span>
     </div>
-    <div class="sib" onclick="openModal('floweditor')">
+    <div class="sib" onclick="showPage('floweditor',this)">
       <span class="sib-icon">⬡</span>
       <span class="sib-label" id="sn-flow">Flow Editor</span>
     </div>
@@ -2236,6 +2236,89 @@ function updateBC(sub){
   }
 }
 
+function buildFlowEditorHTML(){
+  const L = LANG==='zh';
+  const nodes2 = [
+    {x:60,  y:80,  icon:'📊', name:L?'行情数据':'Market Feed',    sub:'SUI/USDC · 1H', w:120},
+    {x:60,  y:160, icon:'📰', name:L?'新闻哨兵':'News Sentinel',  sub:L?'情绪: 0.78':'Score: 0.78', w:120},
+    {x:60,  y:240, icon:'🧠', name:'AI Analyzer',                 sub:L?'置信度: 87%':'Conf: 87%', w:120},
+    {x:240, y:140, icon:'🤖', name:L?'我的Agent':'My Agent',       sub:L?'运行中':'Active', w:130, sel:true},
+    {x:420, y:110, icon:'🛡', name:L?'风险守卫':'Risk Guard',       sub:'DD 8%', w:115},
+    {x:420, y:185, icon:'⛳', name:L?'波动门控':'Vol Gate',         sub:'VI < 40', w:115},
+    {x:590, y:140, icon:'🛒', name:L?'下单执行':'Place Order',      sub:'DEX: Cetus', w:120},
+  ];
+  const conns = `
+    <defs><marker id="fe-a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M1 2L8 5L1 8" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5" stroke-linecap="round"/>
+    </marker></defs>
+    <path d="M 180 120 C 210 120 210 175 240 175" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#fe-a)"/>
+    <path d="M 180 200 C 210 200 210 195 240 195" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#fe-a)"/>
+    <path d="M 180 280 C 220 280 220 210 240 210" fill="none" stroke="rgba(140,120,200,.4)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#fe-a)"/>
+    <path d="M 370 175 C 395 175 395 150 420 150" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5" marker-end="url(#fe-a)"/>
+    <path d="M 370 175 C 395 175 395 225 420 225" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#fe-a)"/>
+    <path d="M 535 150 C 562 150 562 185 590 180" fill="none" stroke="rgba(60,170,130,.5)" stroke-width="1.5" marker-end="url(#fe-a)"/>
+  `;
+  const nodesSVG = nodes2.map(n=>`
+    <foreignObject x="${n.x}" y="${n.y-10}" width="${n.w}" height="64">
+      <div xmlns="http://www.w3.org/1999/xhtml" style="background:${n.sel?'var(--s4)':'var(--s2)'};border:1px solid ${n.sel?'rgba(255,255,255,.35)':'var(--b2)'};border-radius:8px;padding:8px 10px;font-family:Inter,sans-serif">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+          <span style="font-size:12px">${n.icon}</span>
+          <span style="font-size:11px;font-weight:600;color:#e8eeff">${n.name}</span>
+        </div>
+        <div style="font-size:9px;color:#4a68a8">${n.sub}</div>
+      </div>
+    </foreignObject>`).join('');
+
+  return `<div style="max-width:900px;margin:0 auto;padding:24px 28px;display:flex;flex-direction:column;height:100%;box-sizing:border-box">
+    <!-- Node library strip -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--b1);flex-wrap:wrap">
+      <span style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-right:4px">${L?'节点库':'NODE LIBRARY'}</span>
+      ${['📊 '+(L?'行情':'Market'),'📰 '+(L?'新闻':'News'),'🧠 AI','🤖 Agent','🛒 '+(L?'下单':'Order'),'🛡 '+(L?'风控':'Guard'),'⛳ '+(L?'条件':'Condition'),'🔔 '+(L?'警报':'Alert')]
+        .map(n=>`<div style="padding:5px 10px;border-radius:7px;background:var(--s3);border:1px solid var(--b1);font-size:11px;color:var(--t2);cursor:grab;white-space:nowrap">${n}</div>`).join('')}
+    </div>
+    <!-- Canvas -->
+    <div style="flex:1;min-height:280px;background:var(--bg);border-radius:10px;border:1px solid var(--b1);position:relative;overflow:hidden;
+      background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+      background-size:32px 32px">
+      <svg width="100%" height="100%" style="position:absolute;inset:0">
+        ${conns}
+        ${nodesSVG}
+      </svg>
+      <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--t3);white-space:nowrap">
+        ${L?'行情数据 → AI分析 → 我的Agent → 风险守卫 → 下单执行':'Market Feed → AI Analyzer → My Agent → Risk Guard → Place Order'}
+      </div>
+    </div>
+    <!-- Config row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid var(--b1)">
+      <div>
+        <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;font-weight:600">${L?'选中节点':'SELECTED NODE'}</div>
+        <div style="font-size:13px;font-weight:700;color:var(--t1)">${L?'我的Agent':'My Agent'}</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px">${L?'决策协调器':'Decision coordinator'}</div>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;font-weight:600">${L?'触发条件':'TRIGGER'}</div>
+        <select style="width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:7px;color:var(--t1);font-size:12px;padding:7px 10px;font-family:inherit;outline:none">
+          <option>${L?'所有来源同意':'All sources agree'}</option>
+          <option>${L?'任一来源触发':'Any source fires'}</option>
+          <option>${L?'仅AI信号':'AI signal only'}</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;font-weight:600">${L?'最小置信度':'MIN CONFIDENCE'}</div>
+        <input type="range" min="50" max="99" value="80" style="width:100%;margin-bottom:4px" oninput="this.nextElementSibling.textContent=this.value+'%'">
+        <div style="font-size:12px;font-weight:600;color:var(--t1)">80%</div>
+      </div>
+    </div>
+    <!-- Actions -->
+    <div style="display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--b1)">
+      <button class="btn btn-ghost" onclick="showPage('network',document.getElementById('sib-network'))">← ${L?'返回':'Back'}</button>
+      <button class="btn btn-ghost">▶ ${L?'模拟运行':'Simulate'}</button>
+      <button class="btn btn-white" onclick="openModal('deploy')">${L?'部署流程':'Deploy Flow'} →</button>
+    </div>
+  </div>`;
+}
+
+
 /* ── SIDEBAR PAGE NAVIGATION — completely separate from top tabs ── */
 let _currentPage = 'network';
 
@@ -2270,9 +2353,7 @@ function showPage(page, sibEl){
   } else if(page === 'auditlog'){
     ov.innerHTML = buildAuditLogHTML();
   } else if(page === 'floweditor'){
-    ov.style.display = 'none';
-    if(cwEl) cwEl.style.visibility = 'visible';
-    openModal('floweditor');
+    ov.innerHTML = buildFlowEditorHTML();
   }
 }
 
