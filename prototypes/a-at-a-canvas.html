@@ -688,7 +688,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <nav class="sidebar">
 
   <!-- ── Brand ── -->
-  <div class="logo" onclick="openModal('about')">
+  <div class="logo" onclick="showPage('about',null)">
     <img src="data:image/png;base64,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" width="32" height="32" style="border-radius:8px;flex-shrink:0" draggable="false">
     <div>
       <div class="logo-text">A@A</div>
@@ -727,7 +727,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
       Social Trading
       <span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(255,255,255,.06);color:var(--t3);text-transform:uppercase;letter-spacing:.5px">Soon</span>
     </div>
-    <div class="sib sib-dim" onclick="openModal('market')">
+    <div class="sib sib-dim" onclick="showPage('market',this)">
       <span class="sib-icon">◈</span>
       <span class="sib-label" id="sn-market">Agent Market</span>
       <span class="sib-badge">48</span>
@@ -746,7 +746,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 
   <!-- ── Platform ── -->
   <div class="nav-group">
-    <div class="sib" onclick="openModal('market')">
+    <div class="sib" onclick="showPage('market',this)">
       <span class="sib-icon">◈</span>
       <span class="sib-label" id="sn-marketplace">Marketplace</span>
     </div>
@@ -755,7 +755,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
       <span class="sib-label" id="sn-metrics">Metrics</span>
       <span class="sib-badge new" id="metrics-new">New</span>
     </div>
-    <div class="sib" onclick="openModal('settings')">
+    <div class="sib" id="sib-settings" onclick="showPage('settings',this)">
       <span class="sib-icon">⚙</span>
       <span class="sib-label" id="sn-settings">Settings</span>
     </div>
@@ -805,7 +805,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 
   <!-- ── User Footer ── -->
   <div class="sfooter">
-    <div class="user-row" onclick="openModal('profile')">
+    <div class="user-row" onclick="showPage('profile',null)">
       <div class="ava">AL</div>
       <div class="user-info">
         <div class="user-name">ArisLiWind</div>
@@ -1336,60 +1336,142 @@ function clearSel(){
 function showNodePanel(id){
   const n=nodes[id];if(!n)return;
   const d=n.def;
-  const panel=document.getElementById('panel');
-  panel.classList.remove('gone');
-
+  document.getElementById('panel').classList.remove('gone');
+  const L=LANG==='zh';
   const conns=edges.filter(e=>e.from===id||e.to===id);
-  const mdata={
-    mine:  [{l:'30D ROI',v:'+12.4%',c:'pos'},{l:'Sharpe',v:'1.82',c:''},{l:'Max DD',v:'−4.1%',c:'neg'},{l:'Win Rate',v:'67%',c:'pos'}],
-    market:[{l:'Tick Rate',v:'1,240/s',c:'info'},{l:'Latency',v:'4ms',c:'pos'},{l:'Source',v:'Binance',c:''},{l:'Pair',v:'SUI/USDC',c:''}],
-    news:  [{l:'Sentiment',v:'Bullish',c:'pos'},{l:'Score',v:'78%',c:'pos'},{l:'Articles',v:'24',c:''},{l:'Updated',v:'2m ago',c:''}],
-    ai:    [{l:'Confidence',v:'87%',c:'pos'},{l:'Signal',v:'LONG',c:'pos'},{l:'Model',v:'GPT-4o',c:''},{l:'Tokens',v:'2.4k',c:''}],
-    copy:  [{l:'30D ROI',v:'+28.7%',c:'pos'},{l:'Sharpe',v:'2.14',c:''},{l:'Max DD',v:'−3.2%',c:'neg'},{l:'Followers',v:'1,240',c:''}],
-    risk:  [{l:'DD Limit',v:'8%',c:'warn'},{l:'Daily Loss',v:'3%',c:'warn'},{l:'Vol Gate',v:'40',c:''},{l:'Status',v:'Watching',c:'warn'}],
-  };
-  const tags={mine:['SUI/USDC','4H TF','Trend Follow','Auto'],market:['CEX','Real-time','WebSocket'],news:['RSS','Twitter','NLP','GPT'],ai:['GPT-4o','Multi-modal','Auto-retry'],copy:['Top 1%','Verified','148d live'],risk:['On-chain','Auto-pause','Configurable']};
 
   document.getElementById('ph').innerHTML=`
     <div class="ph-icon">${d.icon}</div>
     <div style="flex:1;min-width:0">
-      <div class="ph-title">${d.label}</div>
-      <div class="ph-sub">#${id.toUpperCase().padStart(4,'0')} · ${d.type}</div>
+      <div class="ph-title">${t('nd_'+id)||d.label}</div>
+      <div class="ph-sub">#${id.toUpperCase().padStart(4,'0')} · ${t('nd_'+id+'_type')||d.type}</div>
     </div>
     <div class="ph-close" onclick="clearSel()">✕</div>`;
 
-  let body=``;
-  if(id==='mine'||id==='copy'){body+=`
-    <div class="ps">
-      <div class="pst">Performance</div>
-      <div class="pchart">
-        <div class="pchart-val pos">${id==='copy'?'+28.7%':'+12.4%'}</div>
-        <div class="pchart-delta pos">▲ 30D</div>
-        <svg width="100%" height="100%" viewBox="0 0 316 54" preserveAspectRatio="none" style="opacity:.55">
-          <defs><linearGradient id="pcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${id==='copy'?'#22c55e':'#fff'}" stop-opacity=".3"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs>
-          <polygon points="0,48 35,42 70,44 105,36 140,26 175,28 210,18 245,14 280,8 316,2 316,54 0,54" fill="url(#pcg)"/>
-          <polyline points="0,48 35,42 70,44 105,36 140,26 175,28 210,18 245,14 280,8 316,2" fill="none" stroke="${id==='copy'?'#22c55e':'#fff'}" stroke-width="1.5"/>
-        </svg>
+  /* ══ MY TRADING AGENT — Binance-style panel ══ */
+  if(id==='mine'){
+    const price=(0.8420+Math.random()*.003).toFixed(4);
+    document.getElementById('pb').innerHTML=`
+    <!-- Price header -->
+    <div style="padding:11px 14px 9px;border-bottom:1px solid var(--b1);background:var(--s2)">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px">
+        <span style="font-size:12px;font-weight:800;color:var(--t1)">SUI/USDC</span>
+        <span style="font-size:8px;padding:2px 5px;border-radius:3px;background:rgba(34,187,136,.1);color:var(--acc-g);font-weight:700">${L?'现货':'SPOT'}</span>
+        <span style="font-size:9px;color:var(--t3);margin-left:auto">${L?'Binance API':'Binance API'}</span>
       </div>
-    </div>`;}
-  body+=`<div class="ps"><div class="pst">Metrics</div><div class="mgrid">${(mdata[id]||[]).map(m=>`<div class="mc"><div class="mc-l">${m.l}</div><div class="mc-v ${m.c}">${m.v}</div></div>`).join('')}</div></div>`;
-  body+=`<div class="ps"><div class="pst">Connections (${conns.length})</div><div class="cl">${conns.map(e=>{
-    const oid=e.from===id?e.to:e.from;
-    const od=NDEFS[oid]||{};
-    const dir=e.from===id?'→':'←';
-    return`<div class="citem" onclick="pickEdge(${edges.indexOf(e)},edges[${edges.indexOf(e)}],{x:0,y:0})">
-      <span class="citem-icon">${od.icon||'⬡'}</span>
-      <span class="citem-name">${dir} ${od.label||oid}</span>
-      <span class="citem-badge cb-${e.type}">${e.type}</span>
-      <div class="citem-sdot" style="background:var(--acc-g)"></div>
-    </div>`}).join('')}</div></div>`;
-  body+=`<div class="ps"><div class="pst">Tags</div><div class="tags">${(tags[id]||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div></div>`;
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <span id="bn-price" style="font-size:24px;font-weight:800;color:var(--acc-g);letter-spacing:-1px;font-family:'JetBrains Mono',monospace">${price}</span>
+        <span style="font-size:12px;color:var(--acc-g);font-weight:600">+2.14%</span>
+        <span style="font-size:9px;color:var(--t3);margin-left:auto">H:0.8612 L:0.8201</span>
+      </div>
+    </div>
+    <!-- Chart + timeframe -->
+    <div style="padding:9px 14px 6px;border-bottom:1px solid var(--b1)">
+      <div style="display:flex;gap:3px;margin-bottom:6px">
+        ${['1m','5m','15m','1h','4h','1d'].map((tf,i)=>`<span style="font-size:9px;padding:2px 5px;border-radius:3px;cursor:pointer;background:${i===4?'var(--s5)':'transparent'};color:${i===4?'var(--t1)':'var(--t3)'};font-weight:${i===4?700:400}" onclick="this.parentElement.querySelectorAll('span').forEach(s=>{s.style.background='transparent';s.style.color='var(--t3)';s.style.fontWeight=400});this.style.background='var(--s5)';this.style.color='var(--t1)';this.style.fontWeight=700">${tf}</span>`).join('')}
+      </div>
+      <svg width="100%" height="72" viewBox="0 0 280 72" preserveAspectRatio="none">
+        <defs><linearGradient id="cg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--acc-g)" stop-opacity=".2"/><stop offset="100%" stop-color="var(--acc-g)" stop-opacity="0"/></linearGradient></defs>
+        <polygon points="0,62 24,55 48,58 72,47 96,40 120,42 144,30 168,24 192,17 216,13 240,8 264,5 280,2 280,72 0,72" fill="url(#cg2)"/>
+        <polyline points="0,62 24,55 48,58 72,47 96,40 120,42 144,30 168,24 192,17 216,13 240,8 264,5 280,2" fill="none" stroke="var(--acc-g)" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="144" cy="30" r="3.5" fill="var(--acc-g)"/>
+        <circle cx="216" cy="13" r="3.5" fill="var(--r)"/>
+        <text x="144" y="24" text-anchor="middle" font-size="7.5" fill="var(--acc-g)" font-family="Inter,sans-serif" font-weight="700">${L?'买':'B'}</text>
+        <text x="216" y="7" text-anchor="middle" font-size="7.5" fill="var(--r)" font-family="Inter,sans-serif" font-weight="700">${L?'卖':'S'}</text>
+      </svg>
+    </div>
+    <!-- Order book -->
+    <div style="padding:9px 14px;border-bottom:1px solid var(--b1)">
+      <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:6px">${L?'挂单簿':'Order Book'}</div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;font-size:9px;font-family:'JetBrains Mono',monospace;gap:0">
+        <div style="color:var(--t3);margin-bottom:3px">${L?'数量':'Qty'}</div><div style="color:var(--t3);text-align:center;margin-bottom:3px">${L?'价格':'Price'}</div><div style="color:var(--t3);text-align:right;margin-bottom:3px">${L?'数量':'Qty'}</div>
+        ${[['12,400','0.8432','9,820'],['8,760','0.8428','15,340'],['21,100','0.8425','7,200']].map(([bq,p,aq],i)=>`
+        <div style="color:var(--acc-g);padding:1.5px 0">${bq}</div>
+        <div style="text-align:center;color:${i===0?'var(--t1)':'var(--t2)'};font-weight:${i===0?700:400};padding:1.5px 0">${p}</div>
+        <div style="color:var(--r);text-align:right;padding:1.5px 0">${aq}</div>`).join('')}
+        <div style="grid-column:1/-1;text-align:center;color:var(--t3);font-size:8px;padding:2px 0;border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);margin:2px 0">${L?'价差 0.0002 (0.02%)':'Spread 0.0002 (0.02%)'}</div>
+        ${[['18,300','0.8420','5,600'],['9,100','0.8416','11,200'],['31,400','0.8412','22,800']].map(([bq,p,aq])=>`
+        <div style="color:var(--acc-g);padding:1.5px 0">${bq}</div>
+        <div style="text-align:center;color:var(--t2);padding:1.5px 0">${p}</div>
+        <div style="color:var(--r);text-align:right;padding:1.5px 0">${aq}</div>`).join('')}
+      </div>
+    </div>
+    <!-- Positions -->
+    <div style="padding:9px 14px;border-bottom:1px solid var(--b1)">
+      <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:6px">${L?'持仓':'Positions'} (3)</div>
+      ${[['SUI/USDC',true,'0.8301',price,'+$62'],['BTC/USDC',true,'67,050','67,263','+$180'],['ETH/USDC',false,'3,512','3,478','+$10']].map(([pair,long,entry,curr,pnl])=>`
+      <div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px">
+        <span style="padding:1px 4px;border-radius:2px;font-size:7.5px;font-weight:800;background:${long?'rgba(34,187,136,.1)':'rgba(224,85,85,.1)'};color:${long?'var(--acc-g)':'var(--r)'}">${long?(L?'多':'L'):(L?'空':'S')}</span>
+        <span style="font-weight:700;color:var(--t1);flex:1">${pair}</span>
+        <span style="color:var(--t3);font-family:'JetBrains Mono',monospace;font-size:9px">${entry}</span>
+        <span style="font-weight:800;color:var(--acc-g)">${pnl}</span>
+      </div>`).join('')}
+    </div>
+    <!-- Trade history -->
+    <div style="padding:9px 14px;border-bottom:1px solid var(--b1)">
+      <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:6px">${L?'成交记录':'Trade History'}</div>
+      ${[['09:14',true,'SUI/USDC','0.8421','+$42'],['08:52',false,'ETH/USDC','3,482','−$18'],['08:30',true,'BTC/USDC','67,240','+$180'],['Yest',false,'SUI/USDC','0.8380','+$61']].map(([time,buy,pair,px,pnl])=>`
+      <div style="display:flex;align-items:center;gap:5px;padding:3px 0;font-size:10px;border-bottom:1px solid rgba(255,255,255,.03)">
+        <span style="font-size:8px;color:var(--t3);font-family:'JetBrains Mono',monospace;min-width:34px">${time}</span>
+        <span style="padding:1px 4px;border-radius:2px;font-size:7.5px;font-weight:800;background:${buy?'rgba(34,187,136,.1)':'rgba(224,85,85,.1)'};color:${buy?'var(--acc-g)':'var(--r)'}">${buy?(L?'买':'B'):(L?'卖':'S')}</span>
+        <span style="font-weight:600;color:var(--t1);flex:1">${pair}</span>
+        <span style="color:var(--t3);font-size:9px;font-family:'JetBrains Mono',monospace">${px}</span>
+        <span style="font-weight:700;font-size:10px;color:${pnl.startsWith('+')?'var(--acc-g)':'var(--r)'}">${pnl}</span>
+      </div>`).join('')}
+    </div>
+    <!-- Connect exchange -->
+    <div style="padding:9px 14px">
+      <div style="background:rgba(51,85,204,.08);border:1px solid rgba(51,85,204,.2);border-radius:7px;padding:9px 11px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(51,85,204,.4)'" onmouseout="this.style.borderColor='rgba(51,85,204,.2)'" onclick="showPage('about',null)">
+        <span style="font-size:15px">🔗</span>
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:600;color:var(--t1)">${L?'连接真实交易所':'Connect Real Exchange'}</div>
+          <div style="font-size:9px;color:var(--t3);margin-top:1px">Binance / OKX / Bybit · ${L?'只读API密钥':'Read-Only API Key'}</div>
+        </div>
+        <span style="font-size:13px;color:var(--t3)">›</span>
+      </div>
+    </div>`;
 
+    document.getElementById('pa').innerHTML=`
+      <button class="pab pab-ghost" onclick="clearSel()">${L?'关闭':'Close'}</button>
+      <button class="pab pab-white" onclick="openModal('config_mine')">${L?'配置':'Configure'}</button>
+      <button class="pab pab-red" onclick="openModal('pause')">${L?'暂停':'Pause'}</button>`;
+
+    if(window._priceTick) clearInterval(window._priceTick);
+    window._priceTick=setInterval(()=>{
+      const el=document.getElementById('bn-price');
+      if(!el){clearInterval(window._priceTick);return;}
+      const v=(0.8415+Math.random()*.0012).toFixed(4);
+      el.style.transition='opacity .1s';el.style.opacity='.35';
+      setTimeout(()=>{el.textContent=v;el.style.opacity='1';},110);
+    },1600);
+    return;
+  }
+
+  /* ── OTHER NODES ── */
+  const mdata={
+    market:[{l:L?'推送频率':'Tick Rate',v:'1,240/s',c:'info'},{l:L?'延迟':'Latency',v:'4ms',c:'pos'},{l:L?'数据源':'Source',v:'Binance',c:''},{l:L?'交易对':'Pair',v:'SUI/USDC',c:''}],
+    news:  [{l:L?'情绪':'Sentiment',v:L?'看涨':'Bullish',c:'pos'},{l:L?'分值':'Score',v:'78%',c:'pos'},{l:L?'文章数':'Articles',v:'24',c:''},{l:L?'更新':'Updated',v:'2m ago',c:''}],
+    ai:    [{l:L?'置信度':'Confidence',v:'87%',c:'pos'},{l:L?'信号':'Signal',v:L?'做多':'LONG',c:'pos'},{l:L?'模型':'Model',v:'GPT-4o',c:''},{l:L?'令牌':'Tokens',v:'2.4k',c:''}],
+    copy:  [{l:L?'30日收益':'30D ROI',v:'+28.7%',c:'pos'},{l:'Sharpe',v:'2.14',c:''},{l:L?'最大回撤':'Max DD',v:'−3.2%',c:'neg'},{l:L?'跟随者':'Followers',v:'1,240',c:''}],
+    risk:  [{l:L?'回撤上限':'DD Limit',v:'8%',c:'warn'},{l:L?'日亏损':'Daily Loss',v:'3%',c:'warn'},{l:L?'波动阈值':'Vol Gate',v:'40',c:''},{l:L?'状态':'Status',v:L?'监控中':'Watching',c:'warn'}],
+  };
+  const tags={
+    market:['CEX',L?'实时':'Real-time','WebSocket'],
+    news:  ['RSS','Twitter','NLP','GPT'],
+    ai:    ['GPT-4o',L?'多模态':'Multi-modal','Auto-retry'],
+    copy:  [L?'前1%':'Top 1%',L?'已认证':'Verified','148d live'],
+    risk:  [L?'链上':'On-chain',L?'自动暂停':'Auto-pause',L?'可配置':'Configurable'],
+  };
+  let body='';
+  if(id==='copy'){body+=`<div class="ps"><div class="pst">${t('insp_perf')}</div><div class="pchart"><div class="pchart-val pos">+28.7%</div><div class="pchart-delta pos">▲ 30D</div><svg width="100%" height="100%" viewBox="0 0 316 54" preserveAspectRatio="none" style="opacity:.5"><defs><linearGradient id="pcg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--acc-g)" stop-opacity=".3"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs><polygon points="0,48 40,40 80,44 120,32 160,24 200,16 240,8 280,4 316,1 316,54 0,54" fill="url(#pcg3)"/><polyline points="0,48 40,40 80,44 120,32 160,24 200,16 240,8 280,4 316,1" fill="none" stroke="var(--acc-g)" stroke-width="1.5"/></svg></div></div>`;}
+  body+=`<div class="ps"><div class="pst">${t('insp_metrics')}</div><div class="mgrid">${(mdata[id]||[]).map(m=>`<div class="mc"><div class="mc-l">${m.l}</div><div class="mc-v ${m.c}">${m.v}</div></div>`).join('')}</div></div>`;
+  const eTL={data:L?'数据流':'data',signal:L?'AI信号':'signal',copy:L?'跟单':'copy',guard:L?'风控':'guard'};
+  body+=`<div class="ps"><div class="pst">${t('insp_conns')} (${conns.length})</div><div class="cl">${conns.map(e=>{const oid=e.from===id?e.to:e.from;const od=NDEFS[oid]||{};const dir=e.from===id?'→':'←';return`<div class="citem" onclick="pickEdge(${edges.indexOf(e)},edges[${edges.indexOf(e)}],{x:0,y:0})"><span class="citem-icon">${od.icon||'⬡'}</span><span class="citem-name">${dir} ${t('nd_'+oid)||od.label||oid}</span><span class="citem-badge cb-${e.type}">${eTL[e.type]||e.type}</span><div class="citem-sdot" style="background:var(--acc-g)"></div></div>`;}).join('')}</div></div>`;
+  body+=`<div class="ps"><div class="pst">${t('insp_tags')}</div><div class="tags">${(tags[id]||[]).map(tg=>`<span class="tag">${tg}</span>`).join('')}</div></div>`;
   document.getElementById('pb').innerHTML=body;
   document.getElementById('pa').innerHTML=`
-    <button class="pab pab-ghost" onclick="clearSel()">Close</button>
-    <button class="pab pab-white" onclick="openModal('config_${id}')">Configure</button>
-    ${id==='mine'?'<button class="pab pab-red" onclick="openModal(\'pause\')">Pause</button>':''}`;
+    <button class="pab pab-ghost" onclick="clearSel()">${t('insp_close')}</button>
+    <button class="pab pab-white" onclick="openModal('config_${id}')">${t('insp_configure')}</button>`;
 }
 
 /* ═══════════════════════════════════════
@@ -2218,6 +2300,8 @@ const PAGE_LABELS = {
   auditlog: {en:'Audit Log',      zh:'审计日志'},
   floweditor:{en:'Flow Editor',   zh:'流程编辑'},
   market:   {en:'Agent Market',   zh:'Agent 市场'},
+  settings: {en:'Settings',        zh:'设置'},
+  profile:  {en:'Profile',         zh:'个人资料'},
 };
 function updateBC(sub){
   const L = LANG==='zh';
@@ -2319,6 +2403,149 @@ function buildFlowEditorHTML(){
 }
 
 
+function buildMarketHTML(){
+  const L=LANG==='zh';
+  const agents=[
+    {icon:'🦁',name:'AlphaMesh Pro',    tag:L?'趋势跟随':'Trend Follow',roi:'+28.7%',sharpe:'2.14',dd:'−3.2%',f:'1,240',verified:true,hot:true},
+    {icon:'🐬',name:'DeltaWave DeFi',   tag:L?'均值回归':'Mean Reversion',roi:'+19.3%',sharpe:'1.76',dd:'−5.8%',f:'872', verified:true,hot:false},
+    {icon:'⚡',name:'GridStrike Sui',   tag:L?'网格策略':'Grid',          roi:'+11.2%',sharpe:'2.40',dd:'−1.8%',f:'2,104',verified:true,hot:false},
+    {icon:'🤖',name:'NeuralSui v2',     tag:L?'AI驱动':'AI-Native',       roi:'+34.1%',sharpe:'1.92',dd:'−9.4%',f:'341', verified:false,hot:true},
+    {icon:'🌊',name:'WaveRider Pro',    tag:L?'波动套利':'Volatility',     roi:'+22.8%',sharpe:'1.84',dd:'−6.2%',f:'590', verified:true,hot:false},
+    {icon:'🎯',name:'PrecisionDeFi',    tag:L?'精准入场':'Precision',      roi:'+16.5%',sharpe:'2.10',dd:'−2.9%',f:'1,089',verified:true,hot:false},
+  ];
+  return `<div style="max-width:860px;margin:0 auto;padding:24px 28px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <input placeholder="${L?'搜索 Agent...':'Search agents...'}" style="flex:1;padding:8px 12px;background:var(--s3);border:1px solid var(--b2);border-radius:8px;color:var(--t1);font-size:12px;font-family:inherit;outline:none">
+      <div style="display:flex;gap:4px">
+        ${[L?'全部':'All',L?'策略':'Strategy',L?'数据':'Data',L?'风控':'Guard'].map((f,i)=>`<button style="padding:6px 12px;border-radius:7px;font-size:11px;font-weight:500;border:none;cursor:pointer;font-family:inherit;background:${i===0?'var(--blue)':'var(--s3)'};color:${i===0?'#fff':'var(--t2)'};transition:all .15s" onmouseover="if(${i!==0})this.style.background='var(--s4)'" onmouseout="if(${i!==0})this.style.background='var(--s3)'">${f}</button>`).join('')}
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${agents.map(a=>`
+      <div style="background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;transition:all .15s;cursor:pointer" onmouseover="this.style.borderColor='var(--b3)';this.style.background='var(--s3)'" onmouseout="this.style.borderColor='var(--b1)';this.style.background='var(--s2)'">
+        <div style="width:42px;height:42px;border-radius:10px;background:var(--s4);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${a.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
+            <span style="font-size:13px;font-weight:700;color:var(--t1)">${a.name}</span>
+            ${a.verified?`<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(34,187,136,.1);color:var(--acc-g);font-weight:700">${L?'认证':'Verified'}</span>`:''}
+            ${a.hot?`<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(245,158,11,.1);color:var(--acc-y);font-weight:700">${L?'热门':'Hot'}</span>`:''}
+          </div>
+          <span style="font-size:10px;color:var(--t3)">${a.tag}</span>
+        </div>
+        <div style="display:flex;gap:20px;align-items:center">
+          ${[[L?'30日收益':'30D ROI',a.roi,'var(--acc-g)'],[L?'夏普':'Sharpe',a.sharpe,'var(--t1)'],[L?'最大回撤':'Max DD',a.dd,'var(--r)'],[L?'跟随者':'Followers',a.f,'var(--t2)']].map(([l,v,c])=>`
+          <div style="text-align:center">
+            <div style="font-size:14px;font-weight:800;color:${c};letter-spacing:-.5px">${v}</div>
+            <div style="font-size:9px;color:var(--t3);margin-top:1px">${l}</div>
+          </div>`).join('')}
+        </div>
+        <button style="padding:7px 16px;border-radius:7px;background:var(--blue);color:#fff;font-size:11px;font-weight:700;border:none;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;transition:all .15s" onmouseover="this.style.background='var(--blue2)'" onmouseout="this.style.background='var(--blue)'">${L?'跟随':'Follow'} →</button>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function buildSettingsHTML(){
+  const L=LANG==='zh';
+  const toggles=[[L?'AI信号已启用':'AI signals enabled','on'],[L?'新闻情绪过滤':'News sentiment filter','on'],[L?'自动风险防护':'Auto risk guard','on'],[L?'公开个人资料':'Public profile',''],[L?'链上证明':'On-chain attestation','on']];
+  return `<div style="max-width:520px;margin:0 auto;padding:28px 32px">
+    <!-- Language -->
+    <div style="margin-bottom:22px">
+      <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:12px">${L?'界面语言':'Display Language'}</div>
+      <div style="display:flex;gap:8px">
+        ${['en','zh'].map(lang=>`<div onclick="selectLang('${lang}')" id="lang-card-${lang}" style="flex:1;padding:12px 0;border-radius:9px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;border:1px solid ${LANG===lang?'rgba(255,255,255,.3)':'var(--b1)'};background:${LANG===lang?'var(--s5)':'transparent'};color:${LANG===lang?'var(--t1)':'var(--t3)'}">
+          <div style="font-size:18px;margin-bottom:5px">${lang==='en'?'🇺🇸':'🇨🇳'}</div>
+          <div>${lang==='en'?'English':'中文'}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <!-- Agent defaults -->
+    <div style="margin-bottom:20px">
+      <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:12px">${L?'Agent 默认参数':'Agent Defaults'}</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div><div style="font-size:11px;color:var(--t2);margin-bottom:5px">${L?'默认仓位大小 (%)':'Default Position Size (%)'}</div><input type="number" value="5" style="width:100%;padding:8px 11px;background:var(--s3);border:1px solid var(--b2);border-radius:7px;color:var(--t1);font-size:12px;font-family:inherit;outline:none"></div>
+        <div><div style="font-size:11px;color:var(--t2);margin-bottom:5px">${L?'日最大交易次数':'Max Daily Trades'}</div><input type="number" value="10" style="width:100%;padding:8px 11px;background:var(--s3);border:1px solid var(--b2);border-radius:7px;color:var(--t1);font-size:12px;font-family:inherit;outline:none"></div>
+        <div><div style="font-size:11px;color:var(--t2);margin-bottom:5px">${L?'默认交易对':'Default Pair'}</div><select style="width:100%;padding:8px 11px;background:var(--s3);border:1px solid var(--b2);border-radius:7px;color:var(--t1);font-size:12px;font-family:inherit;outline:none;cursor:pointer"><option>SUI/USDC</option><option>BTC/USDC</option><option>ETH/USDC</option></select></div>
+      </div>
+    </div>
+    <!-- Toggles -->
+    <div style="margin-bottom:24px">
+      <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:12px">${L?'行为设置':'Behavior'}</div>
+      ${toggles.map(([label,on])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--b1)">
+        <span style="font-size:12px;color:var(--t2)">${label}</span>
+        <div class="tgl ${on}" onclick="this.classList.toggle('on')" style="flex-shrink:0"></div>
+      </div>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="showPage('network',document.getElementById('sib-network'))" style="flex:1">${L?'取消':'Cancel'}</button>
+      <button class="btn btn-white" onclick="saveSettings()" style="flex:1">${L?'保存':'Save'}</button>
+    </div>
+  </div>`;
+}
+
+function buildProfileHTML(){
+  const L=LANG==='zh';
+  return `<div style="max-width:480px;margin:0 auto;padding:28px 32px">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--b1)">
+      <div style="width:56px;height:56px;border-radius:50%;background:var(--s4);border:1px solid var(--b3);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--t1)">AL</div>
+      <div>
+        <div style="font-size:18px;font-weight:800;color:var(--t1);letter-spacing:-.4px">ArisLiWind</div>
+        <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:3px">0x3f9a4e2b1c3d…d42c</div>
+      </div>
+      <div style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--acc-g);box-shadow:0 0 8px var(--acc-g)"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+      ${[[L?'30日收益':'30D ROI','+12.4%','var(--acc-g)'],[L?'总资产':'Total Value','$12,840','var(--t1)'],[L?'活跃Agent':'Active Agents','1','var(--t1)'],[L?'跟随者':'Followers','0','var(--t2)']].map(([l,v,c])=>`
+      <div style="background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:12px 14px">
+        <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;font-weight:600">${l}</div>
+        <div style="font-size:20px;font-weight:800;color:${c};letter-spacing:-.6px">${v}</div>
+      </div>`).join('')}
+    </div>
+    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:14px 16px;margin-bottom:16px">
+      <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;font-weight:600">SuiMesh Identity</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t2);line-height:1.7">mesh_id: 0x3f9a4e2b1c3d…d42c<br>registered: 2026-01-14<br>protocol: SuiMesh/v2</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="showPage('network',document.getElementById('sib-network'))" style="flex:1">${L?'返回':'Back'}</button>
+      <button class="btn btn-white" onclick="showPage('settings',document.getElementById('sib-settings'))" style="flex:1">${L?'设置':'Settings'}</button>
+    </div>
+  </div>`;
+}
+
+
+function buildAboutHTML(){
+  const L=LANG==='zh';
+  const rows=[
+    [L?'信号宽度':'Signal Breadth',   L?'仅价格':'Price only',          L?'8源融合：价格+订单簿+新闻+情绪+链上+AI':'8 sources: price+OB+news+sentiment+on-chain+AI', '+340%'],
+    [L?'决策延迟':'Decision Latency', L?'~500ms (收盘后)':'~500ms (candle close)', L?'持续流式，<50ms':'Continuous stream <50ms', '10× faster'],
+    [L?'假阳性率':'False Positives',  L?'~38% (MA交叉)':'~38% (MA crossover)',     L?'多Agent共识降至~14%':'Multi-agent consensus ~14%', '−63%'],
+    [L?'风险管理':'Risk Management',  L?'固定止损':'Fixed stop-loss',    L?'实时波动+新闻+回撤三重联动':'Vol+news+DD real-time guard', L?'动态':'Dynamic'],
+    [L?'跟单':'Copy Trading',         L?'无脑镜像':'Blind mirror 1:1',   L?'跟单方自有风险守卫，智能过滤':'Follower has own Risk Guard', L?'智能':'Intelligent'],
+  ];
+  return `<div style="max-width:760px;margin:0 auto;padding:28px 32px">
+    <div style="margin-bottom:24px">
+      <div style="font-size:28px;font-weight:800;color:var(--t1);letter-spacing:-1.5px;margin-bottom:6px">A@A</div>
+      <div style="font-size:14px;color:var(--t2);margin-bottom:4px">Agent at Agent · ${L?'去中心化智能交易网络':'Decentralised Intelligent Trading Network'}</div>
+      <div style="font-size:11px;color:var(--t3)">Powered by SuiMesh/v2 · Sui Mainnet · A@A v0.1</div>
+    </div>
+    <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:12px">${L?'为什么 A@A 远超传统自动交易':'Why A@A beats traditional auto-trading'}</div>
+    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:10px;overflow:hidden;margin-bottom:20px">
+      <div style="display:grid;grid-template-columns:130px 1fr 1fr 70px;font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;font-weight:700;padding:10px 14px;border-bottom:1px solid var(--b1);background:var(--s3)">
+        <div>${L?'维度':'Dimension'}</div><div>${L?'传统机器人':'Traditional Bot'}</div><div>A@A</div><div style="text-align:right">${L?'提升':'Delta'}</div>
+      </div>
+      ${rows.map(([dim,trad,aaa,delta])=>`
+      <div style="display:grid;grid-template-columns:130px 1fr 1fr 70px;padding:11px 14px;border-bottom:1px solid var(--b1);font-size:11px;align-items:start">
+        <div style="color:var(--t1);font-weight:600">${dim}</div>
+        <div style="color:var(--t3);line-height:1.4">${trad}</div>
+        <div style="color:var(--t2);line-height:1.4">${aaa}</div>
+        <div style="text-align:right;font-weight:800;color:var(--acc-g);font-size:12px;white-space:nowrap">${delta}</div>
+      </div>`).join('')}
+    </div>
+    <button class="btn btn-ghost" onclick="showPage('network',document.getElementById('sib-network'))">${L?'← 返回':'← Back'}</button>
+  </div>`;
+}
+
+
 /* ── SIDEBAR PAGE NAVIGATION — completely separate from top tabs ── */
 let _currentPage = 'network';
 
@@ -2354,6 +2581,14 @@ function showPage(page, sibEl){
     ov.innerHTML = buildAuditLogHTML();
   } else if(page === 'floweditor'){
     ov.innerHTML = buildFlowEditorHTML();
+  } else if(page === 'market'){
+    ov.innerHTML = buildMarketHTML();
+  } else if(page === 'settings'){
+    ov.innerHTML = buildSettingsHTML();
+  } else if(page === 'profile'){
+    ov.innerHTML = buildProfileHTML();
+  } else if(page === 'about'){
+    ov.innerHTML = buildAboutHTML();
   }
 }
 
