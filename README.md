@@ -1,8 +1,14 @@
-# SuiMesh A2A — Design Repository
+# A@A — Design Repository
 
-> Agent-Native Automated Trading Platform on Sui
+> Agent-at-Agent Automated Trading Platform, powered by SuiMesh
 
-This repository contains the **pre-launch design phase** of SuiMesh A2A: interaction design, visual specifications, interface prototypes, and node relationship diagrams.
+This repository contains the **pre-launch design phase** of A@A: interaction design, visual specifications, interface prototypes, and node relationship diagrams.
+
+## What is A@A?
+
+**A@A (Agent-at-Agent)** is a decentralized, Agent-first automated trading platform built on Sui. Every user owns a trading Agent node. Agents connect to each other — and to market data, news feeds, and AI analysis nodes — forming a living, collaborative intelligence network.
+
+> **SuiMesh** is the underlying communication layer that A@A runs on. SuiMesh handles the Agent-to-Agent messaging protocol, identity verification, and on-chain context ownership. A@A is the trading application built on top of it.
 
 ## Contents
 
@@ -14,16 +20,27 @@ This repository contains the **pre-launch design phase** of SuiMesh A2A: interac
 
 ## Core Concept
 
-SuiMesh A2A is a decentralized, **Agent-first** automated trading platform where every user owns a trading Agent node. Agents connect to each other, to market data sources, news feeds, and AI analysis nodes — forming a living, collaborative intelligence network.
+Every user on A@A owns one or more Agent nodes. These Agents can:
+- Connect to market data sources, news APIs, and AI analysis nodes
+- Follow and copy-trade other users' public Agents with one click
+- Collaborate peer-to-peer across users, forming a decentralized strategy network
+- Execute trades autonomously, 24/7, with full on-chain auditability
 
 ### Key Screens
-1. **Agent Network View** — topology canvas, live node status
-2. **Agent Marketplace** — discover & subscribe to top-performing agents
-3. **Flow Editor** — drag-and-drop strategy builder
-4. **Strategy Monitor** — real-time P&L, risk dashboard
+1. **Agent Network View** — topology canvas, live node status & connections
+2. **Agent Marketplace** — discover & subscribe to top-performing Agents
+3. **Flow Editor** — drag-and-drop strategy builder, no code required
+4. **Strategy Monitor** — real-time P&L, positions, risk dashboard
 5. **Decision Audit Log** — full on-chain traceable decision history
+
+## Stack / Protocol
+
+| Layer | Name | Role |
+|-------|------|------|
+| Communication | **SuiMesh** | Agent messaging, identity, context ownership |
+| Application | **A@A** | Trading UI, Agent marketplace, flow editor |
+| Chain | **Sui** | Settlement, smart contracts, on-chain audit |
 
 ---
 
-*Own the Context. Verify the Action.*
-
+*Own the Context. Verify the Action. — SuiMesh*

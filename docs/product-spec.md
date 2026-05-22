@@ -1,4 +1,4 @@
-# SuiMesh A2A — Product Specification v0.1
+# A@A — Product Specification v0.1
 
 > Status: Pre-design phase | Last updated: 2026-05-22
 
@@ -6,10 +6,28 @@
 
 ## 1. Platform Positioning
 
-**SuiMesh A2A** is a decentralized, fully automated, 24/7 intelligent trading platform built on the Sui blockchain.
+**A@A (Agent-at-Agent)** is a decentralized, fully automated, 24/7 intelligent trading platform built on the Sui blockchain, powered by the **SuiMesh** communication protocol.
 
-- **Tagline**: Own the Context. Verify the Action.
-- **Core differentiator**: Multi-user Agent cooperation — not just personal automation, but a living Agent ecosystem where users' Agents can collaborate, copy-trade, and form consensus across chains.
+- **Platform name**: A@A
+- **Tagline**: Agent at Agent. Trade at Scale.
+- **Underlying protocol**: SuiMesh (handles Agent messaging, identity, on-chain context)
+- **Core differentiator**: Multi-user Agent cooperation — not just personal automation, but a living Agent ecosystem where users' Agents collaborate, copy-trade, and form consensus.
+
+### Layer Separation
+
+```
+┌─────────────────────────────────────┐
+│           A@A Application           │  ← Trading UI, Agent Marketplace,
+│   (Agent Network, Flow Editor,      │    Flow Editor, Monitor, Audit Log
+│    Monitor, Marketplace, Log)       │
+├─────────────────────────────────────┤
+│         SuiMesh Protocol            │  ← Agent messaging, identity,
+│  (A2A communication layer)          │    context ownership, verification
+├─────────────────────────────────────┤
+│            Sui Blockchain           │  ← Settlement, smart contracts,
+│                                     │    on-chain audit trail
+└─────────────────────────────────────┘
+```
 
 ---
 
@@ -18,7 +36,7 @@
 ### 2.1 Agent Node
 Every user owns one or more **Agent Nodes** — autonomous, composable trading bots that:
 - Pull data from connected source nodes (market feeds, news APIs, AI analyzers)
-- Execute strategies via on-chain smart contracts
+- Execute strategies via on-chain smart contracts on Sui
 - Expose a public performance profile (optional)
 - Communicate with other users' Agents via the SuiMesh A2A protocol
 
@@ -45,13 +63,13 @@ Connections are directional and typed:
 ## 3. Core User Scenarios
 
 ### Scenario A — "Set and Forget"
-> User creates their Trading Agent, connects to Market Data + News Node, sets risk parameters, deploys. Agent runs 24/7.
+> User creates their Trading Agent, connects to Market Data + News Node, sets risk parameters, deploys. Agent runs 24/7 on Sui via SuiMesh.
 
 ### Scenario B — "Follow a Pro"
-> User discovers a top-performing public agent in the Marketplace. One click: "Follow". Their own Agent mirrors all trades with configurable size multiplier and risk cap.
+> User discovers a top-performing public agent in the A@A Marketplace. One click: "Follow". Their own Agent mirrors all trades with configurable size multiplier and risk cap.
 
 ### Scenario C — "Conditional Copy"
-> User follows Agent B, but adds a condition: "If market volatility index > 40 OR breaking news sentiment is negative, pause copy-trading". Their Risk Guard Node handles this automatically.
+> User follows Agent B, but adds a condition: "If market volatility index > 40 OR breaking news sentiment is negative, pause copy-trading". Risk Guard Node handles this automatically.
 
 ### Scenario D — "Build a Network"
 > Power user creates a mesh: News Agent → AI Analyzer → My Agent ↔ Agent B (peer strategy sharing) → Copy-traded by 50 followers.
@@ -61,10 +79,10 @@ Connections are directional and typed:
 ## 4. Interface Structure (5 Main Views)
 
 ### View 1: Agent Network Canvas
-- Central topology view (Force-directed or manual layout)
+- Central topology view showing all connected Agent nodes
 - Each node: live status badge, mini performance sparkline, connection lines
 - Drag to connect nodes, click to configure
-- Global search + filter nodes by type/performance
+- Global search + filter nodes by type / performance
 
 ### View 2: Agent Marketplace
 - Grid of public agents sorted by: ROI / Followers / Sharpe Ratio / Recent Activity
@@ -73,26 +91,24 @@ Connections are directional and typed:
 - My Followed Agents panel (sidebar)
 
 ### View 3: Flow Editor
-- Drag-and-drop canvas (similar to n8n / Flowith)
+- Drag-and-drop canvas (no-code strategy builder)
 - Left panel: node library (Data Sources, Analysis, Actions, Guards)
 - Right panel: selected node configuration
-- "Test Run" button — dry-run strategy against historical data
-- Deploy button → pushes config to on-chain agent contract
+- "Test Run" — dry-run strategy against historical data
+- Deploy → pushes config to on-chain agent contract via SuiMesh
 
 ### View 4: Strategy Monitor
-- Multi-panel dashboard:
-  - Asset equity curve (interactive chart)
-  - Active positions table
-  - Recent trades feed
-  - Node health status panel
-  - Risk metrics: drawdown, position size, daily P&L
-- Alert configuration (push notifications, on-chain triggers)
+- Asset equity curve (interactive chart)
+- Active positions table
+- Recent trades feed
+- Node health status panel
+- Risk metrics: drawdown, position size, daily P&L, volatility index
 
 ### View 5: Decision Audit Log
-- Timeline view of all decisions made by all connected nodes
+- Timeline of all decisions made by all connected nodes
 - Each entry: timestamp, triggering node, signal received, action taken, tx hash
 - Click any entry: expand full decision chain trace
-- Export to CSV / on-chain attestation
+- Export to CSV / on-chain attestation via SuiMesh
 
 ---
 
@@ -100,7 +116,7 @@ Connections are directional and typed:
 
 1. **Visual first** — Every connection, every decision is visible. No black boxes.
 2. **One-click depth** — Complex operations (copy-trade setup, risk config) are one click to start, guided wizards to complete.
-3. **Traceable by default** — Every action produces an auditable log entry.
+3. **Traceable by default** — Every action produces an auditable log entry, anchored on-chain via SuiMesh.
 4. **Progressive disclosure** — Simple view for beginners, full canvas for power users.
 5. **Risk-first UX** — Risk Guard configuration is prominently surfaced, never buried.
 
