@@ -700,11 +700,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
   <!-- ── My Agent ── -->
   <div class="nav-group">
     <div class="nav-group-label" id="ng-myagent">My Agent</div>
-    <div class="sib on" id="sib-network" onclick="setSib(this)">
+    <div class="sib on" id="sib-network" onclick="showPage('network',this)">
       <span class="sib-icon">⬡</span>
       <span class="sib-label" id="sn-network">Agent Network</span>
     </div>
-    <div class="sib" onclick="switchTab('monitor',document.getElementById('tab-mon'))">
+    <div class="sib" onclick="showPage('monitor',this)">
       <span class="sib-icon">▤</span>
       <span class="sib-label" id="sn-monitor">Monitor</span>
       <span class="dot g"></span>
@@ -713,7 +713,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
       <span class="sib-icon">⬡</span>
       <span class="sib-label" id="sn-flow">Flow Editor</span>
     </div>
-    <div class="sib" onclick="switchTab('history',document.getElementById('tab-log'))">
+    <div class="sib" onclick="showPage('auditlog',this)">
       <span class="sib-icon">≡</span>
       <span class="sib-label" id="sn-log">Audit Log</span>
       <span class="sib-badge new">3</span>
@@ -733,11 +733,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
       <span class="sib-label" id="sn-market">Agent Market</span>
       <span class="sib-badge">48</span>
     </div>
-    <div class="sib sib-dim" onclick="switchTab('monitor',document.getElementById('tab-mon'))">
+    <div class="sib sib-dim" onclick="showPage('monitor',this)">
       <span class="sib-icon">◉</span>
       <span class="sib-label" id="sn-leaderboard">Leaderboard</span>
     </div>
-    <div class="sib sib-dim" onclick="switchTab('history',document.getElementById('tab-log'))">
+    <div class="sib sib-dim" onclick="showPage('auditlog',this)">
       <span class="sib-icon">◈</span>
       <span class="sib-label" id="sn-activity">Activity</span>
     </div>
@@ -751,7 +751,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
       <span class="sib-icon">◈</span>
       <span class="sib-label" id="sn-marketplace">Marketplace</span>
     </div>
-    <div class="sib" onclick="switchTab('monitor',document.getElementById('tab-mon'))">
+    <div class="sib" onclick="showPage('monitor',this)">
       <span class="sib-icon">▦</span>
       <span class="sib-label" id="sn-metrics">Metrics</span>
       <span class="sib-badge new" id="metrics-new">New</span>
@@ -1447,7 +1447,7 @@ function showEdgePanel(edge){
   document.getElementById('pb').innerHTML=body;
   document.getElementById('pa').innerHTML=`
     <button class="pab pab-ghost" onclick="clearSel()">Close</button>
-    <button class="pab pab-ghost" onclick="switchTab('history',document.getElementById('tab-log'))">View Log</button>
+    <button class="pab pab-ghost" onclick="showPage('auditlog',null)">View Log</button>
     <button class="pab pab-red" onclick="removeEdge()">Disconnect</button>`;
 }
 
@@ -2224,6 +2224,110 @@ function buildHistoryHTML(){
 }
 
 function setTab(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on')}
+
+/* ── SIDEBAR PAGE NAVIGATION — completely separate from top tabs ── */
+let _currentPage = 'network';
+
+function showPage(page, sibEl){
+  // 1. Update sidebar active state
+  if(sibEl){
+    document.querySelectorAll('.sib').forEach(s=>s.classList.remove('on'));
+    sibEl.classList.add('on');
+  }
+  _currentPage = page;
+
+  const L = LANG === 'zh';
+  const ov = document.getElementById('tab-overlay');
+  const nb = document.getElementById('tb-netname');
+
+  // 2. Show/hide main canvas area (network page only)
+  const cwEl = document.getElementById('cv');
+  const panelEl = document.getElementById('panel');
+  if(cwEl) cwEl.style.visibility = (page === 'network') ? 'visible' : 'hidden';
+
+  // 3. Handle each page
+  if(page === 'network'){
+    ov.style.display = 'none';
+    if(cwEl) cwEl.style.visibility = 'visible';
+    if(nb) nb.textContent = L ? 'Agent 网络' : 'My Agent Network';
+    // restore top tabs to Network
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+    const tn = document.getElementById('tab-net');
+    if(tn) tn.classList.add('on');
+    return;
+  }
+
+  // 4. Non-network pages: show overlay with full-page content
+  ov.style.display = 'block';
+  if(panelEl) panelEl.classList.add('gone'); // hide inspector
+
+  if(page === 'monitor'){
+    if(nb) nb.textContent = L ? '收益监控' : 'Strategy Monitor';
+    ov.innerHTML = buildMonitorHTML();
+  } else if(page === 'auditlog'){
+    if(nb) nb.textContent = L ? '审计日志' : 'Audit Log';
+    ov.innerHTML = buildAuditLogHTML();
+  } else if(page === 'floweditor'){
+    // Flow editor still uses modal
+    ov.style.display = 'none';
+    if(cwEl) cwEl.style.visibility = 'visible';
+    openModal('floweditor');
+  }
+}
+
+function buildAuditLogHTML(){
+  const L = LANG === 'zh';
+  const steps = [
+    {n:1, c:'var(--acc-c)', t:L?'行情数据信号':'Market Feed Signal',       d:L?'SUI/USDC 突破20日EMA，RSI:58，成交量+34%':'SUI/USDC crossed EMA20. RSI:58. Volume +34%.',              code:'close:0.8421 ema20:0.831 rsi:58 vol:128400'},
+    {n:2, c:'var(--acc-y)', t:L?'新闻哨兵 — 看涨':'News Sentinel — Bullish',  d:L?'3篇正面文章，情绪分0.78（看涨阈值已过）':'3 positive articles. Sentiment: 0.78 (Bullish threshold).',   code:'sentiment:0.78 articles:24 keywords:["Sui","ecosystem"]'},
+    {n:3, c:'var(--acc-p)', t:L?'AI分析器 — 做多信号':'AI Analyzer — LONG signal', d:L?'GPT-4o综合分析：技术+情绪双重确认，置信度87%':'GPT-4o: bullish alignment confirmed. Confidence: 87%.',         code:'action:"LONG" confidence:0.87 tp:0.91 sl:0.81'},
+    {n:4, c:'var(--acc-y)', t:L?'风险守卫 — 通过✓':'Risk Guard — Passed ✓',     d:L?'回撤3.2%<8%，日亏损1.8%<3%，波动率24（低）':'DD 3.2%<8%. Daily loss 1.8%<3%. Vol 24 (Low). All clear.',    code:'dd:PASS daily_loss:PASS vol:PASS sentiment:PASS'},
+    {n:5, c:'var(--acc-g)', t:L?'链上成交':'Order Executed On-chain',     d:L?'做多 SUI/USDC $500 @ 0.8421，DEX: Cetus Protocol':'LONG SUI/USDC $500 at 0.8421. DEX: Cetus. Gas: 0.0012 SUI.', code:'tx:0x8f4a…2e91 block:4182091 status:confirmed'},
+  ];
+  return `<div style="max-width:860px;margin:0 auto;padding:28px 32px">
+    <div style="background:var(--s2);border:1px solid var(--b3);border-radius:10px;padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;gap:10px">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--acc-g);box-shadow:0 0 8px var(--acc-g);flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700">${L?'做多 SUI/USDC $500 — 已成交':'LONG SUI/USDC $500 — Executed'}</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">${L?'我的Agent · AI信号 · Tx: 0x8f4a…2e91':'My Agent · AI Signal · Tx: 0x8f4a…2e91'}</div>
+      </div>
+      <div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace">09:14:32</div>
+    </div>
+    <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.9px;font-weight:700;margin-bottom:14px">${L?'决策链路追踪':'Decision Chain Trace'}</div>
+    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:20px 22px;margin-bottom:24px">
+      ${steps.map((s,i)=>`
+      <div style="display:flex;gap:14px;position:relative;${i<steps.length-1?'padding-bottom:22px':''}">
+        ${i<steps.length-1?`<div style="position:absolute;left:9px;top:22px;bottom:0;width:1px;background:var(--b2)"></div>`:''}
+        <div style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px;border:1.5px solid ${s.c};color:${s.c}">${s.n}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">${s.t}</div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:7px">${s.d}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t3);background:var(--s3);padding:7px 10px;border-radius:6px;border:1px solid var(--b1);word-break:break-all">${s.code}</div>
+        </div>
+      </div>`).join('')}
+    </div>
+    <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.9px;font-weight:700;margin-bottom:12px">${L?'历史记录':'Recent History'}</div>
+    ${[
+      [L?'做空 ETH/USDC $300':'SHORT ETH/USDC $300','var(--r)','08:52:07',L?'跟单 @AlphaMesh · Tx: 0xa2f1…9c4d':'Copy @AlphaMesh · Tx: 0xa2f1…9c4d'],
+      [L?'风险守卫：波动率检查通过':'Risk Guard: Vol check passed','var(--acc-y)','08:50:01',L?'风险守卫 · 波动指数: 24':'Risk Guard · Vol index: 24'],
+      [L?'做多 BTC/USDC $1,200':'LONG BTC/USDC $1,200','var(--acc-g)','08:30:18',L?'我的Agent · 趋势信号 · Tx: 0xb382…1a77':'My Agent · Trend Signal · Tx: 0xb382…1a77'],
+      [L?'跳过交易 — 新闻暂停触发':'Trade skipped — News pause','var(--t3)','08:10:44',L?'新闻哨兵 · 负面情绪骤降':'News Sentinel · Negative sentiment spike'],
+    ].map(([title,col,time,meta])=>`
+    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px 16px;margin-bottom:6px">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:3px">
+        <div style="width:7px;height:7px;border-radius:50%;background:${col};flex-shrink:0"></div>
+        <div style="font-size:12px;font-weight:600;flex:1">${title}</div>
+        <div style="font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace">${time}</div>
+      </div>
+      <div style="font-size:11px;color:var(--t3);padding-left:16px">${meta}</div>
+    </div>`).join('')}
+    <div style="display:flex;gap:8px;margin-top:24px;padding-top:16px;border-top:1px solid var(--b1)">
+      <button class="btn btn-ghost" onclick="showPage('network',document.getElementById('sib-network'))">${L?'← 返回':'← Back'}</button>
+      <button class="btn btn-ghost">Export CSV</button>
+      <button class="btn btn-ghost">${L?'链上认证':'On-chain Attest'}</button>
+    </div>
+  </div>`;
+}
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
 
 /* ═══════════════════════════════════════
