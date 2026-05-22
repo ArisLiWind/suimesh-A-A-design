@@ -280,14 +280,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
   box-shadow:0 2px 16px rgba(51,85,204,.06);
   display:flex;align-items:center;padding:0 20px;gap:14px;z-index:100
 }
-.tb-bc{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t3)}
-.tb-bc b{font-size:14px;font-weight:600;color:var(--t1);letter-spacing:-.3px}
-.tb-bc span{color:var(--t2)}.tb-bc b{color:var(--t1);font-weight:500}
-.tb-sep{color:var(--t3)}
-.tb-center{flex:1;display:flex;justify-content:center}
-.tabs{display:flex;background:var(--s2);border-radius:8px;padding:3px;gap:1px;border:1px solid var(--b2)}
-.tab{padding:4px 13px;border-radius:5px;font-size:11px;font-weight:500;color:var(--t3);cursor:pointer;transition:all .15s;white-space:nowrap}
-.tab.on{background:var(--s5);color:#fff;font-weight:600;box-shadow:0 0 12px rgba(51,85,204,.4)}
+/* breadcrumb */
+.tb-bc{display:flex;align-items:center;gap:4px;font-size:13px;flex:1}
+.bc-root{color:var(--t3);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-root:hover{color:var(--t1)}
+.bc-sep{color:var(--t3);font-size:12px}
+.bc-page{color:var(--t1);font-weight:700;letter-spacing:-.2px}
+#bc-sub-label{color:var(--t2);font-weight:500}
 .tb-right{display:flex;align-items:center;gap:8px}
 .badge-live{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:6px;font-size:11px;font-weight:600;color:var(--acc-g);border:1px solid rgba(0,192,128,.2);background:rgba(0,192,128,.05)}
 .badge-live-dot{width:5px;height:5px;border-radius:50%;background:var(--acc-g);animation:pulse 2s infinite}
@@ -823,15 +822,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div class="main">
   <!-- TOPBAR -->
   <header class="topbar">
-    <div class="tb-bc">
-      <b id="tb-netname">My Agent Network</b>
-    </div>
-    <div class="tb-center">
-      <div class="tabs">
-        <div class="tab on" id="tab-net" onclick="switchTab('network',this)">Network</div>
-        <div class="tab" id="tab-mon" onclick="switchTab('monitor',this)">Performance</div>
-        <div class="tab" id="tab-log" onclick="switchTab('history',this)">History</div>
-      </div>
+    <!-- Breadcrumb: Agent > Page > Sub -->
+    <div class="tb-bc" id="tb-bc">
+      <span class="bc-root" id="bc-root" onclick="showPage('network',document.getElementById('sib-network'))">A@A</span>
+      <span class="bc-sep">›</span>
+      <span class="bc-page" id="bc-page">Agent Network</span>
+      <span class="bc-sub" id="bc-sub" style="display:none">
+        <span class="bc-sep">›</span>
+        <span id="bc-sub-label"></span>
+      </span>
     </div>
     <div class="tb-right">
       <div style="display:flex;align-items:center;gap:14px;font-size:11px;margin-right:6px">
@@ -2111,20 +2110,7 @@ function saveSettings(){
 }
 
 function setSib(el){document.querySelectorAll('.sib').forEach(s=>s.classList.remove('on'));el.classList.add('on')}
-function switchTab(view,el){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');
-  const ov=document.getElementById('tab-overlay');
-  const nb=document.getElementById('tb-netname');
-  if(view==='network'){
-    ov.style.display='none';
-    if(nb) nb.textContent=LANG==='zh'?'Agent 网络':'My Agent Network';
-    return;
-  }
-  if(nb) nb.textContent=view==='monitor'?(LANG==='zh'?'收益监控':'Performance'):(LANG==='zh'?'决策日志':'Decision Audit Log');
-  ov.style.display='block';
-  ov.innerHTML=view==='monitor'?buildMonitorHTML():buildHistoryHTML();
-}
+function switchTab(){} // removed — left nav is sole navigation
 
 function buildMonitorHTML(){
   const L=LANG==='zh';
@@ -2216,14 +2202,39 @@ function buildHistoryHTML(){
         <div style="font-size:10px;color:var(--t3);padding-left:15px">${meta}</div>
       </div>`).join('')}
     <div style="display:flex;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--b1)">
-      <button class="btn btn-ghost" onclick="switchTab('network',document.getElementById('tab-net'))">${L?'← 返回网络':'← Back to Network'}</button>
+      <button class="btn btn-ghost" onclick="showPage('network',document.getElementById('sib-network'))">${L?'← 返回网络':'← Back to Network'}</button>
       <button class="btn btn-ghost">Export CSV</button>
       <button class="btn btn-ghost">${L?'链上认证':'On-chain Attest'}</button>
     </div>
   </div>`;
 }
 
-function setTab(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on')}
+function setTab(el){} // tabs removed — kept for compat
+
+/* ── Breadcrumb update ── */
+const PAGE_LABELS = {
+  network:  {en:'Agent Network',  zh:'Agent 网络'},
+  monitor:  {en:'Monitor',        zh:'收益监控'},
+  auditlog: {en:'Audit Log',      zh:'审计日志'},
+  floweditor:{en:'Flow Editor',   zh:'流程编辑'},
+  market:   {en:'Agent Market',   zh:'Agent 市场'},
+};
+function updateBC(sub){
+  const L = LANG==='zh';
+  const root = document.getElementById('bc-root');
+  const page = document.getElementById('bc-page');
+  const subEl = document.getElementById('bc-sub');
+  const subLbl = document.getElementById('bc-sub-label');
+  if(root) root.textContent = 'A@A';
+  const lbl = PAGE_LABELS[_currentPage] || {en:_currentPage, zh:_currentPage};
+  if(page) page.textContent = L ? lbl.zh : lbl.en;
+  if(sub && subEl && subLbl){
+    subLbl.textContent = sub;
+    subEl.style.display = 'flex';
+  } else if(subEl){
+    subEl.style.display = 'none';
+  }
+}
 
 /* ── SIDEBAR PAGE NAVIGATION — completely separate from top tabs ── */
 let _currentPage = 'network';
@@ -2238,37 +2249,27 @@ function showPage(page, sibEl){
 
   const L = LANG === 'zh';
   const ov = document.getElementById('tab-overlay');
-  const nb = document.getElementById('tb-netname');
-
-  // 2. Show/hide main canvas area (network page only)
+  // 2. Network page: hide overlay, show canvas
   const cwEl = document.getElementById('cv');
   const panelEl = document.getElementById('panel');
-  if(cwEl) cwEl.style.visibility = (page === 'network') ? 'visible' : 'hidden';
 
-  // 3. Handle each page
   if(page === 'network'){
     ov.style.display = 'none';
     if(cwEl) cwEl.style.visibility = 'visible';
-    if(nb) nb.textContent = L ? 'Agent 网络' : 'My Agent Network';
-    // restore top tabs to Network
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-    const tn = document.getElementById('tab-net');
-    if(tn) tn.classList.add('on');
+    updateBC();
     return;
   }
 
-  // 4. Non-network pages: show overlay with full-page content
+  // 3. Other pages: show overlay, canvas beneath
   ov.style.display = 'block';
-  if(panelEl) panelEl.classList.add('gone'); // hide inspector
+  if(panelEl) panelEl.classList.add('gone');
+  updateBC();
 
   if(page === 'monitor'){
-    if(nb) nb.textContent = L ? '收益监控' : 'Strategy Monitor';
     ov.innerHTML = buildMonitorHTML();
   } else if(page === 'auditlog'){
-    if(nb) nb.textContent = L ? '审计日志' : 'Audit Log';
     ov.innerHTML = buildAuditLogHTML();
   } else if(page === 'floweditor'){
-    // Flow editor still uses modal
     ov.style.display = 'none';
     if(cwEl) cwEl.style.visibility = 'visible';
     openModal('floweditor');
