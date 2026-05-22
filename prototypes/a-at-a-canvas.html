@@ -323,88 +323,44 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 #svgl .edge-hit{pointer-events:stroke;cursor:pointer}
 
 /* ─── NODES ─── */
-/* ── NODE CARD — Grok light-leak centered style ── */
 .node{
-  position:absolute;width:190px;
-  border-radius:18px;
-  padding:18px 16px 14px;
-  cursor:pointer;user-select:none;
-  transition:transform .2s var(--ease),box-shadow .2s;
-  will-change:transform;
-  text-align:center;
-  /* glassmorphism base */
-  background:linear-gradient(145deg,rgba(20,24,60,.92) 0%,rgba(8,10,30,.96) 100%);
-  border:1px solid rgba(80,100,200,.25);
-  box-shadow:
-    0 8px 32px rgba(0,0,4,.6),
-    0 1px 0 rgba(255,255,255,.06) inset,
-    0 -1px 0 rgba(0,0,0,.4) inset;
-  overflow:hidden;
+  position:absolute;width:172px;
+  background:var(--s2);border:1px solid var(--b2);border-radius:14px;
+  padding:14px 16px;cursor:pointer;user-select:none;
+  transition:border-color .2s,box-shadow .2s;will-change:transform;
+  box-shadow:0 4px 24px rgba(0,0,0,.5),0 1px 0 rgba(51,85,204,.06) inset
 }
-/* light leak glow — pseudo behind card */
-.node::before{
-  content:'';position:absolute;top:-30%;left:50%;
-  transform:translateX(-50%);
-  width:120%;height:60%;
-  background:radial-gradient(ellipse, rgba(60,80,220,.25) 0%, transparent 70%);
-  pointer-events:none;z-index:0;
-  transition:opacity .3s;
-}
-.node:hover::before{opacity:1.4}
-.node.sel::before{background:radial-gradient(ellipse, rgba(60,100,255,.45) 0%, transparent 65%)}
-.node>*{position:relative;z-index:1}
-.node:hover{
-  transform:translateY(-3px);
-  box-shadow:0 16px 48px rgba(0,0,20,.7),0 0 0 1px rgba(80,120,255,.35),0 1px 0 rgba(255,255,255,.08) inset;
-}
-.node.sel{
-  border-color:rgba(80,130,255,.6);
-  box-shadow:0 0 0 2px rgba(60,100,255,.4),0 0 40px rgba(60,100,255,.2),0 16px 48px rgba(0,0,20,.7);
-}
-.node.drag{box-shadow:0 24px 64px rgba(0,0,20,.8);z-index:1000;transform:scale(1.04)}
-@keyframes nin{from{opacity:0;transform:scale(.82) translateY(10px)}to{opacity:1;transform:none}}
-.node{animation:nin .4s var(--easeb) both}
-
-/* centered layout inside card */
-.n-icon{
-  width:44px;height:44px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;margin:0 auto 10px;
-  background:rgba(255,255,255,.07);
-  border:1px solid rgba(255,255,255,.1);
-  box-shadow:0 0 20px rgba(60,80,220,.2);
-}
-.n-name{font-size:13px;font-weight:800;letter-spacing:-.3px;color:var(--t1);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.n-type{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
-.n-sr{display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:6px}
+.node:hover{border-color:var(--b3);box-shadow:0 0 0 2px rgba(51,85,204,.2),0 8px 32px rgba(0,0,0,.6),0 0 0 1px rgba(51,85,204,.1) inset}
+.node.sel{border-color:var(--blue);box-shadow:0 0 0 2px rgba(51,85,204,.35),0 0 32px rgba(51,85,204,.2),0 12px 40px rgba(0,0,0,.7)}
+.node.drag{box-shadow:0 20px 60px rgba(0,0,0,.7);z-index:1000}
+@keyframes nin{from{opacity:0;transform:scale(.88) translateY(6px)}to{opacity:1;transform:none}}
+.node{animation:nin .35s var(--easeb) both}
+.n-top{display:flex;align-items:flex-start;gap:9px;margin-bottom:9px}
+.n-icon{width:30px;height:30px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--s3);border:1px solid rgba(51,85,204,.2)}
+.n-meta{flex:1;min-width:0}
+.n-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.2px}
+.n-type{font-size:9px;color:var(--t3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+.n-sr{display:flex;align-items:center;gap:5px;margin-bottom:5px}
 .sdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.sdot.g{background:var(--acc-g);box-shadow:0 0 6px rgba(34,197,94,.5)}
-.sdot.b{background:#4488cc}
+.sdot.g{background:var(--acc-g);box-shadow:0 0 5px rgba(34,197,94,.4)}
+.sdot.b{background:var(--b)}
 .sdot.y{background:var(--acc-y)}
 .sdot.x{background:var(--t3)}
 .n-st{font-size:10px;color:var(--t3)}
-.n-metric{font-size:18px;font-weight:800;letter-spacing:-.6px;margin-bottom:6px}
+.n-metric{font-size:14px;font-weight:700;letter-spacing:-.3px}
 .n-metric.pos{color:var(--acc-g)}.n-metric.muted{color:var(--t2)}.n-metric.warn{color:var(--acc-y)}
-.n-spark{height:28px;width:100%;margin:0 auto}
-/* chat bubble on card — shows last message from/to this agent */
-.n-bubble{
-  margin-top:8px;padding:5px 8px;border-radius:7px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
-  font-size:10px;color:var(--t2);text-align:left;line-height:1.4;
-  display:none;cursor:pointer;transition:background .15s;
-}
-.node:hover .n-bubble,.node.sel .n-bubble{display:block}
-.n-bubble:hover{background:rgba(255,255,255,.08)}
-
+.n-spark{margin-top:7px;height:24px;width:100%}
 .port{
   position:absolute;width:10px;height:10px;border-radius:50%;
-  background:rgba(60,80,220,.4);border:1.5px solid rgba(120,150,255,.6);
+  background:var(--s3);border:1.5px solid var(--t3);
   cursor:crosshair;z-index:10;transition:all .15s;opacity:0
 }
 .node:hover .port,.node.sel .port{opacity:1}
-.port:hover{border-color:#fff;background:rgba(100,140,255,.8);transform:scale(1.5)!important}
+.port:hover{border-color:var(--t1);background:var(--t1);transform:scale(1.4)}
 .port.out{right:-5px;top:50%;transform:translateY(-50%)}
 .port.in {left:-5px; top:50%;transform:translateY(-50%)}
+.port.out:hover{transform:translateY(-50%) scale(1.4)}
+.port.in:hover {transform:translateY(-50%) scale(1.4)}
 
 /* ─── EDGES ─── */
 .edge{fill:none;stroke-width:1.5}
@@ -722,113 +678,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 /* ── Dim nav items (Soon) ── */
 .sib-dim{opacity:.45;pointer-events:auto}
 .sib-dim:hover{opacity:.75;background:var(--s3)}
-
-/* ── Global Chat Bar ── */
-.chat-bar{
-  position:absolute;bottom:30px;left:var(--sw);right:0;
-  z-index:60;padding:0 16px 10px;
-  pointer-events:none;
-}
-.chat-bar-inner{
-  display:flex;align-items:center;gap:8px;
-  background:var(--s2);
-  border:1px solid var(--b3);
-  border-radius:12px;
-  padding:8px 10px 8px 14px;
-  pointer-events:auto;
-  box-shadow:0 8px 32px rgba(0,0,20,.6);
-}
-.chat-target{
-  font-size:11px;font-weight:700;color:var(--blue2);
-  background:rgba(51,85,204,.15);border:1px solid rgba(51,85,204,.25);
-  border-radius:6px;padding:3px 9px;cursor:pointer;white-space:nowrap;
-  transition:all .15s;flex-shrink:0;
-}
-.chat-target:hover{background:rgba(51,85,204,.28)}
-.chat-input{
-  flex:1;background:transparent;border:none;outline:none;
-  color:var(--t1);font-size:13px;font-family:inherit;
-  caret-color:var(--blue2);
-}
-.chat-input::placeholder{color:var(--t3)}
-.chat-send{
-  width:32px;height:32px;border-radius:8px;
-  background:var(--blue);border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:14px;flex-shrink:0;transition:all .15s;
-}
-.chat-send:hover{background:var(--blue2);transform:scale(1.05)}
-.chat-send:active{transform:scale(.95)}
-
-/* ── Panel chat section ── */
-.panel-chat{
-  display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;
-}
-.pchat-msgs{
-  flex:1;overflow-y:auto;padding:10px 14px;
-  display:flex;flex-direction:column;gap:8px;
-}
-.pchat-msg{display:flex;gap:8px;align-items:flex-start}
-.pchat-msg.me{flex-direction:row-reverse}
-.pchat-ava{
-  width:24px;height:24px;border-radius:50%;flex-shrink:0;
-  overflow:hidden;background:var(--s4);
-  display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:700;color:var(--t2);
-}
-.pchat-bubble{
-  max-width:80%;padding:7px 10px;border-radius:10px;
-  font-size:11px;line-height:1.5;
-}
-.pchat-msg.agent .pchat-bubble{background:var(--s3);color:var(--t1);border-radius:3px 10px 10px 10px}
-.pchat-msg.me .pchat-bubble{background:var(--blue);color:#fff;border-radius:10px 3px 10px 10px}
-.pchat-meta{font-size:9px;color:var(--t3);margin-top:2px;font-family:'JetBrains Mono',monospace}
-.pchat-input-row{
-  display:flex;gap:6px;padding:10px 12px;
-  border-top:1px solid var(--b1);flex-shrink:0;
-}
-.pchat-input{
-  flex:1;padding:7px 10px;background:var(--s3);
-  border:1px solid var(--b2);border-radius:8px;
-  color:var(--t1);font-size:11px;font-family:inherit;outline:none;
-  transition:border-color .15s;
-}
-.pchat-input:focus{border-color:var(--b3)}
-.pchat-send{
-  padding:7px 12px;border-radius:8px;background:var(--blue);
-  color:#fff;border:none;cursor:pointer;font-size:11px;
-  font-family:inherit;font-weight:600;transition:all .15s;
-}
-.pchat-send:hover{background:var(--blue2)}
-
-/* ── Panel tabs ── */
-.panel-tabs{
-  display:flex;border-bottom:1px solid var(--b1);flex-shrink:0;
-}
-.ptab{
-  flex:1;padding:8px 0;text-align:center;
-  font-size:11px;font-weight:500;color:var(--t3);
-  cursor:pointer;border-bottom:2px solid transparent;
-  transition:all .15s;
-}
-.ptab.on{color:var(--t1);border-bottom-color:var(--blue);font-weight:700}
-.ptab:hover{color:var(--t2)}
-
-/* ── Add node to network ── */
-.add-node-row{
-  display:flex;flex-direction:column;gap:6px;
-  padding:12px 14px;border-bottom:1px solid var(--b1);
-}
-.add-node-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:6px;
-}
-.add-node-btn2{
-  padding:7px 0;border-radius:8px;font-size:11px;font-weight:500;
-  border:1px solid var(--b2);background:var(--s3);color:var(--t2);
-  cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;
-}
-.add-node-btn2:hover{background:var(--s4);color:var(--t1);border-color:var(--b3)}
-
 </style>
 </head>
 <body>
@@ -1013,16 +862,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
       <div class="pb" id="pb"></div>
       <div class="pa" id="pa"></div>
     </aside>
-  </div>
-
-  <!-- GLOBAL CHAT BAR -->
-  <div class="chat-bar" id="chat-bar">
-    <div class="chat-bar-inner">
-      <div class="chat-target" id="chat-target" onclick="cycleChatTarget()">@ All Agents</div>
-      <input class="chat-input" id="chat-input" placeholder="Message all agents, or select one to command..." 
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendGlobalChat()}">
-      <button class="chat-send" onclick="sendGlobalChat()" title="Send">›</button>
-    </div>
   </div>
 
   <!-- STATUS BAR -->
@@ -1252,51 +1091,6 @@ function applyI18n(){
   if(depBtn2&&!depBtn2.disabled) depBtn2.textContent=t('deploy');
 }
 
-
-/* ═══════════════════════════════════════
-   AGENT CHAT SYSTEM
-═══════════════════════════════════════ */
-// Per-agent message history
-const AGENT_MSGS = {
-  mine:   [{from:'agent',text:'Running trend analysis on SUI/USDC. EMA20 cross detected.'},{from:'user',text:'Increase position size to 8% if confidence > 90%'},{from:'agent',text:'Understood. Rule applied. Current confidence: 87%, holding at 5%.'}],
-  market: [{from:'agent',text:'SUI/USDC tick rate: 1,240/s. Volume spike detected +34%.'},{from:'agent',text:'Price crossed above 20-period EMA at 0.8421.'}],
-  news:   [{from:'agent',text:'Sentiment score updated: 0.78 (Bullish). 3 new articles detected.'},{from:'agent',text:'Top signal: "Sui TVL reaches all-time high" — score +0.91'}],
-  ai:     [{from:'agent',text:'LONG signal issued for SUI/USDC. Confidence: 87%. TP: 0.91, SL: 0.81'},{from:'user',text:'Why did you issue a LONG?'},{from:'agent',text:'Technical breakout (EMA cross) + bullish sentiment (0.78) + volume confirmation. All 3 aligned.'}],
-  copy:   [{from:'agent',text:'Opened LONG BTC/USDC $1,200 @ 67,240. Copying AlphaMesh Pro.'},{from:'user',text:'Pause copy-trading if my drawdown hits 6%'},{from:'agent',text:'Rule saved. Will pause at 6% drawdown. Current DD: 3.2%.'}],
-  risk:   [{from:'agent',text:'All checks passed. Drawdown: 3.2%/8%, Daily loss: 1.8%/3%, Vol: 24 (Low).'},{from:'agent',text:'Monitoring volatility index. No pause triggered.'}],
-};
-
-// Connection message log (what flows between two agents)
-const CONN_MSGS = {};
-
-function getConnKey(from,to){ return from+'->'+to; }
-
-function addAgentMsg(id, from, text){
-  if(!AGENT_MSGS[id]) AGENT_MSGS[id]=[];
-  AGENT_MSGS[id].push({from, text, time: new Date().toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'})});
-  // update bubble on card
-  const el = document.getElementById('nd-'+id);
-  if(el){
-    const b = el.querySelector('.n-bubble');
-    if(b) b.innerHTML = '💬 ' + text.slice(0,42) + (text.length>42?'…':'');
-  }
-  // if this agent's panel is open, refresh chat
-  if(selNode===id) refreshChatPanel(id);
-}
-
-
-const _AVA48 = 'data:image/png;base64,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';
-function nodeAvatar(id){
-  if(id==='mine'||id==='copy'){
-    return '<img src="'+_AVA48+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%" draggable="false">';
-  }
-  const initials = {market:'M',news:'N',ai:'AI',risk:'R'};
-  const colors   = {market:'#1880c8',news:'#c09030',ai:'#6050c0',risk:'#c06030'};
-  const lbl = initials[id] || (NDEFS[id]?(NDEFS[id].label||id).charAt(0).toUpperCase():'?');
-  const col = colors[id] || '#3355cc';
-  return `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;background:${col}22;color:${col};border-radius:50%">${lbl}</div>`;
-}
-
 const NDEFS = {
   mine:  {label:'My Trading Agent',type:'Personal Agent',   icon:'🤖',col:'w', st:'active',   metric:'+12.4%',mc:'pos',id:'mine'},
   market:{label:'Market Data',     type:'Data Source',      icon:'📊',col:'c', st:'streaming', metric:'1,240/s', mc:'info',id:'market'},
@@ -1394,16 +1188,14 @@ function spawnNode(id,x,y,delay=0){
   const el=document.createElement('div');
   el.className='node';el.id='nd-'+id;
   el.style.cssText=`left:${x}px;top:${y}px;animation-delay:${delay}ms`;
-  // last chat message per node
-  const lastMsg = AGENT_MSGS[id] ? AGENT_MSGS[id][AGENT_MSGS[id].length-1] : null;
   el.innerHTML=`
-    <div class="n-icon" style="overflow:hidden;border-radius:50%;width:52px;height:52px;padding:0">${nodeAvatar(id)}</div>
-    <div class="n-name">${def.label}</div>
-    <div class="n-type">${def.type}</div>
+    <div class="n-top">
+      <div class="n-icon">${def.icon}</div>
+      <div class="n-meta"><div class="n-name">${def.label}</div><div class="n-type">${def.type}</div></div>
+    </div>
     <div class="n-sr"><div class="sdot ${STMAP[def.st]||'x'}"></div><div class="n-st">${cap(def.st)}</div></div>
     <div class="n-metric ${def.mc}">${def.metric}</div>
     <svg class="n-spark" viewBox="0 0 144 24">${spark(id)}</svg>
-    ${lastMsg?`<div class="n-bubble" onclick="event.stopPropagation();pickNode('${id}')">💬 ${lastMsg.text.slice(0,42)}${lastMsg.text.length>42?'…':''}</div>`:'<div class="n-bubble" onclick="event.stopPropagation();pickNode(''+id+'')">💬 ${LANG==="zh"?"点击与此 Agent 对话...":"Click to chat with this Agent..."}</div>'}
     <div class="port in"  data-n="${id}"></div>
     <div class="port out" data-n="${id}"></div>`;
   el.addEventListener('mousedown',e=>ndDown(e,id));
@@ -1548,24 +1340,13 @@ function showNodePanel(id){
   const L=LANG==='zh';
   const conns=edges.filter(e=>e.from===id||e.to===id);
 
-  // Avatar for panel header
-  const phAva = (id==='mine'||id==='copy')
-    ? `<img src="data:image/png;base64,${AVA48}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
-    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;background:var(--s4);color:var(--t2);border-radius:50%">${d.label.charAt(0)}</div>`;
-
   document.getElementById('ph').innerHTML=`
-    <div class="ph-icon" style="overflow:hidden;border-radius:50%;width:36px;height:36px;padding:0;border:1.5px solid var(--b3)">${phAva}</div>
+    <div class="ph-icon">${d.icon}</div>
     <div style="flex:1;min-width:0">
       <div class="ph-title">${t('nd_'+id)||d.label}</div>
       <div class="ph-sub">#${id.toUpperCase().padStart(4,'0')} · ${t('nd_'+id+'_type')||d.type}</div>
     </div>
     <div class="ph-close" onclick="clearSel()">✕</div>`;
-
-  // Panel tabs: Info | Chat
-  const pbEl = document.getElementById('pb');
-  pbEl.style.display='flex';
-  pbEl.style.flexDirection='column';
-  pbEl.style.overflow='hidden';
 
   /* ══ MY TRADING AGENT — Binance-style panel ══ */
   if(id==='mine'){
@@ -1663,7 +1444,6 @@ function showNodePanel(id){
       el.style.transition='opacity .1s';el.style.opacity='.35';
       setTimeout(()=>{el.textContent=v;el.style.opacity='1';},110);
     },1600);
-    _attachPanelChat(id);
     return;
   }
 
@@ -1691,9 +1471,7 @@ function showNodePanel(id){
   document.getElementById('pb').innerHTML=body;
   document.getElementById('pa').innerHTML=`
     <button class="pab pab-ghost" onclick="clearSel()">${t('insp_close')}</button>
-    <button class="pab pab-white" onclick="openModal('config_${id}')">${t('insp_configure')}</button>
-    <button class="pab pab-ghost" onclick="showConnectMenu('${id}')" title="${LANG==='zh'?'连接到':'Connect to'} (C)" style="font-size:18px;padding:7px 10px">⇋</button>`;
-  _attachPanelChat(id);
+    <button class="pab pab-white" onclick="openModal('config_${id}')">${t('insp_configure')}</button>`;
 }
 
 /* ═══════════════════════════════════════
@@ -2513,332 +2291,7 @@ function buildHistoryHTML(){
   </div>`;
 }
 
-
-function _attachPanelChat(nodeId){
-  const pb = document.getElementById('pb');
-  if(!pb) return;
-  const L = LANG==='zh';
-  // Wrap existing content + add tabs + chat section
-  const existingContent = pb.innerHTML;
-  pb.innerHTML = `
-    <!-- Panel tabs -->
-    <div class="panel-tabs">
-      <div class="ptab on" id="ptab-info" onclick="switchPanelTab('info','${nodeId}')">${L?'信息':'Info'}</div>
-      <div class="ptab" id="ptab-chat" onclick="switchPanelTab('chat','${nodeId}')">${L?'对话':'Chat'}</div>
-      <div class="ptab" id="ptab-net" onclick="switchPanelTab('network','${nodeId}')">${L?'网络':'Network'}</div>
-    </div>
-    <!-- Info panel -->
-    <div id="panel-info-content" style="flex:1;overflow-y:auto">${existingContent}</div>
-    <!-- Chat panel (hidden) -->
-    <div id="panel-chat-content" style="display:none;flex:1;flex-direction:column;min-height:0">
-      <div class="pchat-msgs" id="pchat-msgs"></div>
-      <div class="pchat-input-row">
-        <input class="pchat-input" id="pchat-input" placeholder="${L?'向此 Agent 发指令...':'Send command to this Agent...'}"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();sendPanelChat('${nodeId}')}" >
-        <button class="pchat-send" onclick="sendPanelChat('${nodeId}')">↑</button>
-      </div>
-    </div>
-    <!-- Network expand panel (hidden) -->
-    <div id="panel-net-content" style="display:none;flex:1;overflow-y:auto">
-      <div class="add-node-row">
-        <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:6px">${L?'添加节点到网络':'Add Node to Network'} (${Object.keys(nodes).length}/${MAX_NODES})</div>
-        <div class="add-node-grid">
-          ${NODE_TEMPLATES.map(t=>`<button class="add-node-btn2" onclick="addNetworkNode('${t.type}')">${t.label}</button>`).join('')}
-        </div>
-      </div>
-      <div style="padding:10px 14px">
-        <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:8px">${L?'当前连接':'Current Connections'} (${edges.length})</div>
-        <div>
-          ${edges.map((e,i)=>{
-            const fn=NDEFS[e.from]||{};const tn=NDEFS[e.to]||{};
-            return `<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--b1);font-size:11px">
-              <span style="color:var(--t1);font-weight:600">${fn.label||e.from}</span>
-              <span style="color:var(--t3);font-size:10px">→</span>
-              <span style="color:var(--t1)">${tn.label||e.to}</span>
-              <span style="font-size:9px;padding:1px 6px;border-radius:3px;background:var(--s4);color:var(--t3);margin-left:auto">${e.type}</span>
-              <span style="cursor:pointer;color:var(--r);font-size:12px" onclick="edges.splice(${i},1);drawEdges();updateSBar();_attachPanelChat('${nodeId}')">✕</span>
-            </div>`;
-          }).join('')}
-        </div>
-        <button class="btn btn-ghost" style="width:100%;margin-top:10px" onclick="showConnectMenu('${nodeId}')">${L?'+ 连接到另一个节点':'+ Connect to another node'} (C)</button>
-      </div>
-    </div>
-  `;
-  refreshPanelChat(nodeId);
-}
-
-function switchPanelTab(tab, nodeId){
-  ['info','chat','net'].forEach(t=>{
-    const tab_el=document.getElementById('ptab-'+t);
-    const content=document.getElementById('panel-'+t+'-content');
-    if(tab_el) tab_el.classList.toggle('on', t===tab);
-    if(content) content.style.display = t===tab ? (t==='info'?'block':'flex') : 'none';
-  });
-  if(tab==='chat') refreshPanelChat(nodeId);
-}
-
-function sendPanelChat(nodeId){
-  const inp=document.getElementById('pchat-input');
-  if(!inp)return;
-  const text=inp.value.trim();
-  if(!text)return;
-  inp.value='';
-  sendChat(nodeId, text);
-}
-
 function setTab(el){} // tabs removed — kept for compat
-
-/* ──────────────────────────────────────
-   AGENT CHAT SYSTEM
-────────────────────────────────────── */
-const CHAT_HISTORY = {}; // nodeId -> [{role:'user'|'agent', text, time}]
-let _chatTarget = 'all'; // 'all' | nodeId
-const _AVA48_PANEL = 'data:image/png;base64,' + (_AVA48||'');
-
-const AGENT_AUTO_REPLIES = {
-  mine:   (L) => L ? [
-    '我正在监控 SUI/USDC ，目前处于趋势追随模式。',
-    '已接收指令，正在分析当前市场环境。',
-    '风险守卫显示回撤3.2%，下单条件正常。',
-    '数据已同步至所有连接的 Agent。'
-  ] : [
-    'Monitoring SUI/USDC. Currently in trend-following mode.',
-    'Command received. Analyzing current market conditions.',
-    'Risk Guard shows DD at 3.2%. Order conditions normal.',
-    'Data synced across all connected agents.'
-  ],
-  market: (L) => L ? [
-    'SUI/USDC 当前价格: 0.8421 (+2.1%)。成交量比均値高 34%。',
-    '已检测到 20日均线突破， RSI 58，信号已推送至交易 Agent。',
-    '订单簿深度较好，价差 0.0002 (0.02%)。'
-  ] : [
-    'SUI/USDC price: 0.8421 (+2.1%). Volume 34% above avg.',
-    'EMA20 breakout detected. RSI 58. Signal pushed to Trading Agent.',
-    'Order book healthy. Spread 0.0002 (0.02%).'
-  ],
-  news: (L) => L ? [
-    '情绪分岐0.78，看涨。过去 2 小时检测到 24 篇正面文章。',
-    'Sui 生态系统 TVL 创新高，社交情绪正强。',
-    '未发现负面事件，继续监控中。'
-  ] : [
-    'Sentiment score 0.78, Bullish. 24 positive articles in 2h.',
-    'Sui ecosystem TVL hits all-time high. Social sentiment strong.',
-    'No negative events detected. Continuing surveillance.'
-  ],
-  ai: (L) => L ? [
-    '综合分析: 技术 + 情绪双重确认。信号: LONG SUI/USDC，置信度 87%。',
-    '模型已使用 GPT-4o，2,400 token。TP: 0.91， SL: 0.81。',
-    '上一个信号为 HOLD，等待突破确认。现已确认。'
-  ] : [
-    'Combined analysis: tech + sentiment aligned. LONG SUI/USDC, Conf: 87%.',
-    'GPT-4o used, 2,400 tokens. TP: 0.91, SL: 0.81.',
-    'Previous signal was HOLD awaiting breakout. Now confirmed.'
-  ],
-  copy: (L) => L ? [
-    '跟单状态正常，本日已复制 3 笔交易。',
-    '30 日收益 +28.7%，夏普 2.14，资金安全。'
-  ] : [
-    'Copy-trade active. 3 trades mirrored today.',
-    '30D ROI +28.7%, Sharpe 2.14. Capital safe.'
-  ],
-  risk: (L) => L ? [
-    '所有检查通过。回撤 3.2% < 8%，日亏损 1.8% < 3%。',
-    '波动率指数 24（低），暂无暂停交易触发。'
-  ] : [
-    'All checks passed. DD 3.2%<8%, daily loss 1.8%<3%.',
-    'Volatility index 24 (Low). No pause trigger active.'
-  ]
-};
-
-function getAutoReply(nodeId){
-  const replies = AGENT_AUTO_REPLIES[nodeId];
-  if(!replies) return LANG==='zh'?'已收到消息。':'Message received.';
-  const arr = replies(LANG==='zh');
-  return arr[Math.floor(Math.random()*arr.length)];
-}
-
-function getChatHistory(nodeId){
-  if(!CHAT_HISTORY[nodeId]) CHAT_HISTORY[nodeId] = [
-    {role:'agent', text: getAutoReply(nodeId), time: '09:14'}
-  ];
-  return CHAT_HISTORY[nodeId];
-}
-
-function sendChat(nodeId, text){
-  if(!text.trim()) return;
-  const hist = getChatHistory(nodeId);
-  const now = new Date();
-  const time = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
-  hist.push({role:'user', text, time});
-  // agent auto-reply after 600ms
-  setTimeout(()=>{
-    hist.push({role:'agent', text: getAutoReply(nodeId), time});
-    // refresh panel if this node is open
-    if(selNode===nodeId) refreshPanelChat(nodeId);
-    // update node bubble
-    const el=document.getElementById('nd-'+nodeId);
-    if(el){
-      const bubble=el.querySelector('.n-bubble');
-      const lastAgent=hist.filter(h=>h.role==='agent').pop();
-      if(bubble&&lastAgent) bubble.textContent='💬 '+lastAgent.text.slice(0,38)+(lastAgent.text.length>38?'…':'');
-    }
-  }, 600);
-  if(selNode===nodeId) refreshPanelChat(nodeId);
-}
-
-function refreshPanelChat(nodeId){
-  const el=document.getElementById('pchat-msgs');
-  if(!el)return;
-  const hist=getChatHistory(nodeId);
-  const L=LANG==='zh';
-  el.innerHTML=hist.map(m=>{
-    const isMe=m.role==='user';
-    return `<div class="pchat-msg ${isMe?'me':'agent'}">
-      ${!isMe?`<div class="pchat-ava"><img src="${_AVA48}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.textContent='A'"></div>`:
-              `<div class="pchat-ava" style="background:var(--blue)">U</div>`}
-      <div>
-        <div class="pchat-bubble">${m.text}</div>
-        <div class="pchat-meta">${m.time}</div>
-      </div>
-    </div>`;
-  }).join('');
-  el.scrollTop=el.scrollHeight;
-}
-
-// Global chat bar — target cycling
-const CHAT_TARGETS = ['all', ...Object.keys(NDEFS).filter(k=>k!=='risk')];
-let _chatTargetIdx = 0;
-function cycleChatTarget(){
-  _chatTargetIdx = (_chatTargetIdx+1) % (Object.keys(nodes).length+1);
-  const ids = ['all', ...Object.keys(nodes)];
-  _chatTarget = ids[_chatTargetIdx] || 'all';
-  const el=document.getElementById('chat-target');
-  if(!el)return;
-  const L=LANG==='zh';
-  if(_chatTarget==='all'){
-    el.textContent='@ '+(L?'全部 Agent':'All Agents');
-  } else {
-    const nd=NDEFS[_chatTarget]||{};
-    el.textContent='@ '+(nd.label||_chatTarget);
-  }
-  document.getElementById('chat-input').placeholder = 
-    _chatTarget==='all'
-      ? (L?'向所有 Agent 发消息...':'Message all agents...')
-      : (L?`向 ${NDEFS[_chatTarget]?.label||_chatTarget} 发指令...`:`Command ${NDEFS[_chatTarget]?.label||_chatTarget}...`);
-}
-
-function sendGlobalChat(){
-  const inp=document.getElementById('chat-input');
-  const text=inp.value.trim();
-  if(!text)return;
-  inp.value='';
-  const L=LANG==='zh';
-  if(_chatTarget==='all'){
-    // broadcast to all active nodes
-    Object.keys(nodes).forEach(nid=>sendChat(nid,text));
-    // show broadcast toast
-    const toast=document.createElement('div');
-    toast.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--b3);border-radius:8px;padding:7px 16px;font-size:11px;color:var(--t1);z-index:9999;pointer-events:none';
-    toast.textContent=(L?'已广播至 ':'Broadcast to ')+Object.keys(nodes).length+(L?' 个 Agent':'  Agents');
-    document.body.appendChild(toast);
-    setTimeout(()=>{toast.style.transition='opacity .3s';toast.style.opacity='0';setTimeout(()=>toast.remove(),300);},1800);
-  } else {
-    sendChat(_chatTarget, text);
-    // auto-open that node's panel
-    pickNode(_chatTarget);
-  }
-}
-
-/* ──────────────────────────────────────
-   NETWORK EXPANSION
-────────────────────────────────────── */
-const MAX_NODES = 55;
-const NODE_TEMPLATES = [
-  {type:'market', label:'Market Feed',   typeLabel:'Data Source',  metric:'—/s',    mc:'info', st:'active'},
-  {type:'news',   label:'News Sentinel', typeLabel:'News+Sentiment',metric:'—%',     mc:'pos',  st:'active'},
-  {type:'ai',     label:'AI Analyzer',   typeLabel:'LLM Signal',   metric:'—% conf',mc:'muted',st:'active'},
-  {type:'copy',   label:'Strategy Agent',typeLabel:'Copy Source',  metric:'+—%',    mc:'pos',  st:'following'},
-  {type:'risk',   label:'Risk Guard',    typeLabel:'Guard Layer',  metric:'DD —%',  mc:'warn', st:'watching'},
-];
-
-function addNetworkNode(templateType){
-  if(Object.keys(nodes).length >= MAX_NODES){
-    alert((LANG==='zh'?'已达最大节点数 ':'Max nodes reached: ')+MAX_NODES);
-    return;
-  }
-  const tpl = NODE_TEMPLATES.find(t=>t.type===templateType)||NODE_TEMPLATES[0];
-  const uid  = templateType+'_'+Date.now();
-  const cv   = document.getElementById('cv');
-  const cx   = cv.offsetWidth/2  + (Math.random()-.5)*300;
-  const cy   = cv.offsetHeight/2 + (Math.random()-.5)*200;
-  
-  // Build a NDES entry
-  NDEFS[uid] = {
-    label:   tpl.label + ' '+(Object.keys(nodes).length+1),
-    type:    tpl.typeLabel,
-    icon:    '',
-    col:     'b',
-    st:      tpl.st,
-    metric:  tpl.metric,
-    mc:      tpl.mc,
-    id:      uid
-  };
-  spawnNode(uid, cx, cy);
-  updateSBar();
-  
-  // Auto-connect to mine if it exists
-  if(nodes['mine'] && templateType!=='risk'){
-    const edgeType = templateType==='copy'?'copy':templateType==='ai'?'signal':'data';
-    edges.push({from:uid, to:'mine', type:edgeType});
-    drawEdges();
-    updateSBar();
-  }
-  
-  // Select the new node
-  setTimeout(()=>pickNode(uid),100);
-}
-
-function connectNodes(fromId, toId, type){
-  // Prevent duplicate
-  if(edges.find(e=>e.from===fromId&&e.to===toId)) return;
-  if(Object.keys(nodes).length<=1) return;
-  edges.push({from:fromId, to:toId, type:type||'data'});
-  drawEdges();
-  updateSBar();
-}
-
-// Show connect menu when clicking a node while holding Alt
-document.addEventListener('keydown', e=>{
-  if(e.key==='c'||e.key==='C'){
-    if(e.target.tagName==='INPUT') return;
-    if(selNode && Object.keys(nodes).length>1){
-      showConnectMenu(selNode);
-    }
-  }
-});
-
-function showConnectMenu(fromId){
-  const others = Object.keys(nodes).filter(id=>id!==fromId&&!edges.find(e=>e.from===fromId&&e.to===id));
-  if(!others.length){ alert(LANG==='zh'?'已连接所有节点':'All nodes already connected'); return; }
-  const menu = document.createElement('div');
-  const nd = document.getElementById('nd-'+fromId);
-  const rect = nd?.getBoundingClientRect()||{left:400,top:300};
-  menu.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.bottom+8}px;z-index:9999;background:var(--s2);border:1px solid var(--b3);border-radius:10px;padding:6px;min-width:160px;box-shadow:0 8px 28px rgba(0,0,20,.6);animation:ctxin .12s var(--ease) both`;
-  const L=LANG==='zh';
-  menu.innerHTML=`<div style="font-size:9px;color:var(--t3);padding:4px 8px 6px;text-transform:uppercase;letter-spacing:.6px">${L?'连接到':'Connect to'}</div>`
-    +others.map(id=>{
-      const nd2=NDEFS[id]||{};
-      return `<div style="padding:7px 10px;border-radius:7px;font-size:12px;color:var(--t2);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--s4)';this.style.color='var(--t1)'" onmouseout="this.style.background='';this.style.color='var(--t2)'" onclick="connectNodes('${fromId}','${id}','data');this.parentElement.remove()">
-        <span style="font-size:13px">${nodeAvatar(id).includes('img')?'◉':nd2.label?.charAt(0)||'?'}</span>
-        <span>${nd2.label||id}</span>
-      </div>`;
-    }).join('');
-  menu.innerHTML += `<div style="height:1px;background:var(--b1);margin:4px 0"></div>
-    <div style="padding:5px 10px;font-size:10px;color:var(--t3);text-align:center">${L?'C 键 快捷连接':'Press C to connect'}</div>`;
-  document.body.appendChild(menu);
-  const close=e=>{ if(!menu.contains(e.target)){menu.remove();document.removeEventListener('click',close);} };
-  setTimeout(()=>document.addEventListener('click',close),50);
-}
 
 /* ── Breadcrumb update ── */
 const PAGE_LABELS = {
