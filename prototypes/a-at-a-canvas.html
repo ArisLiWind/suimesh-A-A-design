@@ -679,6 +679,67 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 /* ── Dim nav items (Soon) ── */
 .sib-dim{opacity:.45;pointer-events:auto}
 .sib-dim:hover{opacity:.75;background:var(--s3)}
+
+/* ── View Sliding System ── */
+.cw{position:relative;overflow:hidden}
+.view-track{
+  display:flex;
+  width:300%;
+  height:100%;
+  transition:transform .38s cubic-bezier(.4,0,.2,1);
+}
+.view-slide{
+  width:33.333%;
+  height:100%;
+  display:flex;
+  flex-shrink:0;
+  overflow:hidden;
+}
+/* Network slide: existing canvas layout */
+#view-network{display:flex;flex-direction:row}
+/* Monitor/History slides: full scrollable content */
+.view-scroll{flex:1;overflow-y:auto;background:var(--bg)}
+.view-inner{padding:28px 32px;max-width:900px;margin:0 auto}
+
+/* Monitor content typography */
+.vi-section{margin-bottom:28px}
+.vi-sec-label{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.vi-hero{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.vi-card{background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:16px 20px}
+.vi-card-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;font-weight:600}
+.vi-card-val{font-size:26px;font-weight:800;letter-spacing:-1px;line-height:1}
+.vi-card-val.pos{color:var(--acc-g)}
+.vi-chart-wrap{background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden}
+.vi-chart-label{font-size:11px;color:var(--t3);margin-bottom:4px}
+.vi-chart-val{font-size:32px;font-weight:800;color:var(--acc-g);letter-spacing:-1.5px;margin-bottom:2px}
+.vi-chart-delta{font-size:12px;color:var(--acc-g)}
+/* Risk bars */
+.vi-risk-row{margin-bottom:12px}
+.vi-risk-hd{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;color:var(--t2)}
+.vi-bar-track{height:4px;background:var(--s4);border-radius:2px;overflow:hidden}
+.vi-bar-fill{height:100%;border-radius:2px;transition:width .8s}
+/* Table */
+.vi-table{width:100%;border-collapse:collapse;font-size:12px}
+.vi-table th{text-align:left;color:var(--t3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.6px;padding:0 0 10px}
+.vi-table td{padding:9px 0;border-bottom:1px solid var(--b1);color:var(--t1)}
+.vi-table tr:last-child td{border-bottom:none}
+/* Log */
+.vi-log-item{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:11px 14px;margin-bottom:6px;cursor:pointer;transition:border-color .15s}
+.vi-log-item:hover{border-color:var(--b3)}
+.vi-log-hd{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.vi-log-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.vi-log-title{font-size:12px;font-weight:600;flex:1}
+.vi-log-time{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.vi-log-meta{font-size:10px;color:var(--t3);padding-left:15px}
+.vi-chain{padding:12px 0}
+.vi-chain-step{display:flex;gap:10px;position:relative;padding-bottom:14px}
+.vi-chain-step::before{content:'';position:absolute;left:10px;top:21px;bottom:0;width:1px;background:var(--b2)}
+.vi-chain-step:last-child::before{display:none}
+.vi-chain-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;border:1px solid}
+.vi-chain-body{flex:1}
+.vi-chain-title{font-size:12px;font-weight:600;margin-bottom:3px}
+.vi-chain-desc{font-size:11px;color:var(--t2);line-height:1.5;margin-bottom:5px}
+.vi-chain-code{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t3);background:var(--s3);padding:5px 8px;border-radius:5px;border:1px solid var(--b1);word-break:break-all}
 </style>
 </head>
 <body>
@@ -828,9 +889,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
     </div>
     <div class="tb-center">
       <div class="tabs">
-        <div class="tab on" onclick="setTab(this)">Network</div>
-        <div class="tab" onclick="setTab(this);openModal('monitor')">Performance</div>
-        <div class="tab" onclick="setTab(this);openModal('auditlog')">History</div>
+        <div class="tab on" onclick="switchView('network',this)" id="tab-network">Network</div>
+        <div class="tab" onclick="switchView('monitor',this)" id="tab-monitor">Performance</div>
+        <div class="tab" onclick="switchView('history',this)" id="tab-history">History</div>
       </div>
     </div>
     <div class="tb-right">
@@ -845,22 +906,44 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
     </div>
   </header>
 
-  <!-- CANVAS WRAP -->
-  <div class="cw">
-    <div class="canvas" id="cv"
-      onmousedown="cvDown(event)"
-      onmousemove="cvMove(event)"
-      onmouseup="cvUp(event)"
-      onwheel="cvWheel(event)"
-      oncontextmenu="return false">
-      <svg id="svgl"></svg>
-    </div>
-    <!-- PANEL -->
-    <aside class="panel gone" id="panel">
-      <div class="ph" id="ph"></div>
-      <div class="pb" id="pb"></div>
-      <div class="pa" id="pa"></div>
-    </aside>
+  <!-- MAIN VIEW AREA — sliding panels -->
+  <div class="cw" id="cw">
+    <!-- Slider track -->
+    <div class="view-track" id="view-track">
+
+      <!-- VIEW 0: Network Canvas -->
+      <div class="view-slide" id="view-network">
+        <div class="canvas" id="cv"
+          onmousedown="cvDown(event)"
+          onmousemove="cvMove(event)"
+          onmouseup="cvUp(event)"
+          onwheel="cvWheel(event)"
+          oncontextmenu="return false">
+          <svg id="svgl"></svg>
+        </div>
+        <!-- PANEL -->
+        <aside class="panel gone" id="panel">
+          <div class="ph" id="ph"></div>
+          <div class="pb" id="pb"></div>
+          <div class="pa" id="pa"></div>
+        </aside>
+      </div>
+
+      <!-- VIEW 1: Performance / Monitor -->
+      <div class="view-slide" id="view-monitor">
+        <div class="view-scroll">
+          <div class="view-inner" id="monitor-inner"></div>
+        </div>
+      </div>
+
+      <!-- VIEW 2: History / Audit Log -->
+      <div class="view-slide" id="view-history">
+        <div class="view-scroll">
+          <div class="view-inner" id="history-inner"></div>
+        </div>
+      </div>
+
+    </div><!-- /view-track -->
   </div>
 
   <!-- STATUS BAR -->
@@ -1088,6 +1171,15 @@ function applyI18n(){
   // deploy btn
   const depBtn2=document.getElementById('depbtn');
   if(depBtn2&&!depBtn2.disabled) depBtn2.textContent=t('deploy');
+  // re-render active slide if not network
+  const monInner=document.getElementById('monitor-inner');
+  const histInner=document.getElementById('history-inner');
+  if(monInner&&monInner._rendered){monInner._rendered=false;renderMonitor();}
+  if(histInner&&histInner._rendered){histInner._rendered=false;renderHistory();}
+  // sync tab labels
+  const tnet=document.getElementById('tab-network'); if(tnet) tnet.textContent=LANG==='zh'?'网络图':'Network';
+  const tmon=document.getElementById('tab-monitor'); if(tmon) tmon.textContent=LANG==='zh'?'收益监控':'Performance';
+  const this2=document.getElementById('tab-history'); if(this2) this2.textContent=LANG==='zh'?'决策日志':'History';
 }
 
 const NDEFS = {
@@ -2109,7 +2201,196 @@ function saveSettings(){
 }
 
 function setSib(el){document.querySelectorAll('.sib').forEach(s=>s.classList.remove('on'));el.classList.add('on')}
+function switchView(view, el){
+  // Tab active state
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+
+  // Slide the track
+  const track = document.getElementById('view-track');
+  const idx   = {network:0, monitor:1, history:2}[view] || 0;
+  track.style.transform = `translateX(-${idx * 33.333}%)`;
+
+  // Lazy-render content
+  if(view==='monitor' && !document.getElementById('monitor-inner')._rendered){
+    document.getElementById('monitor-inner')._rendered=true;
+    renderMonitor();
+  }
+  if(view==='history' && !document.getElementById('history-inner')._rendered){
+    document.getElementById('history-inner')._rendered=true;
+    renderHistory();
+  }
+
+  // Update topbar title
+  const titles = {
+    network: LANG==='zh'?'Agent 网络':'My Agent Network',
+    monitor: LANG==='zh'?'收益监控':'Strategy Monitor',
+    history: LANG==='zh'?'决策日志':'Decision Audit Log',
+  };
+  const nb = document.getElementById('tb-netname');
+  if(nb) nb.textContent = titles[view];
+}
+
+function renderMonitor(){
+  const L = LANG==='zh';
+  document.getElementById('monitor-inner').innerHTML = `
+    <!-- Hero chart -->
+    <div class="vi-chart-wrap" style="margin-bottom:20px">
+      <div class="vi-chart-label">${L?'总资产':'Total Portfolio Value'}</div>
+      <div class="vi-chart-val">$12,840</div>
+      <div class="vi-chart-delta">▲ +$1,240 (+10.7%) ${L?'本周':'this week'}</div>
+      <svg width="100%" height="100" viewBox="0 0 800 100" preserveAspectRatio="none" style="margin-top:12px;opacity:.7">
+        <defs><linearGradient id="mg2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--acc-g)" stop-opacity=".3"/>
+          <stop offset="100%" stop-color="var(--acc-g)" stop-opacity="0"/>
+        </linearGradient></defs>
+        <polygon points="0,85 80,78 160,80 240,68 320,52 400,55 480,38 560,30 640,18 720,12 800,4 800,100 0,100" fill="url(#mg2)"/>
+        <polyline points="0,85 80,78 160,80 240,68 320,52 400,55 480,38 560,30 640,18 720,12 800,4" fill="none" stroke="var(--acc-g)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Stats grid -->
+    <div class="vi-section">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:20px">
+        ${[
+          [L?'总资产':'Total Value','$12,840',''],
+          [L?'今日盈亏':'Today P&L','+$204','pos'],
+          [L?'持仓数':'Open Positions','3',''],
+          [L?'活跃Agent':'Active Agents','4','pos'],
+        ].map(([label,val,cls])=>`<div class="vi-card">
+          <div class="vi-card-label">${label}</div>
+          <div class="vi-card-val ${cls}">${val}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Risk dashboard -->
+    <div class="vi-section">
+      <div class="vi-sec-label">${L?'风险仪表盘':'Risk Dashboard'}</div>
+      ${[
+        [L?'回撤':'Drawdown', 3.2, 8, 'var(--acc-g)'],
+        [L?'日亏损':'Daily Loss', 1.8, 3, 'var(--acc-y)'],
+        [L?'持仓敞口':'Exposure', 40, 100, 'var(--acc-c)'],
+      ].map(([label,v,max,c])=>`
+      <div class="vi-risk-row">
+        <div class="vi-risk-hd">
+          <span>${label}</span>
+          <span style="color:${c}">${v}% / ${max}%</span>
+        </div>
+        <div class="vi-bar-track">
+          <div class="vi-bar-fill" style="width:${(v/max*100).toFixed(0)}%;background:${c}"></div>
+        </div>
+      </div>`).join('')}
+    </div>
+
+    <!-- Recent trades -->
+    <div class="vi-section">
+      <div class="vi-sec-label">${L?'近期交易':'Recent Trades'}</div>
+      <table class="vi-table">
+        <thead><tr>
+          <th>${L?'交易对':'Pair'}</th>
+          <th>${L?'方向':'Side'}</th>
+          <th>${L?'规模':'Size'}</th>
+          <th>${L?'盈亏':'P&L'}</th>
+          <th>${L?'Agent':'Agent'}</th>
+        </tr></thead>
+        <tbody>
+          ${[
+            ['SUI/USDC','LONG','$500','+$42',L?'我的Agent':'My Agent',true],
+            ['BTC/USDC','LONG','$1,200','+$180',L?'我的Agent':'My Agent',true],
+            ['ETH/USDC','SHORT','$300','−$18',L?'跟单 @AlphaMesh':'Copy @AlphaMesh',false],
+          ].map(([pair,side,size,pnl,agent,pos])=>`<tr>
+            <td style="font-weight:600">${pair}</td>
+            <td><span style="padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;background:${pos?'rgba(34,187,136,.12)':'rgba(224,85,85,.12)'};color:${pos?'var(--acc-g)':'var(--r)'}">${L?(pos?'做多':'做空'):side}</span></td>
+            <td style="color:var(--t2)">${size}</td>
+            <td style="font-weight:700;color:${pos?'var(--acc-g)':'var(--r)'}">${pnl}</td>
+            <td style="color:var(--t2)">${agent}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Action bar -->
+    <div style="display:flex;gap:10px;padding-top:8px;border-top:1px solid var(--b1)">
+      <button class="btn btn-ghost" onclick="switchView('network',document.getElementById('tab-network'))">${L?'返回网络':'← Back to Network'}</button>
+      <button class="btn btn-ghost">${L?'导出 CSV':'Export CSV'}</button>
+      <button class="btn btn-white" style="color:var(--r);background:transparent;border:1px solid rgba(224,85,85,.3)" onclick="openModal('pause')">${L?'暂停全部':'Pause All'}</button>
+    </div>
+  `;
+}
+
+function renderHistory(){
+  const L = LANG==='zh';
+  const steps=[
+    {n:1,col:'var(--acc-c)',title:L?'行情数据信号':'Market Feed Signal',desc:L?'SUI/USDC 价格突破 20 日EMA，RSI: 58，成交量 +34%':'SUI/USDC crossed above EMA20. RSI: 58. Volume +34% avg.',code:'close:0.8421 ema20:0.831 rsi:58 vol:128400'},
+    {n:2,col:'var(--acc-y)',title:L?'新闻哨兵 — 看涨信号':'News Sentinel — Bullish',desc:L?'检测到 3 篇正面文章，情绪分: 0.78（看涨阈值已越）':'3 positive articles detected. Sentiment: 0.78 (Bullish threshold crossed).',code:'sentiment:0.78 articles:24 keywords:["Sui","ecosystem","growth"]'},
+    {n:3,col:'var(--acc-p)',title:L?'AI 分析器 — 做多信号':'AI Analyzer — LONG signal',desc:L?'GPT-4o 综合分析：技术突破 + 情绪一致，置信度 87%':'GPT-4o: bullish alignment confirmed. Confidence: 87%.',code:'action:"LONG" confidence:0.87 tp:0.91 sl:0.81'},
+    {n:4,col:'var(--acc-y)',title:L?'风险守卫 — 检查通过':'Risk Guard — Passed ✓',desc:L?'回撤 3.2% < 8%，日亏损 1.8% < 3%，波动率 24（低），全部通过':'DD 3.2%<8%, daily loss 1.8%<3%, vol 24 (Low). All checks passed.',code:'dd:PASS daily_loss:PASS vol:PASS sentiment:PASS'},
+    {n:5,col:'var(--acc-g)',title:L?'链上成交':'Order Executed On-chain',desc:L?'做多 SUI/USDC $500 @ 0.8421，DEX: Cetus，Gas: 0.0012 SUI':'LONG SUI/USDC $500 at 0.8421. DEX: Cetus Protocol. Gas: 0.0012 SUI.',code:'tx:0x8f4a9e2b…2e91 block:4182091 status:confirmed'},
+  ];
+
+  document.getElementById('history-inner').innerHTML = `
+    <!-- Recent events -->
+    <div class="vi-section">
+      <div class="vi-sec-label">${L?'最新决策':'Latest Decision'}</div>
+      <div class="vi-log-item" style="border-color:var(--b3)">
+        <div class="vi-log-hd">
+          <div class="vi-log-dot" style="background:var(--acc-g)"></div>
+          <div class="vi-log-title">${L?'做多 SUI/USDC $500 — 已成交':'LONG SUI/USDC $500 — Executed'}</div>
+          <div class="vi-log-time">09:14:32</div>
+        </div>
+        <div class="vi-log-meta">${L?'我的Agent · AI信号 · Tx: 0x8f4a…2e91':'My Agent · AI Signal · Tx: 0x8f4a…2e91'}</div>
+      </div>
+    </div>
+
+    <!-- Decision chain -->
+    <div class="vi-section">
+      <div class="vi-sec-label">${L?'决策链路追踪':'Decision Chain Trace'}</div>
+      <div style="background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:16px">
+        <div class="vi-chain">
+          ${steps.map(s=>`
+          <div class="vi-chain-step">
+            <div class="vi-chain-dot" style="background:rgba(255,255,255,.04);border-color:${s.col};color:${s.col}">${s.n}</div>
+            <div class="vi-chain-body">
+              <div class="vi-chain-title">${s.title}</div>
+              <div class="vi-chain-desc">${s.desc}</div>
+              <div class="vi-chain-code">${s.code}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Other log items -->
+    <div class="vi-section">
+      <div class="vi-sec-label">${L?'历史记录':'History'}</div>
+      ${[
+        {col:'var(--r)',title:L?'做空 ETH/USDC $300 — 成交':'SHORT ETH/USDC $300 — Executed',time:'08:52:07',meta:L?'跟单 @AlphaMesh · Tx: 0xa2f1…9c4d':'Copy @AlphaMesh · Tx: 0xa2f1…9c4d'},
+        {col:'var(--acc-y)',title:L?'风险守卫：波动率检查通过':'Risk Guard: Volatility check passed',time:'08:50:01',meta:L?'风险守卫 · 波动指数: 24':'Risk Guard · Vol index: 24'},
+        {col:'var(--acc-g)',title:L?'做多 BTC/USDC $1,200 — 成交':'LONG BTC/USDC $1,200 — Executed',time:'08:30:18',meta:L?'我的Agent · 趋势信号':'My Agent · Trend Signal'},
+        {col:'var(--t3)',title:L?'跳过交易 — 新闻暂停触发':'Trade skipped — News pause trigger',time:'08:10:44',meta:L?'新闻哨兵 · 情绪骤降':'News Sentinel · Negative spike'},
+      ].map(l=>`
+      <div class="vi-log-item">
+        <div class="vi-log-hd">
+          <div class="vi-log-dot" style="background:${l.col}"></div>
+          <div class="vi-log-title">${l.title}</div>
+          <div class="vi-log-time">${l.time}</div>
+        </div>
+        <div class="vi-log-meta">${l.meta}</div>
+      </div>`).join('')}
+    </div>
+
+    <!-- Action bar -->
+    <div style="display:flex;gap:10px;padding-top:8px;border-top:1px solid var(--b1)">
+      <button class="btn btn-ghost" onclick="switchView('network',document.getElementById('tab-network'))">${L?'返回网络':'← Back to Network'}</button>
+      <button class="btn btn-ghost">${L?'导出 CSV':'Export CSV'}</button>
+      <button class="btn btn-ghost">${L?'链上认证':'On-chain Attest'}</button>
+    </div>
+  `;
+}
+
 function setTab(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on')}
+
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
 
 /* ═══════════════════════════════════════
