@@ -795,6 +795,166 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 /* ═══════════════════════════════════════
    DATA
 ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   I18N — bilingual system
+═══════════════════════════════════════ */
+let LANG = localStorage.getItem('aaa_lang') || 'en';
+
+const I18N = {
+  en: {
+    workspace:'Workspace', my_network:'My Agent Network',
+    tab_network:'Network', tab_perf:'Performance', tab_history:'History',
+    auto_layout:'Auto Layout', deploy:'Deploy →', deploying:'Deploying…', deployed:'✓ Live',
+    lp_title:'Overview', lp_my_network:'My Network', lp_prices:'Live Prices',
+    lp_risk:'Risk Status', lp_trades:'Recent Trades', lp_ai_dec:'Last AI Decision',
+    lp_deploy:'Deploy Agent →', lp_monitor:'View Monitor',
+    lp_active:'Active · SUI/USDC', lp_streaming:'Streaming', lp_nlp:'NLP active', lp_signal:'Signal: LONG',
+    lp_drawdown:'Drawdown', lp_daily_loss:'Daily Loss', lp_exposure:'Exposure',
+    sb_nodes:'Nodes', sb_edges:'Edges', sb_active:'Active', sb_zoom:'Zoom',
+    tt_network:'Agent Network', tt_market:'Marketplace', tt_editor:'Flow Editor',
+    tt_monitor:'Monitor', tt_log:'Audit Log', tt_settings:'Settings', tt_panel:'Panel (Tab)',
+    insp_perf:'Performance', insp_metrics:'Metrics', insp_conns:'Connections',
+    insp_tags:'Tags', insp_close:'Close', insp_configure:'Configure', insp_pause:'Pause',
+    ep_transmits:'What this edge transmits', ep_stats:'Live Stats',
+    ep_msgs:'Recent Messages', ep_why:'Why A@A beats traditional bots',
+    ep_disconnect:'Disconnect', ep_viewlog:'View Log',
+    nd_mine:'My Trading Agent', nd_mine_type:'Personal Agent',
+    nd_market:'Market Data', nd_market_type:'Data Source',
+    nd_news:'News Sentinel', nd_news_type:'News + Sentiment',
+    nd_ai:'AI Analyzer', nd_ai_type:'LLM Signal',
+    nd_copy:'@AlphaMesh Pro', nd_copy_type:'Strategy Agent',
+    nd_risk:'Risk Guard', nd_risk_type:'Protection Layer',
+    st_active:'Active', st_streaming:'Streaming', st_following:'Following',
+    st_watching:'Watching', st_offline:'Offline',
+    set_title:'Settings', set_agent:'Agent Defaults', set_pos:'Default Position Size (%)',
+    set_max_trades:'Max Daily Trades', set_pair:'Default Trading Pair',
+    set_behavior:'Behavior', set_ai:'AI signals enabled', set_news:'News sentiment filter',
+    set_guard:'Auto risk guard', set_public:'Public profile', set_attest:'On-chain attestation',
+    set_lang_label:'Display Language', set_save:'Save', set_cancel:'Cancel',
+    ctx_inspect:'Inspect node', ctx_rename:'Rename', ctx_dup:'Duplicate', ctx_remove:'Remove',
+    pal_add:'Add Node',
+    close:'Close', cancel:'Cancel', save:'Save', done:'Done',
+    ai_sources:'Sources',
+  },
+  zh: {
+    workspace:'工作区', my_network:'我的 Agent 网络',
+    tab_network:'网络图', tab_perf:'收益监控', tab_history:'决策日志',
+    auto_layout:'自动布局', deploy:'部署 →', deploying:'部署中…', deployed:'✓ 已上线',
+    lp_title:'总览', lp_my_network:'我的网络', lp_prices:'实时行情',
+    lp_risk:'风险状态', lp_trades:'近期交易', lp_ai_dec:'AI 最新决策',
+    lp_deploy:'部署 Agent →', lp_monitor:'打开监控',
+    lp_active:'运行中 · SUI/USDC', lp_streaming:'流式接入', lp_nlp:'NLP 分析中', lp_signal:'信号：做多',
+    lp_drawdown:'回撤幅度', lp_daily_loss:'日亏损', lp_exposure:'持仓敞口',
+    sb_nodes:'节点', sb_edges:'连接', sb_active:'活跃', sb_zoom:'缩放',
+    tt_network:'Agent 网络', tt_market:'Agent 市场', tt_editor:'流程编辑器',
+    tt_monitor:'监控', tt_log:'审计日志', tt_settings:'设置', tt_panel:'面板 (Tab)',
+    insp_perf:'收益表现', insp_metrics:'指标', insp_conns:'连接',
+    insp_tags:'标签', insp_close:'关闭', insp_configure:'配置', insp_pause:'暂停',
+    ep_transmits:'此连接传输的内容', ep_stats:'实时统计',
+    ep_msgs:'近期消息', ep_why:'为什么 A@A 赚得更多',
+    ep_disconnect:'断开连接', ep_viewlog:'查看日志',
+    nd_mine:'我的交易 Agent', nd_mine_type:'个人 Agent',
+    nd_market:'行情数据', nd_market_type:'数据源',
+    nd_news:'新闻哨兵', nd_news_type:'资讯 + 情绪',
+    nd_ai:'AI 分析器', nd_ai_type:'LLM 信号',
+    nd_copy:'@AlphaMesh Pro', nd_copy_type:'策略 Agent',
+    nd_risk:'风险守卫', nd_risk_type:'保护层',
+    st_active:'运行中', st_streaming:'流式接入', st_following:'跟单中',
+    st_watching:'监控中', st_offline:'离线',
+    set_title:'设置', set_agent:'Agent 默认参数', set_pos:'默认仓位大小 (%)',
+    set_max_trades:'日最大交易次数', set_pair:'默认交易对',
+    set_behavior:'行为设置', set_ai:'AI 信号已启用', set_news:'新闻情绪过滤',
+    set_guard:'自动风险防护', set_public:'公开个人资料', set_attest:'链上证明',
+    set_lang_label:'界面语言', set_save:'保存', set_cancel:'取消',
+    ctx_inspect:'查看节点', ctx_rename:'重命名', ctx_dup:'复制', ctx_remove:'删除',
+    pal_add:'添加节点',
+    close:'关闭', cancel:'取消', save:'保存', done:'完成',
+    ai_sources:'信号来源',
+  }
+};
+
+function t(key){ return (I18N[LANG]||I18N.en)[key] || I18N.en[key] || key; }
+
+function setLang(lang){
+  LANG=lang;
+  localStorage.setItem('aaa_lang',lang);
+  closeModal();
+  applyI18n();
+}
+
+function applyI18n(){
+  // topbar breadcrumb
+  const bc=document.querySelector('.tb-bc');
+  if(bc){
+    const spans=bc.querySelectorAll('span,b');
+    if(spans[0]) spans[0].textContent=t('workspace');
+    if(spans[2]) spans[2].textContent=t('my_network');
+  }
+  // topbar tabs
+  const tabs=document.querySelectorAll('.tab');
+  const tabKeys=['tab_network','tab_perf','tab_history'];
+  tabs.forEach((el,i)=>{ if(tabKeys[i]) el.textContent=t(tabKeys[i]); });
+  // topbar buttons
+  const alBtn=document.querySelector('.tb-right button');
+  if(alBtn) alBtn.textContent=t('auto_layout');
+  const depBtn=document.getElementById('depbtn');
+  if(depBtn&&!depBtn.disabled) depBtn.textContent=t('deploy');
+  // left panel
+  const lp=document.getElementById('lp');
+  if(lp){
+    const lpTitle=lp.querySelector('.lp-title');
+    if(lpTitle) lpTitle.textContent=t('lp_title');
+    const secs=lp.querySelectorAll('.lp-sec-title');
+    ['lp_my_network','lp_prices','lp_risk','lp_trades','lp_ai_dec']
+      .forEach((k,i)=>{ if(secs[i]) secs[i].textContent=t(k); });
+    const agents=lp.querySelectorAll('.lp-agent');
+    [{name:'nd_mine',sub:'lp_active'},{name:'nd_market',sub:'lp_streaming'},
+     {name:'nd_news',sub:'lp_nlp'},{name:'nd_ai',sub:'lp_signal'}]
+    .forEach((d,i)=>{
+      if(!agents[i])return;
+      const n=agents[i].querySelector('.lp-a-name');
+      const s=agents[i].querySelector('.lp-a-sub');
+      if(n) n.textContent=t(d.name);
+      if(s) s.textContent=t(d.sub);
+    });
+    const riskSpans=lp.querySelectorAll('.lp-risk-hd span:first-child');
+    ['lp_drawdown','lp_daily_loss','lp_exposure']
+      .forEach((k,i)=>{ if(riskSpans[i]) riskSpans[i].textContent=t(k); });
+    const footBtns=lp.querySelectorAll('.lp-foot-btn');
+    if(footBtns[0]) footBtns[0].textContent=t('lp_deploy');
+    if(footBtns[1]) footBtns[1].textContent=t('lp_monitor');
+  }
+  // palette
+  const palTitle=document.querySelector('.pal-title');
+  if(palTitle) palTitle.textContent=t('pal_add');
+  // sidebar tooltips
+  const sibMap=[
+    ['sib-network','tt_network'],
+    [null,'tt_market'],[null,'tt_editor'],
+    [null,null],
+    [null,'tt_monitor'],[null,'tt_log'],
+    [null,null],
+    ['lp-tog','tt_panel'],
+    [null,'tt_settings'],
+  ];
+  const sibEls=document.querySelectorAll('.sidebar .sib, .sidebar .lp-toggle');
+  sibEls.forEach((el,i)=>{ if(sibMap[i]&&sibMap[i][1]) el.title=t(sibMap[i][1]); });
+  // canvas nodes
+  Object.keys(nodes).forEach(id=>{
+    const el=document.getElementById('nd-'+id);
+    if(!el)return;
+    const nk={mine:'nd_mine',market:'nd_market',news:'nd_news',ai:'nd_ai',copy:'nd_copy',risk:'nd_risk'};
+    const tk={mine:'nd_mine_type',market:'nd_market_type',news:'nd_news_type',ai:'nd_ai_type',copy:'nd_copy_type',risk:'nd_risk_type'};
+    const nameEl=el.querySelector('.n-name');
+    const typeEl=el.querySelector('.n-type');
+    if(nameEl&&nk[id]) nameEl.textContent=t(nk[id]);
+    if(typeEl&&tk[id]) typeEl.textContent=t(tk[id]);
+  });
+  // canvas toolbar tooltips
+  const toolMap={tsel:LANG==='zh'?'选择 (V)':'Select (V)',tpan:LANG==='zh'?'平移 (H)':'Pan (H)',tcon:LANG==='zh'?'连线 (C)':'Connect (C)'};
+  Object.entries(toolMap).forEach(([id,tip])=>{ const el=document.getElementById(id); if(el) el.title=tip; });
+}
+
 const NDEFS = {
   mine:  {label:'My Trading Agent',type:'Personal Agent',   icon:'🤖',col:'w', st:'active',   metric:'+12.4%',mc:'pos',id:'mine'},
   market:{label:'Market Data',     type:'Data Source',      icon:'📊',col:'c', st:'streaming', metric:'1,240/s', mc:'info',id:'market'},
@@ -1606,20 +1766,36 @@ function buildModal(type){
     </div>`,
 
     /* SETTINGS */
-    settings:`<div class="modal">
-      <div class="modal-h"><div class="modal-title">Settings</div><div class="modal-close" onclick="closeModal()">✕</div></div>
+    settings:`<div class="modal" style="width:440px">
+      <div class="modal-h"><div class="modal-title">${t('set_title')}</div><div class="modal-close" onclick="closeModal()">✕</div></div>
       <div class="modal-body">
-        <div style="font-size:10px;color:var(--t3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px">Agent Defaults</div>
-        <div class="field"><div class="field-label">Default Position Size (%)</div><input class="field-input" value="5" type="number"></div>
-        <div class="field"><div class="field-label">Max Daily Trades</div><input class="field-input" value="10" type="number"></div>
-        <div class="field"><div class="field-label">Default Trading Pair</div><select class="field-select"><option>SUI / USDC</option><option>BTC / USDC</option><option>ETH / USDC</option></select></div>
-        <div style="font-size:10px;color:var(--t3);margin-bottom:8px;margin-top:16px;text-transform:uppercase;letter-spacing:.6px">Behavior</div>
-        ${[['AI signals enabled','on'],['News sentiment filter','on'],['Auto risk guard','on'],['Public profile',''],['On-chain attestation','on']].map(([l,s])=>`
+
+        <!-- LANGUAGE SWITCHER — top section, prominent -->
+        <div style="margin-bottom:18px;padding:14px;background:var(--s2);border:1px solid var(--b2);border-radius:9px">
+          <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">${t('set_lang_label')}</div>
+          <div style="display:flex;gap:8px">
+            <div id="lang-en" onclick="selectLang('en')" style="flex:1;padding:10px 0;border-radius:8px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s;border:1px solid ${LANG==='en'?'rgba(255,255,255,.35)':'var(--b1)'};background:${LANG==='en'?'var(--s4)':'transparent'};color:${LANG==='en'?'var(--t1)':'var(--t3)'}">
+              <div style="font-size:16px;margin-bottom:4px">🇺🇸</div>
+              <div>English</div>
+            </div>
+            <div id="lang-zh" onclick="selectLang('zh')" style="flex:1;padding:10px 0;border-radius:8px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s;border:1px solid ${LANG==='zh'?'rgba(255,255,255,.35)':'var(--b1)'};background:${LANG==='zh'?'var(--s4)':'transparent'};color:${LANG==='zh'?'var(--t1)':'var(--t3)'}">
+              <div style="font-size:16px;margin-bottom:4px">🇨🇳</div>
+              <div>中文</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:10px;color:var(--t3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px">${t('set_agent')}</div>
+        <div class="field"><div class="field-label">${t('set_pos')}</div><input class="field-input" value="5" type="number"></div>
+        <div class="field"><div class="field-label">${t('set_max_trades')}</div><input class="field-input" value="10" type="number"></div>
+        <div class="field"><div class="field-label">${t('set_pair')}</div><select class="field-select"><option>SUI / USDC</option><option>BTC / USDC</option><option>ETH / USDC</option></select></div>
+        <div style="font-size:10px;color:var(--t3);margin-bottom:8px;margin-top:16px;text-transform:uppercase;letter-spacing:.6px">${t('set_behavior')}</div>
+        ${[[t('set_ai'),'on'],[t('set_news'),'on'],[t('set_guard'),'on'],[t('set_public'),''],[t('set_attest'),'on']].map(([l,s])=>`
         <div class="toggle-row"><span class="tgl-label">${l}</span><div class="tgl ${s}"></div></div>`).join('')}
       </div>
       <div class="modal-foot">
-        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-        <button class="btn btn-white" onclick="closeModal()">Save</button>
+        <button class="btn btn-ghost" onclick="closeModal()">${t('set_cancel')}</button>
+        <button class="btn btn-white" onclick="saveSettings()">${t('set_save')}</button>
       </div>
     </div>`,
 
@@ -1770,6 +1946,39 @@ function tickFlash(el,val){
   setTimeout(()=>{el.textContent=val;el.style.opacity='1';},120);
 }
 
+/* language select inside settings modal */
+function selectLang(lang){
+  // update card visuals immediately
+  ['en','zh'].forEach(l=>{
+    const el=document.getElementById('lang-'+l);
+    if(!el)return;
+    const active=l===lang;
+    el.style.border=active?'1px solid rgba(255,255,255,.35)':'1px solid var(--b1)';
+    el.style.background=active?'var(--s4)':'transparent';
+    el.style.color=active?'var(--t1)':'var(--t3)';
+  });
+  LANG=lang;
+}
+
+function saveSettings(){
+  localStorage.setItem('aaa_lang',LANG);
+  closeModal();
+  applyI18n();
+  // brief toast
+  const toast=document.createElement('div');
+  toast.textContent=LANG==='zh'?'设置已保存':'Settings saved';
+  toast.style.cssText=`position:fixed;bottom:40px;left:50%;transform:translateX(-50%);
+    background:var(--s3);border:1px solid var(--b3);border-radius:7px;
+    padding:8px 18px;font-size:12px;color:var(--t1);z-index:9999;
+    animation:ctxin .15s var(--ease) both;pointer-events:none`;
+  document.body.appendChild(toast);
+  setTimeout(()=>{
+    toast.style.transition='opacity .3s';
+    toast.style.opacity='0';
+    setTimeout(()=>toast.remove(),320);
+  },1600);
+}
+
 function setSib(el){document.querySelectorAll('.sib').forEach(s=>s.classList.remove('on'));el.classList.add('on')}
 function setTab(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on')}
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
@@ -1877,6 +2086,7 @@ window.addEventListener('load',()=>{
   setTimeout(startTicker,1800);
   setTimeout(startSignalBubbles,2500);
   setTimeout(startLPTicker,1200);
+  setTimeout(applyI18n,300);  // apply saved language
 });
 </script>
 </body>
