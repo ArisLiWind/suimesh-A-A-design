@@ -332,6 +332,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 }
 .node:hover{border-color:var(--b3);box-shadow:0 0 0 2px rgba(51,85,204,.2),0 8px 32px rgba(0,0,0,.6),0 0 0 1px rgba(51,85,204,.1) inset}
 .node.sel{border-color:var(--blue);box-shadow:0 0 0 2px rgba(51,85,204,.35),0 0 32px rgba(51,85,204,.2),0 12px 40px rgba(0,0,0,.7)}
+.node.sel.node-mine{
+  transform:scale(1.08);
+  border-color:#6090ff;
+  box-shadow:0 0 0 3px rgba(80,130,255,.5),0 0 60px rgba(60,100,255,.35),0 20px 60px rgba(0,0,30,.8);
+  z-index:50;
+}
 .node.drag{box-shadow:0 20px 60px rgba(0,0,0,.7);z-index:1000}
 @keyframes nin{from{opacity:0;transform:scale(.88) translateY(6px)}to{opacity:1;transform:none}}
 .node{animation:nin .35s var(--easeb) both}
@@ -944,12 +950,16 @@ const I18N = {
     ep_transmits:'What this edge transmits', ep_stats:'Live Stats',
     ep_msgs:'Recent Messages', ep_why:'Why A@A beats traditional bots',
     ep_disconnect:'Disconnect', ep_viewlog:'View Log',
-    nd_mine:'My Trading Agent', nd_mine_type:'Personal Agent',
-    nd_market:'Market Data', nd_market_type:'Data Source',
-    nd_news:'News Sentinel', nd_news_type:'News + Sentiment',
-    nd_ai:'AI Analyzer', nd_ai_type:'LLM Signal',
+    nd_fundamentals:'基本面分析师', nd_fundamentals_type:'分析师',
+    nd_sentiment:'情绪分析师', nd_sentiment_type:'分析师',
+    nd_news:'新闻分析师', nd_news_type:'分析师',
+    nd_technical:'技术分析师', nd_technical_type:'分析师',
+    nd_bull:'看涨研究员', nd_bull_type:'研究员',
+    nd_bear:'看空研究员', nd_bear_type:'研究员',
+    nd_trader:'交易员 Agent', nd_trader_type:'交易决策',
+    nd_risk:'风险经理', nd_risk_type:'风险管理',
+    nd_portfolio:'投资组合经理', nd_portfolio_type:'最终决策',
     nd_copy:'@AlphaMesh Pro', nd_copy_type:'Strategy Agent',
-    nd_risk:'Risk Guard', nd_risk_type:'Protection Layer',
     st_active:'Active', st_streaming:'Streaming', st_following:'Following',
     st_watching:'Watching', st_offline:'Offline',
     set_title:'Settings', set_agent:'Agent Defaults', set_pos:'Default Position Size (%)',
@@ -979,12 +989,8 @@ const I18N = {
     ep_transmits:'此连接传输的内容', ep_stats:'实时统计',
     ep_msgs:'近期消息', ep_why:'为什么 A@A 赚得更多',
     ep_disconnect:'断开连接', ep_viewlog:'查看日志',
-    nd_mine:'我的交易 Agent', nd_mine_type:'个人 Agent',
     nd_market:'行情数据', nd_market_type:'数据源',
-    nd_news:'新闻哨兵', nd_news_type:'资讯 + 情绪',
-    nd_ai:'AI 分析器', nd_ai_type:'LLM 信号',
     nd_copy:'@AlphaMesh Pro', nd_copy_type:'策略 Agent',
-    nd_risk:'风险守卫', nd_risk_type:'保护层',
     st_active:'运行中', st_streaming:'流式接入', st_following:'跟单中',
     st_watching:'监控中', st_offline:'离线',
     set_title:'设置', set_agent:'Agent 默认参数', set_pos:'默认仓位大小 (%)',
@@ -1092,17 +1098,90 @@ function applyI18n(){
 }
 
 const NDEFS = {
-  mine:  {label:'My Trading Agent',type:'Personal Agent',   icon:'🤖',col:'w', st:'active',   metric:'+12.4%',mc:'pos',id:'mine'},
-  market:{label:'Market Data',     type:'Data Source',      icon:'📊',col:'c', st:'streaming', metric:'1,240/s', mc:'info',id:'market'},
-  news:  {label:'News Sentinel',   type:'News + Sentiment', icon:'📰',col:'y', st:'active',   metric:'Bullish 78%',mc:'pos',id:'news'},
-  ai:    {label:'AI Analyzer',     type:'LLM Signal',       icon:'🧠',col:'p', st:'active',   metric:'Conf. 87%',mc:'muted',id:'ai'},
-  copy:  {label:'@AlphaMesh Pro',  type:'Strategy Agent',   icon:'◈', col:'g', st:'following', metric:'+28.7%',mc:'pos',id:'copy'},
-  risk:  {label:'Risk Guard',      type:'Protection Layer', icon:'🛡', col:'y', st:'watching', metric:'DD 8% limit',mc:'warn',id:'risk'},
+  // ── Analyst Team ──
+  fundamentals:{label:'Fundamentals',  type:'Analyst',        icon:'📈',col:'c', st:'active',   metric:'P/E 18.4', mc:'pos',  id:'fundamentals'},
+  sentiment:   {label:'Sentiment',     type:'Analyst',        icon:'💬',col:'y', st:'active',   metric:'Bullish 72%',mc:'pos', id:'sentiment'},
+  news:        {label:'News Analyst',  type:'Analyst',        icon:'📰',col:'y', st:'active',   metric:'24 signals',mc:'muted',id:'news'},
+  technical:   {label:'Technical',     type:'Analyst',        icon:'📊',col:'c', st:'active',   metric:'MACD ↑',   mc:'pos',  id:'technical'},
+  // ── Researcher Team ──
+  bull:        {label:'Bull Researcher',type:'Researcher',    icon:'🐂',col:'g', st:'active',   metric:'LONG bias', mc:'pos',  id:'bull'},
+  bear:        {label:'Bear Researcher',type:'Researcher',    icon:'🐻',col:'r', st:'active',   metric:'Risk watch',mc:'warn', id:'bear'},
+  // ── Decision Layer ──
+  trader:      {label:'Trader Agent',  type:'Trader',         icon:'⚡',col:'b', st:'active',   metric:'+12.4%',   mc:'pos',  id:'trader'},
+  risk:        {label:'Risk Manager',  type:'Risk Management',icon:'🛡',col:'y', st:'watching', metric:'DD 3.2%',  mc:'warn', id:'risk'},
+  portfolio:   {label:'Portfolio Mgr', type:'Portfolio Manager',icon:'💼',col:'g',st:'active',  metric:'$12,840',  mc:'pos',  id:'portfolio'},
 };
-const STMAP = {active:'g',streaming:'b',following:'g',watching:'y',offline:'x'};
-const ECOLS = {data:'#06b6d4',signal:'#8b5cf6',copy:'#22c55e',guard:'#f59e0b'};
+const STMAP = {active:'g',streaming:'b',following:'g',watching:'y',offline:'x',r:'r'};
+const ECOLS = {data:'rgba(100,150,220,0.8)',signal:'rgba(140,100,220,0.8)',copy:'rgba(60,170,130,0.8)',guard:'rgba(200,160,60,0.8)'};
 
-// Edge interaction data — what flows through each edge + intelligence advantage
+// TradingAgents edge data — what each agent passes to the next
+const EDGE_DATA = {
+  'fundamentals->bull':{
+    type:'data',label:'Fundamentals → Bull Research',
+    desc:'Company financials, P/E ratios, earnings reports, balance sheet health, intrinsic value estimates. Bullish researcher uses this to build the LONG thesis.',
+    payload:'{"pe_ratio":18.4,"eps_growth":0.14,"revenue_trend":"up","debt_ratio":0.32,"signal":"undervalued"}',
+    stats:[{l:'P/E Ratio',v:'18.4',c:'pos'},{l:'EPS Growth',v:'+14%',c:'pos'},{l:'Debt/Equity',v:'0.32',c:''},{l:'Signal',v:'BUY',c:'pos'}],
+    log:[{t:'09:14',msg:'Q3 earnings beat by 12% — revenue $4.2B vs est $3.7B',val:'Score: +0.88',vc:'pos'},{t:'09:08',msg:'P/E below sector median (18.4 vs 22.1)',val:'Undervalued',vc:'pos'},{t:'08:55',msg:'Free cash flow positive for 6 consecutive quarters',val:'+$840M FCF',vc:'pos'},{t:'08:40',msg:'Debt ratio improved from 0.45 to 0.32',val:'Balance improved',vc:'pos'}]
+  },
+  'fundamentals->bear':{
+    type:'data',label:'Fundamentals → Bear Research',
+    desc:'Same financial data passed to the bearish researcher, who looks for red flags: high valuation, debt risks, margin compression.',
+    payload:'{"pe_ratio":18.4,"margin_compression":0.02,"insider_selling":true,"signal":"overvalued_risk"}',
+    stats:[{l:'P/E Ratio',v:'18.4',c:''},{l:'Insider Sell',v:'Yes',c:'neg'},{l:'Margin Δ',v:'−2%',c:'neg'},{l:'Risk',v:'MEDIUM',c:'warn'}],
+    log:[{t:'09:14',msg:'Insider selling detected: CFO sold 50k shares',val:'Risk flag',vc:'neg'},{t:'09:08',msg:'Operating margin compressed 2% YoY',val:'Trend concern',vc:'neg'},{t:'08:50',msg:'Sector competition intensifying — 3 new entrants',val:'Moat risk',vc:'warn'},{t:'08:30',msg:'Macro headwinds: rising rates affect valuation',val:'DCF impact',vc:'warn'}]
+  },
+  'sentiment->bull':{
+    type:'data',label:'Sentiment → Bull Research',
+    desc:'Aggregated sentiment from StockTwits, Reddit, news headlines. Bullish researcher weights positive sentiment as demand signal.',
+    payload:'{"overall_score":0.72,"news_sentiment":0.81,"social_sentiment":0.64,"sources":847}',
+    stats:[{l:'Overall',v:'72% Bull',c:'pos'},{l:'News',v:'0.81',c:'pos'},{l:'Social',v:'0.64',c:'pos'},{l:'Sources',v:'847',c:''}],
+    log:[{t:'09:12',msg:'Twitter/X: #TICKER trending +240% in 2h',val:'Score: +0.85',vc:'pos'},{t:'09:05',msg:'Reddit r/investing: 94% bullish posts',val:'Score: +0.78',vc:'pos'},{t:'08:58',msg:'News sentiment: 18/22 articles positive',val:'Score: +0.81',vc:'pos'}]
+  },
+  'technical->bull':{
+    type:'signal',label:'Technical → Bull Research',
+    desc:'MACD crossover, RSI levels, moving average positions, volume analysis. Technical signals that support the bullish case.',
+    payload:'{"macd":"bullish_cross","rsi":58,"above_ma200":true,"volume_trend":"increasing","signal":"BUY"}',
+    stats:[{l:'MACD',v:'Bull Cross',c:'pos'},{l:'RSI',v:'58',c:'pos'},{l:'MA200',v:'Above',c:'pos'},{l:'Volume',v:'↑ +34%',c:'pos'}],
+    log:[{t:'09:14',msg:'MACD bullish crossover confirmed on 4H chart',val:'Signal: BUY',vc:'pos'},{t:'09:06',msg:'Price broke above 20-day EMA with volume',val:'+2.1%',vc:'pos'},{t:'08:50',msg:'RSI: 58 — momentum building, not overbought',val:'RSI safe',vc:'pos'}]
+  },
+  'technical->bear':{
+    type:'signal',label:'Technical → Bear Research',
+    desc:'Same technical data, bearish researcher looks for resistance levels, divergences, potential reversal signals.',
+    payload:'{"resistance":0.89,"rsi_divergence":false,"support":0.81,"risk":"moderate"}',
+    stats:[{l:'Resistance',v:'0.891',c:'warn'},{l:'Support',v:'0.810',c:''},{l:'Divergence',v:'None',c:'pos'},{l:'Risk',v:'Moderate',c:'warn'}],
+    log:[{t:'09:10',msg:'Key resistance at 0.891 — previous high',val:'Watch level',vc:'warn'},{t:'09:00',msg:'Bollinger bands narrow — breakout or fake-out?',val:'Caution',vc:'warn'}]
+  },
+  'bull->trader':{
+    type:'signal',label:'Bull Research → Trader',
+    desc:'Bullish researcher final report after debating with bear. Includes risk-adjusted LONG thesis with confidence score.',
+    payload:'{"recommendation":"LONG","confidence":0.82,"target":0.91,"thesis":"fundamentals+sentiment aligned","risk_adjusted":true}',
+    stats:[{l:'Signal',v:'LONG',c:'pos'},{l:'Confidence',v:'82%',c:'pos'},{l:'Target',v:'0.91',c:'pos'},{l:'Stop',v:'0.81',c:''}],
+    log:[{t:'09:16',msg:'Bull thesis: EPS growth + positive sentiment = sustained uptrend',val:'Conf: 82%',vc:'pos'},{t:'09:14',msg:'Debate concluded: bull wins 3/4 arguments',val:'LONG',vc:'pos'}]
+  },
+  'bear->trader':{
+    type:'signal',label:'Bear Research → Trader',
+    desc:'Bearish researcher counter-arguments after debate. Trader weighs both sides to make final decision.',
+    payload:'{"recommendation":"CAUTION","risk_flags":["insider_selling","resistance_0.89"],"confidence":0.45}',
+    stats:[{l:'Signal',v:'CAUTION',c:'warn'},{l:'Confidence',v:'45%',c:'warn'},{l:'Risk Flags',v:'2',c:'neg'},{l:'Weight',v:'18%',c:''}],
+    log:[{t:'09:16',msg:'Bear flag: insider selling is a red flag — size down',val:'Risk: Moderate',vc:'warn'},{t:'09:14',msg:'Resistance at 0.891 should limit upside in short term',val:'Cap risk',vc:'warn'}]
+  },
+  'trader->risk':{
+    type:'guard',label:'Trader → Risk Manager',
+    desc:'Trader proposed order sent to Risk Manager for approval. Includes trade size, entry, TP, SL, and position rationale.',
+    payload:'{"action":"BUY","ticker":"SUI","size":500,"entry":0.8421,"tp":0.91,"sl":0.81,"rationale":"bull_thesis_confirmed"}',
+    stats:[{l:'Action',v:'BUY',c:'pos'},{l:'Size',v:'$500',c:''},{l:'TP',v:'0.91',c:'pos'},{l:'SL',v:'0.81',c:'neg'}],
+    log:[{t:'09:17',msg:'Proposed: BUY SUI $500 @ 0.8421 — bull thesis confirmed',val:'Awaiting risk approval',vc:''},{t:'09:16',msg:'Position sizing: 5% portfolio, within limits',val:'Size OK',vc:'pos'}]
+  },
+  'risk->portfolio':{
+    type:'guard',label:'Risk Manager → Portfolio Manager',
+    desc:'Risk Manager assessment report. Checks drawdown, daily loss, portfolio concentration, volatility. Sends approved/rejected signal to Portfolio Manager.',
+    payload:'{"approved":true,"dd_check":"PASS","daily_loss":"PASS","concentration":"PASS","vol_check":"PASS","adjusted_size":500}',
+    stats:[{l:'Decision',v:'APPROVED',c:'pos'},{l:'DD Check',v:'PASS',c:'pos'},{l:'Vol Check',v:'PASS',c:'pos'},{l:'Adjusted',v:'$500',c:''}],
+    log:[{t:'09:18',msg:'All risk checks passed — DD 3.2%<8%, daily loss 1.8%<3%',val:'APPROVED',vc:'pos'},{t:'09:17',msg:'Portfolio concentration: SUI will be 4.2% — within 10% cap',val:'Conc OK',vc:'pos'},{t:'09:16',msg:'Volatility index 24 (Low) — normal market conditions',val:'Vol OK',vc:'pos'}]
+  },
+};
+
+// Intelligence comparison
 const INTEL_VS = [
   {label:'Signal Sources',trad:'Price feed only — reacts after move',aaa:'8 sources fused: price + order book + news + sentiment + on-chain + AI reasoning',delta:'+340% signal breadth'},
   {label:'Decision Latency',trad:'Rule fires in ~500ms (after candle close)',aaa:'Continuous streaming — decision in <50ms from signal detection',delta:'10× faster reaction'},
@@ -1112,44 +1191,6 @@ const INTEL_VS = [
   {label:'Copy-Trading',trad:'Blind mirror — copies every trade 1:1',aaa:'Follower Agent runs own Risk Guard — filters/scales copied trades per personal params',delta:'Intelligent copy'},
 ];
 
-const EDGE_DATA = {
-  'market->mine':{
-    type:'data',label:'Market Data Feed',
-    desc:'Raw OHLCV price data, order book depth and real-time tick stream from Binance CEX, pushed to My Trading Agent every 250ms.',
-    payload:'{"pair":"SUI/USDC","close":0.8421,"volume":128400,"bid":0.8420,"ask":0.8422,"ts":1748000000}',
-    stats:[{l:'Tick Rate',v:'1,240/s',c:'info'},{l:'Latency',v:'4ms',c:'pos'},{l:'Today Msgs',v:'5.2M',c:''},{l:'Data Cost',v:'$0.00',c:'pos'}],
-    log:[
-      {t:'09:14:32',msg:'Price breakout detected: SUI/USDC cross above EMA20',val:'0.8421 → 0.8452',vc:'pos'},
-      {t:'09:13:58',msg:'Volume spike: +34% above 20-period average',val:'Vol: 128,400',vc:'info'},
-      {t:'09:12:11',msg:'Bid-ask spread normalized after volatility',val:'Spread: 0.0002',vc:''},
-      {t:'09:10:44',msg:'New candle closed bullish (4H)',val:'+2.1%',vc:'pos'},
-    ]
-  },
-  'news->mine':{
-    type:'data',label:'News Sentiment Signal',
-    desc:'Processed NLP sentiment scores from 24 articles in the past 2 hours, scraped from RSS feeds, Twitter/X, and on-chain governance discussions.',
-    payload:'{"sentiment":0.78,"label":"BULLISH","articles":24,"top_keyword":"Sui ecosystem","confidence":0.84}',
-    stats:[{l:'Sentiment',v:'Bullish 78%',c:'pos'},{l:'Articles',v:'24',c:''},{l:'Latency',v:'~30s',c:''},{l:'Sources',v:'8 feeds',c:''}],
-    log:[
-      {t:'09:14:01',msg:'Positive article: "Sui TVL reaches all-time high"',val:'Score: +0.91',vc:'pos'},
-      {t:'09:11:22',msg:'Social signal: Sui trending on Twitter/X (+240%)',val:'Score: +0.85',vc:'pos'},
-      {t:'09:08:55',msg:'Neutral article: DeFi market overview',val:'Score: +0.52',vc:''},
-      {t:'09:02:10',msg:'Aggregated score updated → Bullish threshold crossed',val:'0.72 → 0.78',vc:'pos'},
-    ]
-  },
-  'ai->mine':{
-    type:'signal',label:'AI Decision Signal',
-    desc:'GPT-4o analyzes the combined market data + news sentiment and outputs a structured trading recommendation with confidence score and reasoning.',
-    payload:'{"action":"LONG","asset":"SUI/USDC","confidence":0.87,"size_pct":5,"reasoning":"Bullish alignment: technical breakout + sentiment","tp":0.91,"sl":0.81}',
-    stats:[{l:'Signal',v:'LONG',c:'pos'},{l:'Confidence',v:'87%',c:'pos'},{l:'Model',v:'GPT-4o',c:''},{l:'Tokens',v:'2.4k',c:''}],
-    log:[
-      {t:'09:14:28',msg:'LONG signal generated: SUI/USDC — high confidence',val:'Conf: 87%',vc:'pos'},
-      {t:'09:13:50',msg:'Context window updated with latest 4H candle data',val:'2,400 tokens',vc:'info'},
-      {t:'09:10:00',msg:'Previous signal: HOLD — awaiting breakout confirmation',val:'Conf: 61%',vc:''},
-      {t:'09:02:00',msg:'Sentiment data ingested from News Sentinel',val:'Score: 0.78',vc:'pos'},
-    ]
-  },
-};
 
 let nodes={},edges=[],scale=1,ox=0,oy=0;
 let isPan=false,panS=null,panO=null;
@@ -1162,18 +1203,44 @@ let selNode=null,selEdge=null,tool='sel',palOpen=false;
 function init(){
   const cv=document.getElementById('cv');
   const cw=cv.offsetWidth,ch=cv.offsetHeight;
-  const cx=cw/2-86,cy=ch/2-60,r=210;
+  // TradingAgents layered topology:
+  // Layer 1 (Analysts) → Layer 2 (Researchers) → Layer 3 (Trader) → Layer 4 (Risk/Portfolio)
+  const lw = cw > 900 ? cw : 900;
+  const lh = ch > 500 ? ch : 500;
+  const nw = 130; // node width
   const layout={
-    mine:  {x:cx,      y:cy},
-    market:{x:cx-r,    y:cy-90},
-    news:  {x:cx-r+10, y:cy+130},
-    ai:    {x:cx+r-10, y:cy+120},
+    // Layer 1: Analysts (top)
+    fundamentals:{x: lw*0.08,  y: lh*0.06},
+    sentiment:   {x: lw*0.08,  y: lh*0.31},
+    news:        {x: lw*0.08,  y: lh*0.56},
+    technical:   {x: lw*0.08,  y: lh*0.80},
+    // Layer 2: Researchers (middle-left)
+    bull:        {x: lw*0.34,  y: lh*0.18},
+    bear:        {x: lw*0.34,  y: lh*0.62},
+    // Layer 3: Trader (center)
+    trader:      {x: lw*0.58,  y: lh*0.38},
+    // Layer 4: Risk + Portfolio (right)
+    risk:        {x: lw*0.78,  y: lh*0.20},
+    portfolio:   {x: lw*0.78,  y: lh*0.58},
   };
-  ['mine','market','news','ai'].forEach((id,i)=>spawnNode(id,layout[id].x,layout[id].y,i*70));
+  const spawnOrder=['fundamentals','sentiment','news','technical','bull','bear','trader','risk','portfolio'];
+  spawnOrder.forEach((id,i)=>spawnNode(id,layout[id].x,layout[id].y,i*55));
   edges=[
-    {from:'market',to:'mine',type:'data'},
-    {from:'news',  to:'mine',type:'data'},
-    {from:'ai',    to:'mine',type:'signal'},
+    // Analysts → Researchers
+    {from:'fundamentals',to:'bull',  type:'data'},
+    {from:'fundamentals',to:'bear',  type:'data'},
+    {from:'sentiment',   to:'bull',  type:'data'},
+    {from:'sentiment',   to:'bear',  type:'data'},
+    {from:'news',        to:'bull',  type:'data'},
+    {from:'news',        to:'bear',  type:'data'},
+    {from:'technical',   to:'bull',  type:'signal'},
+    {from:'technical',   to:'bear',  type:'signal'},
+    // Researchers debate → Trader
+    {from:'bull',  to:'trader',  type:'signal'},
+    {from:'bear',  to:'trader',  type:'signal'},
+    // Trader → Risk → Portfolio
+    {from:'trader',    to:'risk',      type:'guard'},
+    {from:'risk',      to:'portfolio', type:'guard'},
   ];
   setTimeout(drawEdges,380);
   setTimeout(startParticles,1100);
@@ -1186,7 +1253,7 @@ function init(){
 function spawnNode(id,x,y,delay=0){
   const def=NDEFS[id]||{label:id,type:'Custom',icon:'⬡',col:'w',st:'active',metric:'—',mc:'muted',id};
   const el=document.createElement('div');
-  el.className='node';el.id='nd-'+id;
+  el.className='node'+(id==='mine'?' node-mine':'');el.id='nd-'+id;
   el.style.cssText=`left:${x}px;top:${y}px;animation-delay:${delay}ms`;
   el.innerHTML=`
     <div class="n-top">
@@ -1349,7 +1416,7 @@ function showNodePanel(id){
     <div class="ph-close" onclick="clearSel()">✕</div>`;
 
   /* ══ MY TRADING AGENT — Binance-style panel ══ */
-  if(id==='mine'){
+  if(id==='mine'||id==='trader'){
     const price=(0.8420+Math.random()*.003).toFixed(4);
     document.getElementById('pb').innerHTML=`
     <!-- Price header -->
@@ -1431,6 +1498,21 @@ function showNodePanel(id){
       </div>
     </div>`;
 
+    // Append chat box to pb
+    document.getElementById('pb').innerHTML += `
+    <div id="mine-chat" style="border-top:1px solid var(--b2);padding:12px 14px">
+      <div style="font-size:9px;color:var(--blue2);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:8px">
+        ${L?'指挥 Agent':'Command Agent'}
+      </div>
+      <div id="mine-chat-log" style="max-height:140px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px"></div>
+      <div style="display:flex;gap:6px">
+        <input id="mine-chat-input" style="flex:1;padding:7px 10px;background:var(--s3);border:1px solid var(--b2);border-radius:8px;color:var(--t1);font-size:12px;font-family:inherit;outline:none" 
+          placeholder="${L?'输入指令，例如：暂停跟单...':'e.g. Pause copy-trade...'}"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();sendMineChat()}">
+        <button onclick="sendMineChat()" style="padding:7px 12px;border-radius:8px;background:var(--blue);color:#fff;border:none;cursor:pointer;font-size:12px;font-family:inherit;font-weight:600;transition:all .15s" onmouseover="this.style.background='var(--blue2)'" onmouseout="this.style.background='var(--blue)'">↑</button>
+      </div>
+    </div>`;
+
     document.getElementById('pa').innerHTML=`
       <button class="pab pab-ghost" onclick="clearSel()">${L?'关闭':'Close'}</button>
       <button class="pab pab-white" onclick="openModal('config_mine')">${L?'配置':'Configure'}</button>
@@ -1449,18 +1531,30 @@ function showNodePanel(id){
 
   /* ── OTHER NODES ── */
   const mdata={
-    market:[{l:L?'推送频率':'Tick Rate',v:'1,240/s',c:'info'},{l:L?'延迟':'Latency',v:'4ms',c:'pos'},{l:L?'数据源':'Source',v:'Binance',c:''},{l:L?'交易对':'Pair',v:'SUI/USDC',c:''}],
-    news:  [{l:L?'情绪':'Sentiment',v:L?'看涨':'Bullish',c:'pos'},{l:L?'分值':'Score',v:'78%',c:'pos'},{l:L?'文章数':'Articles',v:'24',c:''},{l:L?'更新':'Updated',v:'2m ago',c:''}],
-    ai:    [{l:L?'置信度':'Confidence',v:'87%',c:'pos'},{l:L?'信号':'Signal',v:L?'做多':'LONG',c:'pos'},{l:L?'模型':'Model',v:'GPT-4o',c:''},{l:L?'令牌':'Tokens',v:'2.4k',c:''}],
-    copy:  [{l:L?'30日收益':'30D ROI',v:'+28.7%',c:'pos'},{l:'Sharpe',v:'2.14',c:''},{l:L?'最大回撤':'Max DD',v:'−3.2%',c:'neg'},{l:L?'跟随者':'Followers',v:'1,240',c:''}],
-    risk:  [{l:L?'回撤上限':'DD Limit',v:'8%',c:'warn'},{l:L?'日亏损':'Daily Loss',v:'3%',c:'warn'},{l:L?'波动阈值':'Vol Gate',v:'40',c:''},{l:L?'状态':'Status',v:L?'监控中':'Watching',c:'warn'}],
+    fundamentals:[{l:'P/E',v:'18.4',c:'pos'},{l:'EPS Growth',v:'+14%',c:'pos'},{l:'FCF',v:'+$840M',c:'pos'},{l:'Signal',v:'BUY',c:'pos'}],
+    sentiment:   [{l:L?'情绪分':'Sentiment',v:'72% Bull',c:'pos'},{l:L?'新闻':'News',v:'0.81',c:'pos'},{l:L?'社交':'Social',v:'0.64',c:'pos'},{l:L?'来源数':'Sources',v:'847',c:''}],
+    news:        [{l:L?'文章数':'Articles',v:'24',c:''},{l:L?'正面':'Positive',v:'18/24',c:'pos'},{l:L?'宏观':'Macro',v:'Neutral',c:''},{l:L?'更新':'Updated',v:'2m ago',c:''}],
+    technical:   [{l:'MACD',v:'Bull Cross',c:'pos'},{l:'RSI',v:'58',c:'pos'},{l:'MA200',v:'Above',c:'pos'},{l:L?'成交量':'Volume',v:'↑ +34%',c:'pos'}],
+    bull:        [{l:L?'信心':'Confidence',v:'82%',c:'pos'},{l:L?'信号':'Signal',v:'LONG',c:'pos'},{l:L?'目标':'Target',v:'0.91',c:'pos'},{l:L?'止损':'Stop',v:'0.81',c:''}],
+    bear:        [{l:L?'风险':'Risk',v:'Moderate',c:'warn'},{l:L?'信号':'Signal',v:'CAUTION',c:'warn'},{l:L?'红旗数':'Flags',v:'2',c:'neg'},{l:L?'权重':'Weight',v:'18%',c:''}],
+    trader:      [{l:L?'30日收益':'30D ROI',v:'+12.4%',c:'pos'},{l:'Sharpe',v:'1.82',c:''},{l:L?'最大回撤':'Max DD',v:'−4.1%',c:'neg'},{l:L?'胜率':'Win Rate',v:'67%',c:'pos'}],
+    risk:        [{l:L?'回撤':'Drawdown',v:'3.2%',c:'warn'},{l:L?'日亏损':'Daily Loss',v:'1.8%',c:'warn'},{l:L?'波动率':'Volatility',v:'24 Low',c:'pos'},{l:L?'状态':'Status',v:L?'监控中':'Watching',c:'warn'}],
+    portfolio:   [{l:L?'总资产':'Portfolio',v:'$12,840',c:'pos'},{l:L?'今日盈亏':'Today',v:'+$204',c:'pos'},{l:L?'持仓数':'Positions',v:'3',c:''},{l:L?'批准':'Approved',v:'Yes',c:'pos'}],
+    copy:        [{l:'30D ROI',v:'+28.7%',c:'pos'},{l:'Sharpe',v:'2.14',c:''},{l:'Max DD',v:'−3.2%',c:'neg'},{l:'Followers',v:'1,240',c:''}],
+    market:      [{l:'Tick Rate',v:'1,240/s',c:'info'},{l:'Latency',v:'4ms',c:'pos'},{l:'Source',v:'Binance',c:''},{l:'Pair',v:'SUI/USDC',c:''}],
   };
   const tags={
-    market:['CEX',L?'实时':'Real-time','WebSocket'],
-    news:  ['RSS','Twitter','NLP','GPT'],
-    ai:    ['GPT-4o',L?'多模态':'Multi-modal','Auto-retry'],
-    copy:  [L?'前1%':'Top 1%',L?'已认证':'Verified','148d live'],
-    risk:  [L?'链上':'On-chain',L?'自动暂停':'Auto-pause',L?'可配置':'Configurable'],
+    fundamentals:['Financials','P/E','EPS','FCF'],
+    sentiment:   ['StockTwits','Reddit','News NLP',L?'情绪':'Sentiment'],
+    news:        ['Global News','Macro','Events',L?'影响力':'Impact'],
+    technical:   ['MACD','RSI','EMA','Bollinger'],
+    bull:        [L?'做多偏向':'LONG bias',L?'基本面':'Fundamentals','Debate'],
+    bear:        [L?'做空偏向':'SHORT bias',L?'风险分析':'Risk','Debate'],
+    trader:      ['SUI/USDC','LangGraph','GPT-4o',L?'多Agent':'Multi-Agent'],
+    risk:        [L?'回撤':'Drawdown',L?'波动率':'Volatility',L?'集中度':'Concentration'],
+    portfolio:   [L?'最终决策':'Final Decision','Executor',L?'审批':'Approver'],
+    copy:        [L?'前1%':'Top 1%',L?'已认证':'Verified','148d live'],
+    market:      ['CEX',L?'实时':'Real-time','WebSocket'],
   };
   let body='';
   if(id==='copy'){body+=`<div class="ps"><div class="pst">${t('insp_perf')}</div><div class="pchart"><div class="pchart-val pos">+28.7%</div><div class="pchart-delta pos">▲ 30D</div><svg width="100%" height="100%" viewBox="0 0 316 54" preserveAspectRatio="none" style="opacity:.5"><defs><linearGradient id="pcg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--acc-g)" stop-opacity=".3"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs><polygon points="0,48 40,40 80,44 120,32 160,24 200,16 240,8 280,4 316,1 316,54 0,54" fill="url(#pcg3)"/><polyline points="0,48 40,40 80,44 120,32 160,24 200,16 240,8 280,4 316,1" fill="none" stroke="var(--acc-g)" stroke-width="1.5"/></svg></div></div>`;}
@@ -1706,7 +1800,7 @@ function updateMM(){
 function updateSBar(){
   document.getElementById('sbn').textContent=Object.keys(nodes).length;
   document.getElementById('sbe').textContent=edges.length;
-  document.getElementById('sba').textContent=Math.min(Object.keys(nodes).length,edges.length+1);
+  document.getElementById('sba').textContent=Object.keys(nodes).filter(id=>nodes[id]&&nodes[id].def.st==='active').length;
 }
 
 /* ═══════════════════════════════════════
@@ -2667,12 +2761,15 @@ document.addEventListener('keydown',e=>{
    LIVE TICKER — real-time number pulse
 ═══════════════════════════════════════ */
 const LIVE_METRICS = {
-  mine:   [{id:'mine_roi',   base:12.4,  delta:0.05,  fmt:v=>`+${v.toFixed(1)}%`,    el:null},
-           {id:'mine_pnl',  base:204,   delta:8,     fmt:v=>`+$${Math.round(v)}`,    el:null}],
-  market: [{id:'mkt_tick',  base:1240,  delta:40,    fmt:v=>`${Math.round(v)}/s`,    el:null},
-           {id:'mkt_price', base:0.8421,delta:0.0003,fmt:v=>v.toFixed(4),            el:null}],
-  news:   [{id:'nws_sent',  base:78,    delta:1,     fmt:v=>`${Math.round(v)}%`,     el:null}],
-  ai:     [{id:'ai_conf',   base:87,    delta:0.5,   fmt:v=>`${v.toFixed(0)}%`,      el:null}],
+  fundamentals:[{base:18.4, delta:0.08,fmt:v=>'P/E '+v.toFixed(1)}],
+  sentiment:   [{base:72,   delta:1.2, fmt:v=>Math.round(v)+'% Bull'}],
+  news:        [{base:24,   delta:2,   fmt:v=>Math.round(v)+' signals'}],
+  technical:   [{base:58,   delta:1.5, fmt:v=>'RSI '+Math.round(v)}],
+  bull:        [{base:82,   delta:1,   fmt:v=>'Conf '+Math.round(v)+'%'}],
+  bear:        [{base:45,   delta:2,   fmt:v=>'Risk '+Math.round(v)+'%'}],
+  trader:      [{base:12.4, delta:0.1, fmt:v=>'+'+v.toFixed(1)+'%'}],
+  risk:        [{base:3.2,  delta:0.1, fmt:v=>'DD '+v.toFixed(1)+'%'}],
+  portfolio:   [{base:12840,delta:50,  fmt:v=>'$'+Math.round(v).toLocaleString()}],
 };
 
 function startTicker(){
@@ -2697,9 +2794,15 @@ function startTicker(){
    SIGNAL BUBBLE — floating msg on edges
 ═══════════════════════════════════════ */
 const SIGNAL_MSGS = {
-  'market->mine': ['Price: 0.8421','Vol spike +34%','EMA cross ↑','RSI: 58','OB depth: 2.4M'],
-  'news->mine':   ['Bullish 78%','Sui TVL ATH','Sentiment ↑','24 articles','Score: 0.84'],
-  'ai->mine':     ['LONG signal','Conf: 87%','TP: 0.91','SL: 0.81','Aligned ✓'],
+  'fundamentals->bull': ['P/E: 18.4','EPS +14%','FCF positive','Undervalued','Revenue ↑'],
+  'fundamentals->bear': ['Insider selling','Margin −2%','Competition ↑','DCF risk','Red flag'],
+  'sentiment->bull':    ['Bullish 72%','Social ↑','News positive','847 sources','Mood: LONG'],
+  'technical->bull':    ['MACD cross ↑','RSI: 58','Above MA200','Vol +34%','Signal: BUY'],
+  'technical->bear':    ['Resistance 0.891','Narrow BBands','Caution','Watch level','Range top'],
+  'bull->trader':       ['LONG thesis','Conf: 82%','Target: 0.91','Debate: win','Approved'],
+  'bear->trader':       ['Risk: Moderate','2 flags','Size down','Insider sell','Caution'],
+  'trader->risk':       ['BUY $500','Entry: 0.8421','TP: 0.91','SL: 0.81','Awaiting…'],
+  'risk->portfolio':    ['APPROVED','DD: PASS','Vol: PASS','Conc: PASS','Execute'],
 };
 
 function startSignalBubbles(){
